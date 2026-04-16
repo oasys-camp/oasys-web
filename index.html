@@ -45,18 +45,12 @@ body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',Geo
 /* GRAIN */
 body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");background-size:200px;opacity:0.6;}
 
-/* TOP BAR */
-.top-bar{position:fixed;top:0;left:0;right:0;z-index:101;height:28px;background:#C9A84C;border-bottom:1px solid rgba(0,0,0,0.15);overflow:hidden;display:flex;align-items:center;}
-.top-bar::before,.top-bar::after{content:'';position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none;}
-.top-bar::before{left:0;background:linear-gradient(to right,#C9A84C,transparent);}
-.top-bar::after{right:0;background:linear-gradient(to left,#C9A84C,transparent);}
-.top-tape{display:flex;gap:0;white-space:nowrap;animation:tape-scroll 50s linear infinite;}
-.top-tape-item{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:0 20px;border-right:1px solid rgba(0,0,0,0.12);display:flex;align-items:center;gap:7px;height:28px;flex-shrink:0;}
-.top-tape-item .tl{color:rgba(0,0,0,0.45);font-size:8px;}
-.top-tape-item .tv{color:rgba(0,0,0,0.85);font-weight:700;}
-.top-dot{width:5px;height:5px;border-radius:50%;background:rgba(0,0,0,0.7);box-shadow:0 0 6px rgba(0,0,0,0.4);animation:blink 2s ease-in-out infinite;}
+  /* ══════════ TOP BAR — TICKER (GOLD) + NAV  ══════════ */
+  .top-bar {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+  }
 
-/* TICKER — fondo verde OASYS (teal profundo) para distinguir del nav negro */
+  /* TICKER — fondo verde OASYS (teal profundo) para distinguir del nav negro */
   .ticker {
     padding:0.35rem 0;
     background:linear-gradient(90deg,
@@ -88,7 +82,8 @@ body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;bac
   .ticker .tv { font-family:var(--font-mono); font-size:0.5rem; letter-spacing:0.18em; color:#ffffff; opacity:1; font-weight:400; text-shadow:0 0 6px rgba(0,255,136,0.3); }
   .ticker .ts { color:#7fe5bf; opacity:0.5; font-size:0.5rem; }
   .ticker .tl.live::before { content:'● '; color:#ffd84a; animation:blink 1.5s step-end infinite; }
-  @keyframes scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }/* NAV */
+  @keyframes scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+/* NAV */
 nav{position:fixed;top:28px;left:0;right:0;z-index:100;display:flex;align-items:stretch;background:rgba(7,10,9,0.96);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);height:52px;overflow:hidden;}
 .nav-identity{display:flex;flex-direction:column;justify-content:center;padding:0 24px;border-right:1px solid var(--border);flex-shrink:0;min-width:260px;}
 .nav-id-top{font-family:'Orbitron',monospace;font-size:11px;color:var(--green);letter-spacing:0.12em;text-transform:uppercase;line-height:1;white-space:nowrap;font-weight:700;}
