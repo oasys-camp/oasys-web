@@ -1,345 +1,83 @@
 /*
-  OASYS BASE CAMP · CSS COMPARTIDO
-  Versión 1.0 · Abril 2026
-  Todas las webs del ecosistema OASYS usan este archivo.
-  Cambiar aquí = cambia en todas partes.
+  OASYS BASE CAMP · CSS EQUILIBRADO
+  Ticker y Nav diferenciados + Titular ajustado
 */
 
 /* ── GOOGLE FONTS ── */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap');
 
-/* ── VARIABLES GLOBALES ── */
 :root {
-  /* Colores principales */
-  --bg:           #060d08;
-  --teal:         #00D4AA;
-  --teal-dim:     rgba(0,212,170,0.15);
-  --teal-faint:   rgba(0,212,170,0.05);
-  --gold:         #C9A84C;
-  --gold-dim:     rgba(201,168,76,0.12);
-  --gold-faint:   rgba(201,168,76,0.05);
-  --cream:        #f0ece4;
-  --cream-dim:    rgba(240,236,228,0.6);
-  --cream-faint:  rgba(240,236,228,0.25);
-  --red:          #E84855;
-
-  /* Bordes */
-  --border:       rgba(0,212,170,0.12);
-  --border-gold:  rgba(201,168,76,0.2);
-  --border-cream: rgba(240,236,228,0.1);
-
-  /* Tipografías */
-  --font-title:   'Orbitron', monospace;
-  --font-body:    'Cormorant Garamond', Georgia, serif;
-  --font-mono:    'Share Tech Mono', monospace;
-
-  /* Espaciado */
-  --gap-sm:   8px;
-  --gap-md:   16px;
-  --gap-lg:   32px;
-  --gap-xl:   64px;
+  --bg: #060d08;
+  --teal: #00D4AA;
+  --gold: #C9A84C;
+  --cream: #f0ece4;
+  --font-title: 'Orbitron', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
 }
 
-/* ── RESET ── */
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ── TICKER (Banda Superior - Negro Puro) ── */
+.ticker-wrap {
+  background: #000000 !important; 
+  color: var(--gold) !important;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+  height: 30px;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
 }
 
-/* ── BASE ── */
-html { scroll-behavior: smooth; }
+/* ── NAV (Menú - Verde Bosque Transparente) ── */
+.nav-container {
+  background: rgba(10, 25, 15, 0.85) !important; /* Un tono verde muy oscuro, no negro */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0, 212, 170, 0.1);
+  top: 30px !important; /* Pegado debajo del ticker */
+  height: 55px;
+  z-index: 1000;
+}
 
+.nav-link {
+  color: var(--teal) !important;
+  font-family: var(--font-title);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+/* ── TITULAR LANDING (Ajustado, menos exagerado) ── */
+h1.hero-title {
+  font-family: var(--font-title) !important;
+  font-weight: 900 !important;
+  /* Tamaño más contenido */
+  font-size: clamp(1.8rem, 6vw, 3.8rem) !important; 
+  line-height: 1.1;
+  text-align: center;
+  /* Degradado suave */
+  background: linear-gradient(95deg, #ff4444 0%, #ffcc33 40%, #00ff88 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  /* Sombra sutil, no exagerada */
+  filter: drop-shadow(0 0 12px rgba(0, 212, 170, 0.15));
+}
+
+h1.hero-title span.a {
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+
+/* ── LIMPIEZA DE SECCIONES ── */
+#mission, #values, #contact, footer { 
+  display: none !important; 
+}
+
+/* ── RESET BÁSICO ── */
 body {
+  margin: 0;
   background: var(--bg);
   color: var(--cream);
-  font-family: var(--font-body);
-  font-size: 15px;
-  line-height: 1.75;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── TIPOGRAFÍA ── */
-h1, h2, h3, h4 {
-  font-family: var(--font-title);
-  color: var(--cream);
-  line-height: 1.15;
-  letter-spacing: 0.05em;
-}
-
-h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 900; }
-h2 { font-size: clamp(18px, 3vw, 28px); font-weight: 700; }
-h3 { font-size: clamp(14px, 2vw, 20px); font-weight: 700; }
-
-p {
-  color: var(--cream-dim);
-  margin-bottom: 16px;
-  font-size: clamp(14px, 1.8vw, 16px);
-}
-
-p:last-child { margin-bottom: 0; }
-
-strong { color: var(--cream); font-weight: 600; }
-
-a {
-  color: var(--teal);
-  text-decoration: none;
-  transition: opacity 0.2s;
-}
-
-a:hover { opacity: 0.75; }
-
-/* ── UTILIDADES COMUNES ── */
-
-/* Labels mono */
-.label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-.label-teal { color: var(--teal); }
-.label-gold { color: var(--gold); }
-.label-cream { color: var(--cream-faint); }
-
-/* Cita / blockquote */
-.quote {
-  border-left: 3px solid var(--gold);
-  padding: 20px 28px;
-  margin: 32px 0;
-  background: var(--gold-dim);
-}
-
-.quote p {
-  font-size: clamp(15px, 2vw, 18px);
-  font-style: italic;
-  color: var(--cream);
-  margin: 0;
-  line-height: 1.6;
-}
-
-/* Cajas highlight */
-.box-teal {
-  background: var(--teal-faint);
-  border: 1px solid var(--border);
-  padding: 20px 24px;
-  margin: 16px 0;
-}
-
-.box-gold {
-  background: var(--gold-faint);
-  border: 1px solid var(--border-gold);
-  padding: 20px 24px;
-  margin: 16px 0;
-}
-
-/* Badge */
-.badge {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border: 1px solid;
-}
-
-.badge-teal { color: var(--teal); border-color: var(--border); }
-.badge-gold { color: var(--gold); border-color: var(--border-gold); }
-.badge-red  { color: var(--red);  border-color: rgba(232,72,85,0.3); }
-
-/* Grid */
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--gap-md);
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--gap-md);
-}
-
-/* Card */
-.card {
-  background: var(--teal-faint);
-  border: 1px solid var(--border);
-  padding: 24px;
-}
-
-.card-gold {
-  background: var(--gold-faint);
-  border: 1px solid var(--border-gold);
-  padding: 24px;
-}
-
-.card-val {
-  font-family: var(--font-title);
-  font-size: clamp(18px, 2.5vw, 28px);
-  font-weight: 700;
-  color: var(--teal);
-  line-height: 1.1;
-  margin-bottom: 6px;
-}
-
-.card-gold .card-val { color: var(--gold); }
-
-/* Tabla */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.table th {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.15em;
-  color: var(--teal);
-  text-transform: uppercase;
-  text-align: left;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
-}
-
-.table td {
-  padding: 10px 16px;
-  border-bottom: 1px solid rgba(0,212,170,0.05);
-  color: var(--cream-dim);
-  vertical-align: top;
-}
-
-.table td:first-child { color: var(--cream); font-weight: 600; }
-.table .tc { color: var(--teal); font-family: var(--font-mono); font-size: 12px; }
-.table .gc { color: var(--gold); font-family: var(--font-mono); font-size: 12px; }
-
-/* Separador */
-.divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 48px 0;
-}
-
-/* ── BOTONES ── */
-.btn {
-  display: inline-block;
-  font-family: var(--font-title);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 14px 32px;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-}
-
-.btn-teal {
-  background: var(--teal);
-  color: var(--bg);
-  font-weight: 700;
-}
-
-.btn-teal:hover { opacity: 0.85; color: var(--bg); }
-
-.btn-outline {
-  background: transparent;
-  color: var(--teal);
-  border: 1px solid var(--teal);
-}
-
-.btn-outline:hover {
-  background: var(--teal-faint);
-  color: var(--teal);
-}
-
-.btn-gold {
-  background: var(--gold);
-  color: var(--bg);
-  font-weight: 700;
-}
-
-.btn-gold:hover { opacity: 0.85; color: var(--bg); }
-
-/* ── EFECTOS DECORATIVOS ── */
-.glow-teal {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.glow-gold {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-/* ── FORMULARIOS ── */
-.form-group { margin-bottom: 20px; }
-
-.form-label {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.15em;
-  color: var(--teal);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.form-label span { color: var(--red); margin-left: 2px; }
-
-.form-input {
-  width: 100%;
-  background: rgba(240,236,228,0.04);
-  border: 1px solid var(--border);
-  color: var(--cream);
-  font-family: var(--font-body);
-  font-size: 15px;
-  padding: 12px 16px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.form-input:focus { border-color: var(--teal); }
-.form-input::placeholder { color: var(--cream-faint); }
-
-.form-input.error { border-color: var(--red); }
-.form-error { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
-.form-error.visible { display: block; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
-}
-/* ── ESTILO ESPECÍFICO PARA EL TITULAR MULTICOLOR ── */
-.hero-title {
-    font-weight: 900;
-    /* El degradado multicolor */
-    background: linear-gradient(95deg, #ff4444 0%, #ff8833 18%, #ffcc33 38%, #aaff66 58%, #00ff88 78%, #00ffaa 100%);
-    
-    /* El truco para que el color se quede solo en el texto */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
-
-    /* Sombra opcional para que brille */
-    filter: drop-shadow(0 0 20px rgba(0, 212, 170, 0.2));
-    
-    /* Aseguramos que el h1 no tenga color sólido que lo tape */
-    color: transparent !important; 
-}
-
-/* Ajuste para que el texto de la segunda línea (LAT 40N) también lo herede */
-.hero-title .a {
-    color: inherit;
-}
-@media (max-width: 480px) {
-  body { font-size: 14px; }
-  .btn { padding: 12px 24px; font-size: 10px; }
+  font-family: 'Cormorant Garamond', serif;
 }
