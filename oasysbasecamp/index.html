@@ -781,7 +781,17 @@
     pointer-events:none; text-transform:uppercase;
   }
   .snd:hover .snd-track { opacity:0.85; }
-
+/* ─── VIDEOS (CONFIGURACIÓN GENERAL) ─── */
+  #videoBg, #videoBosque {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover; /* En PC se ve a pantalla completa */
+  }
   /* ══════════════════════════════════════════════ */
   /* ══════════ RESPONSIVE — MOBILE FIRST ══════════ */
   /* ══════════════════════════════════════════════ */
@@ -898,7 +908,30 @@
     .hero-title .l2 { font-size:1.2rem; }
     .hero-title .l3 { font-size:0.85rem; }
   }
-</style>
+#videoBg, #videoBosque {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  
+  /* En ordenador (pantallas anchas) */
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover; 
+}
+
+/* En móviles (pantallas verticales) */
+@media (max-width: 768px) {
+  #videoBg, #videoBosque {
+    /* En lugar de cubrir todo, ajustamos al ancho */
+    /* Esto evita el superzoom, aunque podrían salir pequeñas barras negras 
+       arriba/abajo que se disimulan con el fondo negro de tu web */
+    width: 100%;
+    height: auto; 
+    object-fit: contain; 
+  }
+}</style>
 </head>
 <body>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5T2LL98X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
