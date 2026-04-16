@@ -1,139 +1,83 @@
 /*
-  OASYS BASE CAMP · CSS COMPARTIDO CORREGIDO
-  Versión Final · Abril 2026
+  OASYS BASE CAMP · CSS EQUILIBRADO
+  Ticker y Nav diferenciados + Titular ajustado
 */
 
 /* ── GOOGLE FONTS ── */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap');
 
-/* ── VARIABLES GLOBALES ── */
 :root {
   --bg: #060d08;
   --teal: #00D4AA;
   --gold: #C9A84C;
-  --gold-dim: rgba(201,168,76,0.12);
   --cream: #f0ece4;
-  --cream-dim: rgba(240,236,228,0.6);
-  --red: #E84855;
-  --border: rgba(0,212,170,0.12);
-  --font-title: 'Orbitron', monospace;
-  --font-body: 'Cormorant Garamond', Georgia, serif;
+  --font-title: 'Orbitron', sans-serif;
   --font-mono: 'Share Tech Mono', monospace;
 }
 
-/* ── RESET & BASE ── */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--cream);
-  font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
-
-/* ── EL TICKER (ORO SOBRE NEGRO) ── */
+/* ── TICKER (Banda Superior - Negro Puro) ── */
 .ticker-wrap {
-  background: #000 !important;
+  background: #000000 !important; 
   color: var(--gold) !important;
-  border-bottom: 1px solid var(--gold-dim);
-  height: 32px;
-  line-height: 32px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-.ticker-item { color: var(--gold) !important; }
-
-/* ── EL NAV (TEAL / EFECTO CRISTAL) ── */
-.nav-container {
-  background: rgba(6, 13, 8, 0.8) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  top: 32px !important; /* Justo debajo del ticker */
-  height: 60px;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+  height: 30px;
   display: flex;
   align-items: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+/* ── NAV (Menú - Verde Bosque Transparente) ── */
+.nav-container {
+  background: rgba(10, 25, 15, 0.85) !important; /* Un tono verde muy oscuro, no negro */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0, 212, 170, 0.1);
+  top: 30px !important; /* Pegado debajo del ticker */
+  height: 55px;
   z-index: 1000;
 }
+
 .nav-link {
   color: var(--teal) !important;
   font-family: var(--font-title);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  transition: all 0.3s ease;
-}
-.nav-link:hover {
-  color: var(--cream) !important;
-  text-shadow: 0 0 10px var(--teal);
+  font-size: 10px;
+  letter-spacing: 1px;
 }
 
-/* ── EL TITULAR (CORRECCIÓN DEGRADADO) ── */
+/* ── TITULAR LANDING (Ajustado, menos exagerado) ── */
 h1.hero-title {
   font-family: var(--font-title) !important;
   font-weight: 900 !important;
-  font-size: clamp(2rem, 8vw, 5rem) !important;
+  /* Tamaño más contenido */
+  font-size: clamp(1.8rem, 6vw, 3.8rem) !important; 
   line-height: 1.1;
   text-align: center;
-  /* El Degradado Forzado */
-  background: linear-gradient(95deg, #ff4444 0%, #ff8833 18%, #ffcc33 38%, #aaff66 58%, #00ff88 78%, #00ffaa 100%) !important;
+  /* Degradado suave */
+  background: linear-gradient(95deg, #ff4444 0%, #ffcc33 40%, #00ff88 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  filter: drop-shadow(0 0 25px rgba(0, 212, 170, 0.25));
-  margin-bottom: 20px;
+  /* Sombra sutil, no exagerada */
+  filter: drop-shadow(0 0 12px rgba(0, 212, 170, 0.15));
 }
 
-/* Forzar transparencia en el span de la segunda línea */
-h1.hero-title span, h1.hero-title .a {
+h1.hero-title span.a {
   -webkit-text-fill-color: transparent !important;
   color: transparent !important;
-  background-clip: text !important;
 }
 
-/* ── OCULTAR SECCIONES NO DESEADAS ── */
-/* Esto deja solo Hero (Landing) y Bosque */
-#mission, 
-#values, 
-#contact, 
-footer, 
-.extra-content-section { 
+/* ── LIMPIEZA DE SECCIONES ── */
+#mission, #values, #contact, footer { 
   display: none !important; 
 }
 
-/* ── SECCIÓN BOSQUE (MANTENER) ── */
-#bosque {
-  padding: 80px 0;
+/* ── RESET BÁSICO ── */
+body {
+  margin: 0;
   background: var(--bg);
-}
-
-/* Estilos de botones y utilidades básicas */
-.btn-teal {
-  background: var(--teal);
-  color: var(--bg);
-  font-family: var(--font-title);
-  font-weight: 700;
-  padding: 12px 24px;
-  text-transform: uppercase;
-  font-size: 11px;
-  border: none;
-  cursor: pointer;
-}
-
-.badge-teal { 
-  color: var(--teal); 
-  border: 1px solid var(--border); 
-  padding: 4px 12px; 
-  font-family: var(--font-mono); 
-  font-size: 10px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  h1.hero-title { font-size: 2.5rem !important; }
-  .nav-container { top: 32px !important; }
+  color: var(--cream);
+  font-family: 'Cormorant Garamond', serif;
 }
