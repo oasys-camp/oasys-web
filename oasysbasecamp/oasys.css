@@ -81,48 +81,4 @@ body {
   color: var(--cream);
   font-family: 'Cormorant Garamond', serif;
 }
-/* ── SECCIONES DE VIDEO (HERO Y BOSQUE) ── */
-.sec-1, .sec-bosque { 
-  position: relative; 
-  width: 100%; 
-  height: 100vh; 
-  min-height: 600px; 
-  overflow: hidden; 
-  background-color: #000; /* Fondo negro de seguridad */
-}
 
-.video-bg, .bosque-bg { 
-  position: absolute; 
-  inset: 0; 
-  z-index: 0; 
-  overflow: hidden; 
-}
-
-/* ELIMINA HUECOS Y CORRIGE ZOOM */
-#videoBg, #videoBosque {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Llena toda la pantalla sin barras negras */
-  object-position: center;
-}
-
-/* Capas de estilo sobre el video */
-.video-bg::after, .bosque-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 50%, rgba(7,10,9,0.1) 0%, rgba(7,10,9,0.4) 60%, rgba(7,10,9,0.8) 100%);
-  z-index: 1;
-}
-
-.scanlines {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.015) 2px, rgba(0,255,136,0.015) 4px);
-}
