@@ -316,7 +316,29 @@ a:hover { opacity: 0.75; }
 @media (max-width: 768px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
 }
+/* ── ESTILO ESPECÍFICO PARA EL TITULAR MULTICOLOR ── */
+.hero-title {
+    font-weight: 900;
+    /* El degradado multicolor */
+    background: linear-gradient(95deg, #ff4444 0%, #ff8833 18%, #ffcc33 38%, #aaff66 58%, #00ff88 78%, #00ffaa 100%);
+    
+    /* El truco para que el color se quede solo en el texto */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
 
+    /* Sombra opcional para que brille */
+    filter: drop-shadow(0 0 20px rgba(0, 212, 170, 0.2));
+    
+    /* Aseguramos que el h1 no tenga color sólido que lo tape */
+    color: transparent !important; 
+}
+
+/* Ajuste para que el texto de la segunda línea (LAT 40N) también lo herede */
+.hero-title .a {
+    color: inherit;
+}
 @media (max-width: 480px) {
   body { font-size: 14px; }
   .btn { padding: 12px 24px; font-size: 10px; }
