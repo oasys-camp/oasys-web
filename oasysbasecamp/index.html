@@ -781,17 +781,7 @@
     pointer-events:none; text-transform:uppercase;
   }
   .snd:hover .snd-track { opacity:0.85; }
-/* ─── VIDEOS (CONFIGURACIÓN GENERAL) ─── */
-  #videoBg, #videoBosque {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: -1;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover; /* En PC se ve a pantalla completa */
-  }
+
   /* ══════════════════════════════════════════════ */
   /* ══════════ RESPONSIVE — MOBILE FIRST ══════════ */
   /* ══════════════════════════════════════════════ */
@@ -908,30 +898,7 @@
     .hero-title .l2 { font-size:1.2rem; }
     .hero-title .l3 { font-size:0.85rem; }
   }
-#videoBg, #videoBosque {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: -1;
-  
-  /* En ordenador (pantallas anchas) */
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover; 
-}
-
-/* En móviles (pantallas verticales) */
-@media (max-width: 768px) {
-  #videoBg, #videoBosque {
-    /* En lugar de cubrir todo, ajustamos al ancho */
-    /* Esto evita el superzoom, aunque podrían salir pequeñas barras negras 
-       arriba/abajo que se disimulan con el fondo negro de tu web */
-    width: 100%;
-    height: auto; 
-    object-fit: contain; 
-  }
-}</style>
+</style>
 </head>
 <body>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5T2LL98X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -952,7 +919,7 @@
 
 <!-- ══════════ HERO BRUTAL ══════════ -->
 <section class="sec-1" id="top">
-  <div class="video-bg">   <video id="videoBg" muted playsinline webkit-playsinline preload="auto" autoplay loop>     <source src="bombonypeluche.mp4" type="video/mp4">   </video> </div>
+  <div class="video-bg"><video id="videoBg" muted playsinline preload="auto" autoplay></video></div>
   <div class="scanlines"></div>
   <div class="c c1"></div><div class="c c2"></div><div class="c c3"></div><div class="c c4"></div>
 
@@ -1137,7 +1104,7 @@
 <!-- ══════════════════════════════════════════════ -->
 <section class="sec-bosque" id="bosque">
   <div class="bosque-bg">
-    <video id="videoBosque" muted playsinline webkit-playsinline preload="auto" autoplay loop>   <source src="bombonypeluche.mp4" type="video/mp4"> </video>
+    <video id="videoBosque" muted playsinline loop preload="metadata" autoplay></video>
   </div>
   <div class="bosque-content">
     <div class="bs-badge">
@@ -1397,10 +1364,10 @@
   let as = false;
   let currentSrc = 'soundtrack.mp3';
 
-const TRACKS = {
+  const TRACKS = {
     hero: { src:'soundtrack.mp3', name:'The Man That Got Away · Judy Garland', label:'Hero soundtrack' },
-    bosque: { src:'soundtrack-bosquesagrado.mp3', name:'El Bosque Sagrado · Ambient', label:'Bosque Sagrado soundtrack' }
-};
+    bosque: { src:'soundtrack-bosquesagrado.mp4', name:'El Bosque Sagrado · Ambient', label:'Bosque Sagrado soundtrack' }
+  };
 
   function sa(){
     if (!as) {
