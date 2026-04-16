@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- GTM -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id=GTM-5T2LL98X'+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5T2LL98X');</script>
 
+<!-- GA4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NMC1GS2WDW"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -10,16 +12,18 @@
   gtag('js', new Date());
   gtag('config', 'G-NMC1GS2WDW');
 </script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OASYS BASE CAMP LAT 40°N</title>
-<meta name="description" content="OASYS BASE CAMP LAT 40°N — Yunclillos, Toledo. Coming Soon.">
+<meta name="description" content="OASYS BASE CAMP LAT 40°N — Explotación agroforestal regenerativa. Yunclillos, Toledo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
     --dark: #070a09;
+    --dark-2: #0a0f0d;
     --teal: #00D4AA;
     --teal-dim: rgba(0, 212, 170, 0.12);
     --teal-glow: rgba(0, 212, 170, 0.35);
@@ -31,10 +35,76 @@
     --font-mono: 'Share Tech Mono', monospace;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { width:100%; height:100%; overflow:hidden; background:var(--dark); color:var(--white); }
+  html { scroll-behavior:smooth; }
+  html, body { width:100%; background:var(--dark); color:var(--white); overflow-x:hidden; }
 
-  /* ── VIDEO ── */
-  .video-bg { position:fixed; inset:0; z-index:0; overflow:hidden; }
+  /* ══════════ TOP BAR UNIFICADO ══════════ */
+  .top-bar {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(7,10,9,0.95);
+    backdrop-filter:blur(8px);
+  }
+  .ticker {
+    padding:0.3rem 0;
+    border-bottom:1px solid rgba(0,212,170,0.06);
+    overflow:hidden;
+  }
+  .ticker .track {
+    display:flex; gap:2rem; white-space:nowrap;
+    animation:scroll 38s linear infinite;
+  }
+  .ticker .tl { font-family:var(--font-mono); font-size:0.48rem; letter-spacing:0.14em; color:var(--teal); opacity:0.4; }
+  .ticker .tv { font-family:var(--font-mono); font-size:0.48rem; letter-spacing:0.14em; color:var(--gold); opacity:0.7; }
+  .ticker .ts { color:var(--teal); opacity:0.15; font-size:0.48rem; }
+  @keyframes scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+  .nav {
+    padding:0.7rem 1.2rem;
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    border-bottom:1px solid rgba(0,212,170,0.08);
+  }
+  .nav-logo {
+    font-family:var(--font-title); font-size:0.58rem; font-weight:700;
+    letter-spacing:0.22em; color:var(--teal); white-space:nowrap;
+    text-decoration:none; cursor:pointer;
+  }
+  .nav-menu { display:flex; gap:1.4rem; align-items:center; }
+  .nav-menu a {
+    font-family:var(--font-mono); font-size:0.48rem;
+    letter-spacing:0.25em; color:var(--white); text-decoration:none;
+    text-transform:uppercase; opacity:0.55; transition:all 0.3s;
+    position:relative; padding:0.2rem 0;
+  }
+  .nav-menu a:hover { opacity:1; color:var(--teal); }
+  .nav-menu a::after {
+    content:''; position:absolute; bottom:-2px; left:0; width:0; height:1px;
+    background:var(--teal); transition:width 0.3s;
+  }
+  .nav-menu a:hover::after { width:100%; }
+
+  .nav-menu a.cta {
+    background:var(--teal); color:var(--dark); opacity:1;
+    padding:0.55rem 1.1rem; letter-spacing:0.2em;
+    font-weight:700; border:1px solid var(--teal);
+    display:inline-flex; align-items:center; gap:0.4rem;
+    transition:all 0.3s;
+  }
+  .nav-menu a.cta:hover {
+    background:transparent; color:var(--teal);
+    box-shadow:0 0 18px rgba(0,212,170,0.35);
+  }
+  .nav-menu a.cta::after { display:none; }
+  .nav-menu a.cta .arrow { font-size:0.7rem; }
+
+  .nav-toggle {
+    display:none; background:transparent; border:none; cursor:pointer;
+    color:var(--teal); font-family:var(--font-mono); font-size:0.55rem;
+    letter-spacing:0.2em;
+  }
+
+  /* ══════════ SECCIÓN 1 — HERO ══════════ */
+  .sec-1 { position:relative; width:100%; height:100vh; overflow:hidden; }
+  .video-bg { position:absolute; inset:0; z-index:0; overflow:hidden; }
   .video-bg video {
     position:absolute; top:50%; left:50%;
     min-width:100%; min-height:100%; width:auto; height:auto;
@@ -48,58 +118,17 @@
     z-index:1;
   }
   .scanlines {
-    position:fixed; inset:0; z-index:1; pointer-events:none;
+    position:absolute; inset:0; z-index:1; pointer-events:none;
     background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,170,0.012) 2px, rgba(0,212,170,0.012) 4px);
   }
-
-  /* ── TOP BAR ── */
-  .top-bar {
-    position:fixed; top:0; left:0; right:0; z-index:10;
-    padding:0.6rem 1.2rem;
-    display:flex; align-items:center; justify-content:space-between;
-    border-bottom:1px solid rgba(0,212,170,0.08);
-    background:linear-gradient(180deg, rgba(7,10,9,0.92) 0%, rgba(7,10,9,0.3) 80%, transparent 100%);
-  }
-  .top-bar .logo {
-    font-family:var(--font-title); font-size:0.55rem; font-weight:700;
-    letter-spacing:0.2em; color:var(--teal); white-space:nowrap;
-  }
-  .top-bar .live {
-    font-family:var(--font-mono); font-size:0.55rem;
-    letter-spacing:0.1em; color:var(--gold);
-    display:flex; align-items:center; gap:0.35rem; white-space:nowrap;
-  }
-  .top-bar .live .dot {
-    width:5px; height:5px; border-radius:50%; background:var(--gold);
-    animation:pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  /* ── TOP TICKER ── */
-  .top-ticker {
-    position:fixed; top:2.2rem; left:0; right:0; z-index:9;
-    padding:0.25rem 0; background:rgba(7,10,9,0.5);
-    border-bottom:1px solid rgba(0,212,170,0.04); overflow:hidden;
-  }
-  .top-ticker .track {
-    display:flex; gap:2rem; white-space:nowrap;
-    animation:scroll 35s linear infinite;
-  }
-  .top-ticker .tl { font-family:var(--font-mono); font-size:0.45rem; letter-spacing:0.12em; color:var(--teal); opacity:0.35; }
-  .top-ticker .tv { font-family:var(--font-mono); font-size:0.45rem; letter-spacing:0.12em; color:var(--gold); opacity:0.6; }
-  .top-ticker .ts { color:var(--teal); opacity:0.12; font-size:0.45rem; }
-  @keyframes scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-
-  /* ── MAIN GRID ── */
   .grid {
     position:relative; z-index:2;
     width:100%; height:100%;
     display:grid;
     grid-template-columns:240px 1fr 240px;
-    padding:3.5rem 0 2.2rem 0;
+    padding:5rem 0 3rem 0;
   }
 
-  /* ── HUD PANEL ── */
   .p {
     background:linear-gradient(145deg, rgba(7,10,9,0.72) 0%, rgba(0,212,170,0.03) 100%);
     border:1px solid rgba(0,212,170,0.1);
@@ -116,42 +145,45 @@
     text-transform:uppercase;
   }
   .p-t::before { content:'· '; color:var(--gold); }
-
   .r { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.3rem; }
   .r .l { font-family:var(--font-mono); font-size:0.45rem; letter-spacing:0.1em; color:var(--teal); opacity:0.45; text-transform:uppercase; }
   .r .v { font-family:var(--font-title); font-size:0.6rem; font-weight:600; color:var(--white); }
   .r .v.g { color:var(--gold); }
   .r .v.t { color:var(--teal); }
-
   .bar { width:100%; height:2px; background:rgba(0,212,170,0.08); margin:0.1rem 0 0.4rem; border-radius:1px; }
   .bar i { display:block; height:100%; border-radius:1px; background:linear-gradient(90deg, var(--teal), var(--gold)); }
-
   .big { font-family:var(--font-title); font-weight:800; font-size:1.4rem; color:var(--gold); line-height:1; }
   .unit { font-family:var(--font-mono); font-size:0.4rem; letter-spacing:0.2em; color:var(--teal); opacity:0.45; margin-top:0.1rem; }
-
   .name { font-family:var(--font-title); font-size:0.58rem; font-weight:700; color:var(--white); letter-spacing:0.08em; margin-bottom:0.25rem; }
   .sub { font-family:var(--font-mono); font-size:0.4rem; letter-spacing:0.1em; color:var(--teal); opacity:0.45; margin-bottom:0.1rem; }
-
   .sr { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem; }
   .sr .sl { font-family:var(--font-mono); font-size:0.45rem; letter-spacing:0.1em; color:var(--teal); opacity:0.45; text-transform:uppercase; }
   .sr .sv { font-family:var(--font-title); font-size:0.55rem; font-weight:600; }
   .sv.on { color:var(--teal); }
   .sv.z { color:var(--gold); }
 
-  /* COLUMNS */
   .col-l { display:flex; flex-direction:column; gap:0.5rem; padding:0.8rem 0.6rem 0.8rem 0.8rem; justify-content:center; }
   .col-r { display:flex; flex-direction:column; gap:0.5rem; padding:0.8rem 0.8rem 0.8rem 0.6rem; justify-content:center; }
-
-  /* CENTER */
   .col-c {
     display:flex; flex-direction:column;
     align-items:center; justify-content:center;
     text-align:center; padding:0 1rem;
   }
+
+  /* Antetítulo + typewriter */
   .hero-pre {
-    font-family:var(--font-mono); font-size:0.5rem;
-    letter-spacing:0.45em; color:var(--gold); opacity:0.65; margin-bottom:0.7rem;
+    font-family:var(--font-mono); font-size:0.55rem;
+    letter-spacing:0.35em; color:var(--gold); opacity:0.8;
+    margin-bottom:0.9rem; text-transform:uppercase;
+    min-height:1rem; line-height:1.3;
   }
+  .hero-pre .cursor {
+    display:inline-block; width:6px; height:0.8em; background:var(--gold);
+    margin-left:2px; animation:blink-cursor 0.9s step-end infinite;
+    vertical-align:middle;
+  }
+  @keyframes blink-cursor { 0%,100%{opacity:1} 50%{opacity:0} }
+
   .hero-title {
     font-family:var(--font-title); font-weight:900;
     font-size:clamp(1.5rem, 3.8vw, 3.2rem);
@@ -159,16 +191,24 @@
     text-shadow:0 0 50px rgba(0,212,170,0.08); margin-bottom:0.15em;
   }
   .hero-title .a { color:var(--teal); }
+
   .hero-sub {
-    font-family:var(--font-narrative); font-size:clamp(0.8rem, 1.4vw, 1.05rem);
-    font-style:italic; font-weight:300; color:var(--cream); opacity:0.45;
-    letter-spacing:0.04em; margin-bottom:2rem;
+    font-family:var(--font-narrative); font-size:clamp(0.85rem, 1.4vw, 1.1rem);
+    font-style:italic; font-weight:300; color:var(--cream); opacity:0.6;
+    letter-spacing:0.04em; margin-bottom:1.8rem;
+    min-height:1.4rem;
+  }
+  .hero-sub .cursor {
+    display:inline-block; width:5px; height:0.8em; background:var(--cream);
+    margin-left:2px; animation:blink-cursor 0.9s step-end infinite;
+    vertical-align:middle; opacity:0.5;
   }
 
-  /* COUNTDOWN — compact */
+  /* FLIP CLOCK */
   .cd-box {
-    background:linear-gradient(135deg, rgba(7,10,9,0.55) 0%, rgba(0,212,170,0.04) 100%);
-    border:1px solid rgba(0,212,170,0.12); padding:0.8rem 1.8rem; position:relative;
+    background:linear-gradient(135deg, rgba(7,10,9,0.65) 0%, rgba(0,212,170,0.04) 100%);
+    border:1px solid rgba(0,212,170,0.15); padding:1rem 1.8rem 0.9rem;
+    position:relative;
   }
   .cd-box::before {
     content:''; position:absolute; top:0; left:25%; right:25%; height:1px;
@@ -176,228 +216,803 @@
   }
   .cd-lbl {
     font-family:var(--font-mono); font-size:0.4rem;
-    letter-spacing:0.35em; color:var(--gold); opacity:0.55; margin-bottom:0.6rem;
+    letter-spacing:0.35em; color:var(--gold); opacity:0.6; margin-bottom:0.8rem;
   }
-  .cd { display:flex; align-items:center; justify-content:center; gap:clamp(0.5rem,1.5vw,1.2rem); }
-  .cd-u { text-align:center; }
-  .cd-n {
+  .cd-flip {
+    display:flex; align-items:flex-start; justify-content:center;
+    gap:clamp(0.35rem, 0.8vw, 0.7rem);
+  }
+  .flip-unit { display:flex; flex-direction:column; align-items:center; gap:0.35rem; }
+  .flip-card {
+    position:relative;
+    background:linear-gradient(180deg, #0a0f0d 0%, #060908 100%);
+    border:1px solid rgba(0,212,170,0.2);
+    border-radius:4px;
+    padding:0.5rem clamp(0.55rem, 1vw, 0.85rem);
+    min-width:clamp(2.5rem, 5vw, 3.2rem);
+    text-align:center;
+    box-shadow:
+      inset 0 1px 0 rgba(0,212,170,0.08),
+      inset 0 -1px 0 rgba(0,0,0,0.5),
+      0 2px 6px rgba(0,0,0,0.4);
+  }
+  .flip-card::before {
+    content:''; position:absolute; top:50%; left:0; right:0; height:1px;
+    background:rgba(0,0,0,0.6); z-index:2;
+  }
+  .flip-num {
     font-family:var(--font-title); font-weight:700;
-    font-size:clamp(1.1rem, 3vw, 1.8rem);
-    color:var(--white); line-height:1; min-width:2ch; display:block;
-    text-shadow:0 0 15px rgba(0,212,170,0.12);
+    font-size:clamp(1.3rem, 2.8vw, 2rem);
+    color:var(--white); line-height:1;
+    text-shadow:0 0 12px rgba(0,212,170,0.25);
+    letter-spacing:0.04em;
+    position:relative; z-index:1;
   }
-  .cd-s {
-    font-family:var(--font-mono); font-size:0.35rem;
-    letter-spacing:0.25em; color:var(--teal); opacity:0.45; margin-top:0.25rem;
+  .flip-lbl {
+    font-family:var(--font-mono); font-size:0.38rem;
+    letter-spacing:0.3em; color:var(--teal); opacity:0.55;
   }
   .cd-sep {
-    font-family:var(--font-title); font-size:clamp(0.8rem,2vw,1.3rem);
-    color:var(--teal); opacity:0.2; animation:blink 1s step-end infinite;
+    font-family:var(--font-title);
+    font-size:clamp(0.9rem, 2vw, 1.4rem);
+    color:var(--teal); opacity:0.35;
+    animation:blink 1s step-end infinite;
+    margin-top:0.45rem;
   }
-  @keyframes blink { 0%,100%{opacity:0.2} 50%{opacity:0.05} }
+  @keyframes blink { 0%,100%{opacity:0.35} 50%{opacity:0.08} }
   .cd-date {
-    font-family:var(--font-mono); font-size:0.4rem;
-    letter-spacing:0.15em; color:var(--teal); opacity:0.35; margin-top:0.6rem;
-  }
-  .loc {
-    margin-top:1.2rem;
-    font-family:var(--font-mono); font-size:0.45rem;
-    letter-spacing:0.15em; color:var(--teal); opacity:0.35;
+    font-family:var(--font-mono); font-size:0.42rem;
+    letter-spacing:0.18em; color:var(--teal); opacity:0.45;
+    margin-top:0.9rem;
   }
 
-  /* ── BOTTOM TICKER ── */
-  .bot-bar {
-    position:fixed; bottom:1.5rem; left:0; right:0; z-index:10;
-    padding:0.4rem 0; overflow:hidden;
-    border-top:1px solid rgba(0,212,170,0.05);
+  .hero-foot {
+    margin-top:1.5rem; display:flex; flex-direction:column; align-items:center; gap:0.4rem;
   }
-  .bot-track {
-    display:flex; gap:2.5rem; white-space:nowrap;
-    animation:scroll 42s linear infinite;
+  .hero-foot-solar {
+    font-family:var(--font-title); font-weight:700;
+    font-size:clamp(0.95rem, 1.8vw, 1.3rem);
+    color:var(--gold); letter-spacing:0.05em;
   }
-  .bot-track span {
-    font-family:var(--font-mono); font-size:0.4rem;
-    letter-spacing:0.12em; color:var(--teal); opacity:0.25;
-  }
-  .bot-track span.g { color:var(--gold); opacity:0.4; }
-
-  /* ── COPYRIGHT ── */
-  .copy {
-    position:fixed; bottom:0; left:0; right:0; z-index:11;
-    text-align:center; padding:0.3rem 1rem;
-    font-family:var(--font-mono); font-size:0.38rem;
-    letter-spacing:0.12em; color:var(--teal); opacity:0.22;
-    background:rgba(7,10,9,0.95);
-    border-top:1px solid rgba(0,212,170,0.03); line-height:1.5;
-  }
-  .copy .mc {
-    font-family:var(--font-narrative); font-style:italic;
-    font-size:0.48rem; letter-spacing:0.05em; color:var(--gold); opacity:0.45;
+  .hero-foot-loc {
+    font-family:var(--font-mono); font-size:0.48rem;
+    letter-spacing:0.2em; color:var(--teal); opacity:0.55;
   }
 
-  /* ── SOUND ── */
-  .snd {
-    position:fixed; bottom:2.2rem; right:0.8rem; z-index:15;
-    width:30px; height:30px; border-radius:50%;
-    border:1px solid rgba(0,212,170,0.18);
-    background:rgba(7,10,9,0.55); backdrop-filter:blur(5px);
-    cursor:pointer; display:flex; align-items:center; justify-content:center;
-    transition:all 0.3s; color:var(--teal); opacity:0.35;
+  .scroll-hint {
+    position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%);
+    z-index:10; font-family:var(--font-mono); font-size:0.42rem;
+    letter-spacing:0.3em; color:var(--teal); opacity:0.4;
+    animation:bounceDown 2.2s ease-in-out infinite;
+    cursor:pointer; text-decoration:none;
   }
-  .snd:hover { opacity:1; border-color:var(--teal); box-shadow:0 0 8px rgba(0,212,170,0.12); }
-  .snd svg { width:11px; height:11px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+  .scroll-hint:hover { opacity:1; }
+  @keyframes bounceDown {
+    0%,100% { transform:translate(-50%,0); opacity:0.4; }
+    50% { transform:translate(-50%,6px); opacity:0.8; }
+  }
 
-  /* ── CORNERS ── */
-  .c { position:fixed; width:20px; height:20px; z-index:5; opacity:0.12; }
+  .c { position:absolute; width:20px; height:20px; z-index:5; opacity:0.12; }
   .c::before,.c::after { content:''; position:absolute; background:var(--teal); }
   .c1{top:8px;left:8px} .c1::before{top:0;left:0;width:14px;height:1px} .c1::after{top:0;left:0;width:1px;height:14px}
   .c2{top:8px;right:8px} .c2::before{top:0;right:0;width:14px;height:1px} .c2::after{top:0;right:0;width:1px;height:14px}
   .c3{bottom:8px;left:8px} .c3::before{bottom:0;left:0;width:14px;height:1px} .c3::after{bottom:0;left:0;width:1px;height:14px}
   .c4{bottom:8px;right:8px} .c4::before{bottom:0;right:0;width:14px;height:1px} .c4::after{bottom:0;right:0;width:1px;height:14px}
 
-  /* ── ANIMATION ── */
-  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-  .col-l .p { animation:fadeUp 0.7s ease-out both; }
-  .col-l .p:nth-child(1){animation-delay:0.15s} .col-l .p:nth-child(2){animation-delay:0.3s} .col-l .p:nth-child(3){animation-delay:0.45s}
-  .col-c { animation:fadeUp 0.9s ease-out 0.1s both; }
-  .col-r .p { animation:fadeUp 0.7s ease-out both; }
-  .col-r .p:nth-child(1){animation-delay:0.25s} .col-r .p:nth-child(2){animation-delay:0.4s} .col-r .p:nth-child(3){animation-delay:0.55s}
+  /* ══════════ SECCIONES + CARRUSEL ══════════ */
+  .sec {
+    position:relative; width:100%; min-height:100vh;
+    padding:6rem 2rem 4rem; display:flex; flex-direction:column;
+    justify-content:center; align-items:center;
+    border-top:1px solid rgba(0,212,170,0.06);
+  }
+  .sec-hdr { max-width:900px; text-align:center; margin-bottom:2.5rem; }
+  .sec-eyebrow {
+    font-family:var(--font-mono); font-size:0.52rem;
+    letter-spacing:0.45em; color:var(--gold); opacity:0.7;
+    margin-bottom:1rem; text-transform:uppercase;
+  }
+  .sec-title {
+    font-family:var(--font-title); font-weight:800;
+    font-size:clamp(1.8rem, 4vw, 3rem);
+    letter-spacing:0.04em; line-height:1.1;
+    color:var(--white); margin-bottom:1.2rem;
+  }
+  .sec-title .a { color:var(--teal); }
+  .sec-lead {
+    font-family:var(--font-narrative); font-style:italic;
+    font-size:clamp(0.95rem, 1.5vw, 1.15rem);
+    font-weight:300; color:var(--cream); opacity:0.7;
+    line-height:1.6; max-width:640px; margin:0 auto;
+  }
 
-  /* ── RESPONSIVE ── */
+  .carousel {
+    position:relative; width:100%; max-width:1100px;
+    aspect-ratio:16/9;
+    background:var(--dark-2);
+    border:1px solid rgba(0,212,170,0.15);
+    overflow:hidden; margin:2rem auto;
+  }
+  .carousel::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px; z-index:3;
+    background:linear-gradient(90deg, transparent, var(--teal-glow), transparent);
+  }
+  .carousel-track {
+    display:flex; width:100%; height:100%;
+    transition:transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  .carousel-slide {
+    flex:0 0 100%; width:100%; height:100%;
+    position:relative; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, #0a0f0d 0%, #070a09 100%);
+  }
+  .carousel-slide video, .carousel-slide img {
+    width:100%; height:100%; object-fit:cover;
+  }
+  .carousel-slide.placeholder {
+    background:repeating-linear-gradient(45deg, #0a0f0d 0, #0a0f0d 2px, #080d0b 2px, #080d0b 6px);
+  }
+  .placeholder-label {
+    font-family:var(--font-mono); font-size:0.6rem;
+    letter-spacing:0.3em; color:var(--teal); opacity:0.45;
+    text-align:center; padding:1rem;
+  }
+  .placeholder-label span {
+    display:block; color:var(--gold); opacity:0.6; font-size:0.48rem;
+    margin-top:0.5rem; letter-spacing:0.2em;
+  }
+
+  .carousel-nav {
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:40px; height:40px; z-index:5;
+    background:rgba(7,10,9,0.65); backdrop-filter:blur(5px);
+    border:1px solid rgba(0,212,170,0.25);
+    color:var(--teal); cursor:pointer;
+    font-family:var(--font-title); font-size:1rem;
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.3s;
+  }
+  .carousel-nav:hover {
+    background:var(--teal); color:var(--dark);
+    box-shadow:0 0 20px rgba(0,212,170,0.3);
+  }
+  .carousel-nav.prev { left:1rem; }
+  .carousel-nav.next { right:1rem; }
+  .carousel-dots {
+    position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+    z-index:5; display:flex; gap:0.5rem;
+  }
+  .carousel-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:rgba(0,212,170,0.3); border:none; cursor:pointer;
+    transition:all 0.3s;
+  }
+  .carousel-dot.active { background:var(--gold); width:20px; border-radius:4px; }
+  .carousel-counter {
+    position:absolute; top:1rem; right:1rem; z-index:5;
+    font-family:var(--font-mono); font-size:0.48rem;
+    letter-spacing:0.2em; color:var(--teal); opacity:0.7;
+    background:rgba(7,10,9,0.6); padding:0.3rem 0.7rem;
+    border:1px solid rgba(0,212,170,0.2);
+  }
+
+  .data-strip {
+    max-width:1100px; width:100%; margin:0.5rem auto 0;
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:1rem;
+  }
+  .data-card {
+    background:linear-gradient(145deg, rgba(7,10,9,0.72) 0%, rgba(0,212,170,0.03) 100%);
+    border:1px solid rgba(0,212,170,0.12);
+    padding:1rem 1.2rem; position:relative;
+  }
+  .data-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, var(--teal-glow), transparent);
+  }
+  .data-card-label {
+    font-family:var(--font-mono); font-size:0.44rem;
+    letter-spacing:0.25em; color:var(--teal); opacity:0.55;
+    text-transform:uppercase; margin-bottom:0.4rem;
+  }
+  .data-card-val {
+    font-family:var(--font-title); font-weight:700;
+    font-size:1.1rem; color:var(--white); line-height:1.2;
+  }
+  .data-card-val.gold { color:var(--gold); }
+  .data-card-sub {
+    font-family:var(--font-mono); font-size:0.42rem;
+    letter-spacing:0.15em; color:var(--teal); opacity:0.4;
+    margin-top:0.3rem;
+  }
+
+  /* ══════════ EL BOSQUE SAGRADO ══════════ */
+  .sec-bosque {
+    position:relative; width:100%; min-height:100vh;
+    padding:0; overflow:hidden;
+    background:var(--dark);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .sec-bosque .video-bg { position:absolute; inset:0; z-index:0; }
+  .sec-bosque .video-bg::after {
+    content:''; position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(7,10,9,0.4) 0%, rgba(7,10,9,0.8) 70%, rgba(7,10,9,0.95) 100%),
+      linear-gradient(180deg, rgba(7,10,9,0.85) 0%, transparent 20%, transparent 70%, rgba(7,10,9,0.9) 100%);
+    z-index:1;
+  }
+  .bosque-content {
+    position:relative; z-index:3;
+    width:100%; max-width:1100px;
+    padding:6rem 2rem 4rem; text-align:center;
+  }
+  .bosque-eyebrow {
+    font-family:var(--font-mono); font-size:0.5rem;
+    letter-spacing:0.5em; color:var(--gold); opacity:0.75;
+    margin-bottom:1rem;
+  }
+  .bosque-title {
+    font-family:var(--font-title); font-weight:900;
+    font-size:clamp(1.8rem, 4.2vw, 3.3rem);
+    letter-spacing:0.03em; line-height:1.1;
+    color:var(--white); margin-bottom:0.4rem;
+    text-shadow:0 0 40px rgba(0,212,170,0.15);
+  }
+  .bosque-title .a { color:var(--teal); font-style:italic; font-family:var(--font-narrative); font-weight:500; }
+  .bosque-sub {
+    font-family:var(--font-narrative); font-style:italic;
+    font-size:clamp(0.95rem, 1.5vw, 1.2rem);
+    font-weight:300; color:var(--cream); opacity:0.7;
+    max-width:620px; margin:0 auto 3rem; line-height:1.6;
+  }
+  .tribute {
+    display:grid; grid-template-columns:1fr auto 1fr;
+    gap:2rem; align-items:center;
+    max-width:800px; margin:0 auto 3rem;
+  }
+  .tribute-card {
+    padding:1.8rem 1.5rem;
+    background:linear-gradient(145deg, rgba(7,10,9,0.82) 0%, rgba(201,168,76,0.04) 100%);
+    border:1px solid rgba(201,168,76,0.25);
+    position:relative;
+  }
+  .tribute-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+  }
+  .tribute-plaza {
+    font-family:var(--font-mono); font-size:0.45rem;
+    letter-spacing:0.3em; color:var(--gold); opacity:0.8;
+    margin-bottom:0.6rem;
+  }
+  .tribute-name {
+    font-family:var(--font-title); font-weight:700;
+    font-size:1.3rem; color:var(--white);
+    letter-spacing:0.08em; margin-bottom:0.4rem;
+  }
+  .tribute-tree {
+    font-family:var(--font-narrative); font-style:italic;
+    font-size:0.9rem; color:var(--cream); opacity:0.7;
+  }
+  .tribute-sep {
+    width:1px; height:40px;
+    background:linear-gradient(180deg, transparent, var(--gold), transparent);
+    opacity:0.4;
+  }
+  .bosque-flow {
+    max-width:720px; margin:0 auto 3rem;
+    display:flex; justify-content:center; align-items:center;
+    gap:1rem; flex-wrap:wrap;
+  }
+  .flow-step {
+    font-family:var(--font-mono); font-size:0.52rem;
+    letter-spacing:0.22em; color:var(--teal); opacity:0.75;
+    padding:0.45rem 0.9rem;
+    border:1px solid rgba(0,212,170,0.2);
+    background:rgba(7,10,9,0.5); white-space:nowrap;
+  }
+  .flow-arrow { font-family:var(--font-mono); color:var(--gold); opacity:0.5; font-size:0.7rem; }
+  .bosque-cta-wrap {
+    display:flex; flex-direction:column; align-items:center; gap:1rem;
+    margin-top:2rem;
+  }
+  .bosque-cta {
+    display:inline-flex; align-items:center; gap:0.7rem;
+    font-family:var(--font-title); font-weight:700;
+    font-size:0.85rem; letter-spacing:0.25em;
+    color:var(--dark); background:var(--gold);
+    padding:1rem 2.2rem; text-decoration:none;
+    border:1px solid var(--gold); transition:all 0.4s;
+    text-transform:uppercase;
+  }
+  .bosque-cta:hover {
+    background:transparent; color:var(--gold);
+    box-shadow:0 0 30px rgba(201,168,76,0.35);
+    transform:translateY(-2px);
+  }
+  .bosque-cta .arrow { font-size:0.9rem; transition:transform 0.4s; }
+  .bosque-cta:hover .arrow { transform:translateX(4px); }
+  .bosque-cta-sub {
+    font-family:var(--font-mono); font-size:0.42rem;
+    letter-spacing:0.25em; color:var(--teal); opacity:0.5;
+  }
+  .bosque-counter {
+    display:flex; justify-content:center; gap:2.5rem;
+    margin-top:2rem;
+  }
+  .bosque-counter-item { text-align:center; }
+  .bosque-counter-v {
+    font-family:var(--font-title); font-weight:800;
+    font-size:1.8rem; color:var(--gold); line-height:1;
+  }
+  .bosque-counter-l {
+    font-family:var(--font-mono); font-size:0.42rem;
+    letter-spacing:0.25em; color:var(--teal); opacity:0.55;
+    margin-top:0.4rem;
+  }
+
+  /* ══════════ FOOTER ══════════ */
+  .footer {
+    position:relative; width:100%;
+    padding:3rem 2rem 1.5rem;
+    background:var(--dark);
+    border-top:1px solid rgba(0,212,170,0.08);
+  }
+  .footer-inner {
+    max-width:1100px; margin:0 auto;
+    display:grid; grid-template-columns:2fr 1fr 1fr;
+    gap:2rem; margin-bottom:2rem;
+  }
+  .footer h4 {
+    font-family:var(--font-mono); font-size:0.48rem;
+    letter-spacing:0.25em; color:var(--teal); opacity:0.8;
+    text-transform:uppercase; margin-bottom:0.8rem;
+  }
+  .footer-brand {
+    font-family:var(--font-title); font-weight:700;
+    font-size:0.7rem; letter-spacing:0.15em;
+    color:var(--white); margin-bottom:0.5rem;
+  }
+  .footer-tagline {
+    font-family:var(--font-narrative); font-style:italic;
+    font-size:0.9rem; color:var(--cream); opacity:0.55;
+    line-height:1.5;
+  }
+  .footer ul { list-style:none; }
+  .footer ul li { margin-bottom:0.5rem; }
+  .footer ul a {
+    font-family:var(--font-mono); font-size:0.5rem;
+    letter-spacing:0.15em; color:var(--white); opacity:0.55;
+    text-decoration:none; text-transform:uppercase;
+    transition:opacity 0.3s;
+  }
+  .footer ul a:hover { opacity:1; color:var(--teal); }
+  .footer-bot {
+    max-width:1100px; margin:0 auto;
+    padding-top:1.2rem; border-top:1px solid rgba(0,212,170,0.06);
+    text-align:center;
+    font-family:var(--font-mono); font-size:0.42rem;
+    letter-spacing:0.15em; color:var(--teal); opacity:0.35;
+    line-height:1.7;
+  }
+  .footer-bot .mc {
+    font-family:var(--font-narrative); font-style:italic;
+    font-size:0.55rem; letter-spacing:0.05em; color:var(--gold); opacity:0.5;
+    display:block; margin-top:0.4rem;
+  }
+
+  .snd {
+    position:fixed; bottom:1.2rem; right:1.2rem; z-index:50;
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid rgba(0,212,170,0.25);
+    background:rgba(7,10,9,0.75); backdrop-filter:blur(8px);
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all 0.3s; color:var(--teal); opacity:0.6;
+  }
+  .snd:hover { opacity:1; border-color:var(--teal); box-shadow:0 0 12px rgba(0,212,170,0.2); }
+  .snd svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+
+  /* ══════════ RESPONSIVE ══════════ */
   @media(max-width:960px) {
+    .ticker { padding:0.22rem 0; }
+    .ticker .tl, .ticker .tv { font-size:0.42rem; }
+    .nav { padding:0.55rem 0.7rem; }
+    .nav-logo { font-size:0.45rem; letter-spacing:0.12em; }
+    .nav-menu { display:none; position:fixed; top:3.3rem; left:0; right:0;
+      flex-direction:column; gap:0; background:rgba(7,10,9,0.98);
+      padding:1rem; border-bottom:1px solid rgba(0,212,170,0.15); }
+    .nav-menu.open { display:flex; }
+    .nav-menu a { padding:0.8rem 0; opacity:0.7; width:100%; text-align:center; }
+    .nav-menu a.cta { margin-top:0.5rem; padding:0.8rem; }
+    .nav-toggle { display:block; }
+
     .grid {
       grid-template-columns:1fr;
       grid-template-rows:auto 1fr auto;
-      padding:3.2rem 0.6rem 2.2rem;
+      padding:5rem 0.6rem 3rem;
       gap:0.4rem; overflow-y:auto;
     }
     .col-l,.col-r { flex-direction:row; flex-wrap:wrap; gap:0.35rem; padding:0; justify-content:center; }
     .col-l{order:2} .col-c{order:1;padding:0} .col-r{order:3}
     .p { min-width:130px; flex:1; max-width:190px; }
     .hero-title { font-size:clamp(1.2rem,5.5vw,1.8rem); }
-    .hero-sub { margin-bottom:1.2rem; }
-    .cd-box { padding:0.6rem 0.8rem; }
-    .top-bar .logo { font-size:0.4rem; letter-spacing:0.12em; }
+    .cd-box { padding:0.7rem 0.6rem; }
+    .carousel-nav { width:32px; height:32px; }
+    .tribute { grid-template-columns:1fr; gap:1rem; }
+    .tribute-sep { width:40px; height:1px; background:linear-gradient(90deg, transparent, var(--gold), transparent); margin:0 auto; }
+    .footer-inner { grid-template-columns:1fr; gap:1.5rem; }
+    .bosque-counter { gap:1.5rem; }
+    .data-strip { grid-template-columns:1fr 1fr; }
   }
 </style>
-</head> 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NMC1GS2WDW"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-NMC1GS2WDW');
-</script><script async src="https://www.googletagmanager.com/gtag/js?id=G-NMC1GS2WDW"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-NMC1GS2WDW');
-</script>
+</head>
 <body>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5T2LL98X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<div class="video-bg"><video id="videoBg" muted playsinline preload="auto"></video></div>
-<div class="scanlines"></div>
-<div class="c c1"></div><div class="c c2"></div><div class="c c3"></div><div class="c c4"></div>
 
-<!-- TOP -->
+<!-- ══════════ TOP BAR UNIFICADO ══════════ -->
 <div class="top-bar">
-  <div class="logo">OASYS BASE CAMP LAT 40°N</div>
-  <div class="live"><span class="dot"></span><span>INCOMING SIGNAL</span></div>
-</div>
-<div class="top-ticker"><div class="track" id="topT"></div></div>
-
-<!-- ═══ GRID ═══ -->
-<div class="grid">
-
-  <!-- LEFT -->
-  <div class="col-l">
-    <div class="p">
-      <div class="p-t">Terreno</div>
-      <div class="r"><span class="l">Superficie total</span><span class="v g">3.4668 ha</span></div>
-      <div class="r"><span class="l">Parcela 9 (regadío)</span><span class="v">1.7743 ha</span></div>
-      <div class="bar"><i style="width:52%"></i></div>
-      <div class="r"><span class="l">Parcela 10</span><span class="v">1.4578 ha</span></div>
-      <div class="bar"><i style="width:42%"></i></div>
-      <div class="r"><span class="l">Altitud</span><span class="v t">604 m</span></div>
-      <div class="r"><span class="l">Polígono</span><span class="v">503</span></div>
+  <div class="ticker"><div class="track" id="topT"></div></div>
+  <nav class="nav">
+    <a href="#top" class="nav-logo">OASYS BASE CAMP LAT 40°N</a>
+    <button class="nav-toggle" id="navToggle">MENU</button>
+    <div class="nav-menu" id="navMenu">
+      <a href="#mission">Mission</a>
+      <a href="#miel">Miel</a>
+      <a href="#almendras">Almendras</a>
+      <a href="#pistachos">Pistachos</a>
+      <a href="#bosque">El Bosque Sagrado</a>
+      <a href="#bosque" class="cta">Reservar <span class="arrow">→</span></a>
     </div>
-    <div class="p">
-      <div class="p-t">Exposición Solar</div>
-      <div class="big">+2900</div>
-      <div class="unit">HORAS / AÑO</div>
-      <div style="margin-top:0.5rem">
-        <div class="r"><span class="l">Clasificación</span><span class="v t">ÓPTIMA</span></div>
+  </nav>
+</div>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="sec-1" id="top">
+  <div class="video-bg"><video id="videoBg" muted playsinline preload="auto"></video></div>
+  <div class="scanlines"></div>
+  <div class="c c1"></div><div class="c c2"></div><div class="c c3"></div><div class="c c4"></div>
+
+  <div class="grid">
+    <div class="col-l">
+      <div class="p">
+        <div class="p-t">Terreno</div>
+        <div class="r"><span class="l">Superficie total</span><span class="v g">3,4668 ha</span></div>
+        <div class="r"><span class="l">Parcela 9 (regadío)</span><span class="v">1,7743 ha</span></div>
+        <div class="bar"><i style="width:52%"></i></div>
+        <div class="r"><span class="l">Parcela 10</span><span class="v">1,4578 ha</span></div>
+        <div class="bar"><i style="width:42%"></i></div>
+        <div class="r"><span class="l">Altitud</span><span class="v t">604 m</span></div>
+        <div class="r"><span class="l">Polígono</span><span class="v">503</span></div>
+      </div>
+      <div class="p">
+        <div class="p-t">Exposición Solar</div>
+        <div class="big">+2900</div>
+        <div class="unit">HORAS / AÑO</div>
+        <div style="margin-top:0.5rem">
+          <div class="r"><span class="l">Clasificación</span><span class="v t">ÓPTIMA</span></div>
+        </div>
+      </div>
+      <div class="p">
+        <div class="p-t">Concesión Agua CHT</div>
+        <div class="r"><span class="l">Expediente</span><span class="v g">12.297/76</span></div>
+        <div class="r"><span class="l">Caudal</span><span class="v t">1,59 l/s</span></div>
+        <div class="r"><span class="l">Tipo</span><span class="v">Superficial</span></div>
+        <div class="r"><span class="l">Vigencia</span><span class="v">~2076</span></div>
       </div>
     </div>
-    <div class="p">
-      <div class="p-t">Concesión Agua CHT</div>
-      <div class="r"><span class="l">Expediente</span><span class="v g">12.297/76</span></div>
-      <div class="r"><span class="l">Caudal</span><span class="v t">1.59 l/s</span></div>
-      <div class="r"><span class="l">Tipo</span><span class="v">Superficial</span></div>
-      <div class="r"><span class="l">Vigencia</span><span class="v">~2076</span></div>
+
+    <div class="col-c">
+      <div class="hero-pre" id="heroPre">&nbsp;</div>
+      <h1 class="hero-title">OASYS BASE CAMP<br><span class="a">LAT 40°N</span></h1>
+      <div class="hero-sub" id="heroSub">&nbsp;</div>
+      <div class="cd-box">
+        <div class="cd-lbl">· LAUNCH COUNTDOWN ·</div>
+        <div class="cd-flip">
+          <div class="flip-unit">
+            <div class="flip-card"><span class="flip-num" id="cd-d">--</span></div>
+            <div class="flip-lbl">DAYS</div>
+          </div>
+          <span class="cd-sep">:</span>
+          <div class="flip-unit">
+            <div class="flip-card"><span class="flip-num" id="cd-h">--</span></div>
+            <div class="flip-lbl">HOURS</div>
+          </div>
+          <span class="cd-sep">:</span>
+          <div class="flip-unit">
+            <div class="flip-card"><span class="flip-num" id="cd-m">--</span></div>
+            <div class="flip-lbl">MIN</div>
+          </div>
+          <span class="cd-sep">:</span>
+          <div class="flip-unit">
+            <div class="flip-card"><span class="flip-num" id="cd-s">--</span></div>
+            <div class="flip-lbl">SEC</div>
+          </div>
+        </div>
+        <div class="cd-date">15 MAYO 2026 · YUNCLILLOS · TOLEDO</div>
+      </div>
+      <div class="hero-foot">
+        <div class="hero-foot-solar">+2900 H.SOLAR/YEAR</div>
+        <div class="hero-foot-loc">YUNCLILLOS 45591 · POL. 503 · P9 + P10</div>
+      </div>
+    </div>
+
+    <div class="col-r">
+      <div class="p">
+        <div class="p-t">Titular Explotación</div>
+        <div class="name">LEONARDO MUÑOZ PÉREZ</div>
+        <div class="sub">JOVEN AGRICULTOR</div>
+        <div class="sub">YUNCLILLOS · TOLEDO · 45591</div>
+        <div style="margin-top:0.4rem">
+          <div class="r"><span class="l">Modelo</span><span class="v t">AGROFORESTAL</span></div>
+        </div>
+      </div>
+      <div class="p">
+        <div class="p-t">Plan Productivo</div>
+        <div class="r"><span class="l">Pistacho</span><span class="v">1,60 ha</span></div>
+        <div class="bar"><i style="width:46%"></i></div>
+        <div class="r"><span class="l">Almendro</span><span class="v">1,10 ha</span></div>
+        <div class="bar"><i style="width:32%"></i></div>
+        <div class="r"><span class="l">Aromáticas</span><span class="v">0,30 ha</span></div>
+        <div class="bar"><i style="width:9%"></i></div>
+        <div class="r"><span class="l">Apicultura</span><span class="v t">Polinización</span></div>
+      </div>
+      <div class="p">
+        <div class="p-t">Eco-Schemes</div>
+        <div class="sr"><span class="sl">Cubierta vegetal</span><span class="sv on">ON</span></div>
+        <div class="sr"><span class="sl">Agroforestería</span><span class="sv on">ON</span></div>
+        <div class="sr"><span class="sl">Polinización</span><span class="sv on">ON</span></div>
+        <div class="sr"><span class="sl">Fitosanitarios</span><span class="sv z">ZERO</span></div>
+      </div>
     </div>
   </div>
 
-  <!-- CENTER -->
-  <div class="col-c">
-    <div class="hero-pre">· EARTH MISSION ·</div>
-    <h1 class="hero-title">OASYS BASE CAMP<br><span class="a">LAT 40°N</span></h1>
-    <div class="hero-sub">Yunclillos, Toledo — Planet Earth</div>
-    <div class="cd-box">
-      <div class="cd-lbl">· LAUNCH COUNTDOWN ·</div>
-      <div class="cd" id="countdown">
-        <div class="cd-u"><span class="cd-n" id="cd-d">--</span><span class="cd-s">DAYS</span></div>
-        <span class="cd-sep">:</span>
-        <div class="cd-u"><span class="cd-n" id="cd-h">--</span><span class="cd-s">HRS</span></div>
-        <span class="cd-sep">:</span>
-        <div class="cd-u"><span class="cd-n" id="cd-m">--</span><span class="cd-s">MIN</span></div>
-        <span class="cd-sep">:</span>
-        <div class="cd-u"><span class="cd-n" id="cd-s">--</span><span class="cd-s">SEC</span></div>
-      </div>
-      <div class="cd-date">15 MAYO 2026 · YUNCLILLOS, TOLEDO</div>
-    </div>
-    <div class="loc">40°03'N · 3°52'W · POL. 503 · P9 + P10</div>
-  </div>
+  <a href="#mission" class="scroll-hint">▼ SCROLL TO EXPLORE</a>
+</section>
 
-  <!-- RIGHT -->
-  <div class="col-r">
-    <div class="p">
-      <div class="p-t">Titular Explotación</div>
-      <div class="name">LEONARDO MUÑOZ PÉREZ</div>
-      <div class="sub">JOVEN AGRICULTOR</div>
-      <div class="sub">YUNCLILLOS · TOLEDO · 45591</div>
-      <div style="margin-top:0.4rem">
-        <div class="r"><span class="l">Modelo</span><span class="v t">AGROFORESTAL</span></div>
-      </div>
+<!-- ══════════ MISSION ══════════ -->
+<section class="sec" id="mission">
+  <div class="sec-hdr">
+    <div class="sec-eyebrow">· Earth Mission ·</div>
+    <h2 class="sec-title">Explotación agroforestal <span class="a">en tiempo real</span></h2>
+    <p class="sec-lead">3,4668 ha en Yunclillos, Lat. 40°N. Pistacho, almendro, aromáticas melíferas, apicultura. Cubierta vegetal permanente, cero fitosanitarios sintéticos, concesión de agua superficial del Guadarrama desde 1977.</p>
+  </div>
+  <div class="carousel" data-section="mission">
+    <div class="carousel-counter"><span class="cc-cur">01</span> / <span class="cc-tot">03</span></div>
+    <div class="carousel-track"></div>
+    <button class="carousel-nav prev" aria-label="Anterior">‹</button>
+    <button class="carousel-nav next" aria-label="Siguiente">›</button>
+    <div class="carousel-dots"></div>
+  </div>
+  <div class="data-strip">
+    <div class="data-card">
+      <div class="data-card-label">Superficie total</div>
+      <div class="data-card-val gold">3,4668 ha</div>
+      <div class="data-card-sub">P9 + P10 · POL. 503</div>
     </div>
-    <div class="p">
-      <div class="p-t">Plan Productivo</div>
-      <div class="r"><span class="l">Pistacho</span><span class="v">1.60 ha</span></div>
-      <div class="bar"><i style="width:46%"></i></div>
-      <div class="r"><span class="l">Almendro</span><span class="v">1.10 ha</span></div>
-      <div class="bar"><i style="width:32%"></i></div>
-      <div class="r"><span class="l">Aromáticas</span><span class="v">0.30 ha</span></div>
-      <div class="bar"><i style="width:9%"></i></div>
-      <div class="r"><span class="l">Apicultura</span><span class="v t">Polinización</span></div>
+    <div class="data-card">
+      <div class="data-card-label">Altitud</div>
+      <div class="data-card-val">604 m</div>
+      <div class="data-card-sub">LAT 40°03'N</div>
     </div>
-    <div class="p">
-      <div class="p-t">Eco-Schemes</div>
-      <div class="sr"><span class="sl">Cubierta vegetal</span><span class="sv on">ON</span></div>
-      <div class="sr"><span class="sl">Agroforestería</span><span class="sv on">ON</span></div>
-      <div class="sr"><span class="sl">Polinización</span><span class="sv on">ON</span></div>
-      <div class="sr"><span class="sl">Fitosanitarios</span><span class="sv z">ZERO</span></div>
+    <div class="data-card">
+      <div class="data-card-label">Exposición solar</div>
+      <div class="data-card-val gold">+2900 h/año</div>
+      <div class="data-card-sub">CLASIFICACIÓN ÓPTIMA</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Fitosanitarios</div>
+      <div class="data-card-val">ZERO</div>
+      <div class="data-card-sub">ORDEN 198/2023 JCCM</div>
     </div>
   </div>
+</section>
 
-</div>
+<!-- ══════════ MIEL ══════════ -->
+<section class="sec" id="miel">
+  <div class="sec-hdr">
+    <div class="sec-eyebrow">· Apicultura ·</div>
+    <h2 class="sec-title">Miel de <span class="a">polinización</span></h2>
+    <p class="sec-lead">Colmenas en servicio polinizador sobre aromáticas melíferas. Floración escalonada Lat. 40°N.</p>
+  </div>
+  <div class="carousel" data-section="miel">
+    <div class="carousel-counter"><span class="cc-cur">01</span> / <span class="cc-tot">03</span></div>
+    <div class="carousel-track"></div>
+    <button class="carousel-nav prev" aria-label="Anterior">‹</button>
+    <button class="carousel-nav next" aria-label="Siguiente">›</button>
+    <div class="carousel-dots"></div>
+  </div>
+  <div class="data-strip">
+    <div class="data-card">
+      <div class="data-card-label">Colmenas 2026</div>
+      <div class="data-card-val gold">40</div>
+      <div class="data-card-sub">INICIO · MAYO 2026</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Proyección 2028</div>
+      <div class="data-card-val">150</div>
+      <div class="data-card-sub">COLMENAS · POLINIZACIÓN</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Superficie apícola</div>
+      <div class="data-card-val gold">0,20 ha</div>
+      <div class="data-card-sub">AROMÁTICAS MELÍFERAS</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Registro</div>
+      <div class="data-card-val">REGA</div>
+      <div class="data-card-sub">APÍCOLA · PENDIENTE</div>
+    </div>
+  </div>
+</section>
 
-<!-- BOTTOM -->
-<div class="bot-bar"><div class="bot-track" id="botT"></div></div>
-<div class="copy">
-  © 2026 OASYS.CAMP · Yunclillos, Toledo, España · Todos los derechos reservados<br>
-  <span class="mc">♪ The Man That Got Away (Eric Kupper Mix/Radio Edit) · Judy Garland</span>
-</div>
+<!-- ══════════ ALMENDRAS ══════════ -->
+<section class="sec" id="almendras">
+  <div class="sec-hdr">
+    <div class="sec-eyebrow">· Prunus dulcis ·</div>
+    <h2 class="sec-title">Almendro <span class="a">Penta · Lauranne</span></h2>
+    <p class="sec-lead">Variedades de floración tardía, autofértiles, adaptadas a Lat. 40°N.</p>
+  </div>
+  <div class="carousel" data-section="almendras">
+    <div class="carousel-counter"><span class="cc-cur">01</span> / <span class="cc-tot">03</span></div>
+    <div class="carousel-track"></div>
+    <button class="carousel-nav prev" aria-label="Anterior">‹</button>
+    <button class="carousel-nav next" aria-label="Siguiente">›</button>
+    <div class="carousel-dots"></div>
+  </div>
+  <div class="data-strip">
+    <div class="data-card">
+      <div class="data-card-label">Superficie</div>
+      <div class="data-card-val gold">1,10 ha</div>
+      <div class="data-card-sub">PARCELA 9 + 10</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Variedades</div>
+      <div class="data-card-val">Penta · Lauranne</div>
+      <div class="data-card-sub">FLORACIÓN TARDÍA</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Plantación</div>
+      <div class="data-card-val gold">2027</div>
+      <div class="data-card-sub">MARCO 6×5 M</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Primera producción</div>
+      <div class="data-card-val">2029</div>
+      <div class="data-card-sub">AÑO 2–3 POST-PLANTACIÓN</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PISTACHOS ══════════ -->
+<section class="sec" id="pistachos">
+  <div class="sec-hdr">
+    <div class="sec-eyebrow">· Pistacia vera ·</div>
+    <h2 class="sec-title">Pistacho <span class="a">Kerman · Sirora</span></h2>
+    <p class="sec-lead">Portainjerto UCB1. Cultivo principal de la explotación.</p>
+  </div>
+  <div class="carousel" data-section="pistachos">
+    <div class="carousel-counter"><span class="cc-cur">01</span> / <span class="cc-tot">03</span></div>
+    <div class="carousel-track"></div>
+    <button class="carousel-nav prev" aria-label="Anterior">‹</button>
+    <button class="carousel-nav next" aria-label="Siguiente">›</button>
+    <div class="carousel-dots"></div>
+  </div>
+  <div class="data-strip">
+    <div class="data-card">
+      <div class="data-card-label">Superficie</div>
+      <div class="data-card-val gold">1,60 ha</div>
+      <div class="data-card-sub">CULTIVO PRINCIPAL</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Variedades</div>
+      <div class="data-card-val">Kerman · Sirora</div>
+      <div class="data-card-sub">PORTAINJERTO UCB1</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Plantación</div>
+      <div class="data-card-val gold">2027</div>
+      <div class="data-card-sub">MARCO 6×5 M</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-label">Primera producción</div>
+      <div class="data-card-val">2034</div>
+      <div class="data-card-sub">AÑO 7–8</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ EL BOSQUE SAGRADO ══════════ -->
+<section class="sec-bosque" id="bosque">
+  <div class="video-bg">
+    <video id="bosqueVideo" muted playsinline preload="metadata" loop>
+      <source src="bosque_sagrado_video.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="scanlines"></div>
+  <div class="c c1"></div><div class="c c2"></div><div class="c c3"></div><div class="c c4"></div>
+
+  <div class="bosque-content">
+    <div class="bosque-eyebrow">· Proyecto SEMILLA ·</div>
+    <h2 class="bosque-title">El <span class="a">Bosque</span> Sagrado</h2>
+    <p class="bosque-sub">Un árbol vivo por cada mascota. Biotransformación regenerativa bajo Reglamento CE 1069/2009 — la memoria se convierte en suelo, raíz, copa.</p>
+
+    <div class="tribute">
+      <div class="tribute-card">
+        <div class="tribute-plaza">· PLAZA Nº 1 ·</div>
+        <div class="tribute-name">BOMBÓN</div>
+        <div class="tribute-tree">— almendro —</div>
+      </div>
+      <div class="tribute-sep"></div>
+      <div class="tribute-card">
+        <div class="tribute-plaza">· PLAZA Nº 2 ·</div>
+        <div class="tribute-name">PELUCHE</div>
+        <div class="tribute-tree">— almendro —</div>
+      </div>
+    </div>
+
+    <div class="bosque-flow">
+      <span class="flow-step">Earth Mission</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">Proyecto SEMILLA</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">El Bosque Sagrado</span>
+    </div>
+
+    <div class="bosque-cta-wrap">
+      <a href="https://elbosquesagrado.org" class="bosque-cta" target="_blank" rel="noopener">
+        Reservar Plaza <span class="arrow">→</span>
+      </a>
+      <div class="bosque-cta-sub">elbosquesagrado.org · 50 plazas fundadoras</div>
+    </div>
+
+    <div class="bosque-counter">
+      <div class="bosque-counter-item">
+        <div class="bosque-counter-v">14</div>
+        <div class="bosque-counter-l">FUNDADORES</div>
+      </div>
+      <div class="bosque-counter-item">
+        <div class="bosque-counter-v">36</div>
+        <div class="bosque-counter-l">DISPONIBLES</div>
+      </div>
+      <div class="bosque-counter-item">
+        <div class="bosque-counter-v">450€</div>
+        <div class="bosque-counter-l">PLAZA FUNDADOR</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">OASYS BASE CAMP LAT 40°N</div>
+      <p class="footer-tagline">Yunclillos, Toledo — Planet Earth.<br>Explotación agroforestal regenerativa · Lat. 40°N.</p>
+    </div>
+    <div>
+      <h4>Navegación</h4>
+      <ul>
+        <li><a href="#mission">Mission</a></li>
+        <li><a href="#miel">Miel</a></li>
+        <li><a href="#almendras">Almendras</a></li>
+        <li><a href="#pistachos">Pistachos</a></li>
+        <li><a href="#bosque">El Bosque Sagrado</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Proyectos</h4>
+      <ul>
+        <li><a href="https://elbosquesagrado.org" target="_blank" rel="noopener">elbosquesagrado.org →</a></li>
+        <li><a href="https://oasys.camp" target="_blank" rel="noopener">oasys.camp →</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bot">
+    © 2026 OASYS.CAMP · Yunclillos, Toledo, España · Todos los derechos reservados
+    <span class="mc">♪ The Man That Got Away · Judy Garland</span>
+  </div>
+</footer>
 
 <!-- AUDIO -->
 <audio id="audio" loop preload="auto"><source src="soundtrack.mp3" type="audio/mpeg"></audio>
@@ -407,61 +1022,233 @@
 </button>
 
 <script>
-  // COUNTDOWN
-  const T=new Date('2026-05-15T09:00:00+02:00').getTime();
+  // ══════════ COUNTDOWN ══════════
+  const T = new Date('2026-05-15T09:00:00+02:00').getTime();
+  function setFlip(id, val) {
+    const el = document.getElementById(id);
+    const str = String(val).padStart(2,'0');
+    if (el.textContent !== str) {
+      el.textContent = str;
+      const card = el.closest('.flip-card');
+      card.style.animation = 'none';
+      void card.offsetWidth;
+      card.style.animation = 'flipPulse 0.3s ease-out';
+    }
+  }
   function tick(){
-    const df=Math.max(0,T-Date.now());
-    document.getElementById('cd-d').textContent=String(Math.floor(df/864e5)).padStart(2,'0');
-    document.getElementById('cd-h').textContent=String(Math.floor(df%864e5/36e5)).padStart(2,'0');
-    document.getElementById('cd-m').textContent=String(Math.floor(df%36e5/6e4)).padStart(2,'0');
-    document.getElementById('cd-s').textContent=String(Math.floor(df%6e4/1e3)).padStart(2,'0');
-    if(df<=0)document.querySelector('.cd-lbl').textContent='· MISSION ACTIVE ·';
+    const df = Math.max(0, T - Date.now());
+    setFlip('cd-d', Math.floor(df/864e5));
+    setFlip('cd-h', Math.floor(df%864e5/36e5));
+    setFlip('cd-m', Math.floor(df%36e5/6e4));
+    setFlip('cd-s', Math.floor(df%6e4/1e3));
+    if (df <= 0) document.querySelector('.cd-lbl').textContent = '· MISSION ACTIVE ·';
   }
-  tick(); setInterval(tick,1000);
+  tick(); setInterval(tick, 1000);
 
-  // VIDEO CAROUSEL
-  const PL=['oasys_video.mp4','oasys_video_pedreras.mp4'];
-  const vb=document.getElementById('videoBg');
-  let ci=0;
+  const styleEl = document.createElement('style');
+  styleEl.textContent = `@keyframes flipPulse {
+    0% { transform:scale(1); }
+    50% { transform:scale(1.04); box-shadow:inset 0 1px 0 rgba(0,212,170,0.2),inset 0 -1px 0 rgba(0,0,0,0.5),0 2px 10px rgba(0,212,170,0.15); }
+    100% { transform:scale(1); }
+  }`;
+  document.head.appendChild(styleEl);
+
+  // ══════════ TYPEWRITER ══════════
+  const preMessages = [
+    'Earth Mission · Nodo 0 · Yunclillos, Toledo',
+    'Operación agroforestal en tiempo real',
+    'Lat. 40°03\'N · Long. 3°52\'W · Altitud 604 m',
+    'Cubierta vegetal permanente · Cero fitosanitarios',
+    'Concesión hídrica CHT 12.297/76 · Vigencia ~2076'
+  ];
+  const subMessages = [
+    'Yunclillos, Toledo — Planet Earth',
+    'Pistacho · Almendro · Aromáticas · Apicultura',
+    '3,4668 ha en producción regenerativa',
+    'Polígono 503 · Parcelas 9 y 10',
+    'Sistema hídrico del Guadarrama desde 1977'
+  ];
+  const cursorHTML = '<span class="cursor"></span>';
+
+  function typeWriter(el, text, speed=45) {
+    return new Promise(resolve => {
+      el.innerHTML = cursorHTML;
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          el.innerHTML = text.slice(0, i+1) + cursorHTML;
+          i++;
+        } else {
+          clearInterval(interval);
+          setTimeout(resolve, 2500);
+        }
+      }, speed);
+    });
+  }
+  function eraseWriter(el, speed=25) {
+    return new Promise(resolve => {
+      let current = el.textContent;
+      const interval = setInterval(() => {
+        if (current.length > 0) {
+          current = current.slice(0, -1);
+          el.innerHTML = current + cursorHTML;
+        } else {
+          clearInterval(interval);
+          setTimeout(resolve, 300);
+        }
+      }, speed);
+    });
+  }
+  async function runTypewriter(el, messages, initialDelay=0) {
+    await new Promise(r => setTimeout(r, initialDelay));
+    let i = 0;
+    while (true) {
+      await typeWriter(el, messages[i]);
+      await eraseWriter(el);
+      i = (i + 1) % messages.length;
+    }
+  }
+  runTypewriter(document.getElementById('heroPre'), preMessages, 600);
+  runTypewriter(document.getElementById('heroSub'), subMessages, 1400);
+
+  // ══════════ VIDEO HERO ══════════
+  const PL = ['oasys_video.mp4','oasys_video_pedreras.mp4'];
+  const vb = document.getElementById('videoBg');
+  let ci = 0;
   function pv(i){
-    vb.style.opacity='0';
-    setTimeout(()=>{
-      vb.src=PL[i]; vb.load();
-      vb.play().then(()=>{vb.style.opacity='1'}).catch(()=>{
-        document.addEventListener('click',()=>{vb.play();vb.style.opacity='1'},{once:true});
+    vb.style.opacity = '0';
+    setTimeout(() => {
+      vb.src = PL[i]; vb.load();
+      vb.play().then(() => { vb.style.opacity = '1'; }).catch(() => {
+        document.addEventListener('click', () => { vb.play(); vb.style.opacity = '1'; }, {once:true});
       });
-    },600);
+    }, 600);
   }
-  vb.style.transition='opacity 0.8s ease';
-  vb.addEventListener('ended',()=>{ci=(ci+1)%PL.length;pv(ci)});
-  window.addEventListener('load',()=>pv(0));
+  vb.style.transition = 'opacity 0.8s ease';
+  vb.addEventListener('ended', () => { ci = (ci+1) % PL.length; pv(ci); });
+  window.addEventListener('load', () => pv(0));
 
-  // AUDIO
-  const au=document.getElementById('audio'),sb=document.getElementById('sndBtn'),
-        iM=document.getElementById('iM'),iP=document.getElementById('iP');
-  let as=false;
-  function sa(){if(!as){au.volume=0.35;au.play().then(()=>{as=true;iM.style.display='none';iP.style.display='block';sb.style.opacity='0.6'}).catch(()=>{})}}
-  document.addEventListener('click',sa,{once:true});
-  document.addEventListener('touchstart',sa,{once:true});
-  sb.addEventListener('click',e=>{
+  // ══════════ VIDEO BOSQUE LAZY ══════════
+  const bosqueVid = document.getElementById('bosqueVideo');
+  if ('IntersectionObserver' in window && bosqueVid){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) bosqueVid.play().catch(()=>{});
+        else bosqueVid.pause();
+      });
+    }, {threshold:0.25});
+    io.observe(document.getElementById('bosque'));
+  }
+
+  // ══════════ AUDIO ══════════
+  const au = document.getElementById('audio'), sb = document.getElementById('sndBtn'),
+        iM = document.getElementById('iM'), iP = document.getElementById('iP');
+  let as = false;
+  function sa(){
+    if (!as) {
+      au.volume = 0.35;
+      au.play().then(() => {
+        as = true; iM.style.display = 'none'; iP.style.display = 'block'; sb.style.opacity = '0.85';
+      }).catch(()=>{});
+    }
+  }
+  document.addEventListener('click', sa, {once:true});
+  document.addEventListener('touchstart', sa, {once:true});
+  sb.addEventListener('click', e => {
     e.stopPropagation();
-    if(!as){sa();return}
-    if(au.paused){au.play();iM.style.display='none';iP.style.display='block'}
-    else{au.pause();iM.style.display='block';iP.style.display='none'}
+    if (!as) { sa(); return; }
+    if (au.paused) { au.play(); iM.style.display='none'; iP.style.display='block'; }
+    else { au.pause(); iM.style.display='block'; iP.style.display='none'; }
   });
 
-  // TOP TICKER
-  const td=[{l:'TEMP',v:'17°C'},{l:'SENSACIÓN',v:'15°C'},{l:'HUMEDAD',v:'58%'},
+  // ══════════ TICKER ══════════
+  const td = [{l:'TEMP',v:'17°C'},{l:'SENSACIÓN',v:'15°C'},{l:'HUMEDAD',v:'58%'},
     {l:'SOLAR',v:'+2900h/AÑO'},{l:'VIENTO',v:'7 km/h'},{l:'ALTITUD',v:'604m'},
     {l:'LAT',v:"40°03'N"},{l:'LONG',v:"3°52'W"}];
-  const tt=document.getElementById('topT');
-  tt.innerHTML=[...td,...td,...td].map(d=>`<span class="tl">${d.l}</span> <span class="tv">${d.v}</span> <span class="ts">·</span>`).join('');
+  const tt = document.getElementById('topT');
+  tt.innerHTML = [...td,...td,...td].map(d => `<span class="tl">${d.l}</span> <span class="tv">${d.v}</span> <span class="ts">·</span>`).join('');
 
-  // BOTTOM TICKER
-  const bi=['EARTH MISSION','REGENERATIVE AGRICULTURE','AGROFORESTRY','YUNCLILLOS 45591',
-    'POLÍGONO 503','PLANET EARTH','+2900 H.SOLAR/YEAR','CUBIERTA VEGETAL PERMANENTE'];
-  const bt=document.getElementById('botT');
-  bt.innerHTML=[...bi,...bi,...bi].map((t,i)=>`<span class="${i%3===0?'g':''}">${t}</span>`).join('<span style="opacity:0.08;color:var(--teal)">·</span>');
+  // ══════════ NAV MÓVIL ══════════
+  const nt = document.getElementById('navToggle'), nm = document.getElementById('navMenu');
+  nt.addEventListener('click', () => nm.classList.toggle('open'));
+  nm.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nm.classList.remove('open')));
+
+  // ══════════ CARRUSELES ══════════
+  // Cuando tengas media real, reemplaza {type:'placeholder'} por:
+  //   {type:'image', src:'img/mission_1.jpg', caption:'Descripción'}
+  //   {type:'video', src:'video/mission_1.mp4', caption:'Descripción'}
+  const mediaMap = {
+    mission: [
+      {type:'placeholder', label:'SLIDE 01', caption:'Parcela 9 · Vista general'},
+      {type:'placeholder', label:'SLIDE 02', caption:'Parcela 10 · Cubierta vegetal'},
+      {type:'placeholder', label:'SLIDE 03', caption:'Acceso · Polígono 503'}
+    ],
+    miel: [
+      {type:'placeholder', label:'SLIDE 01', caption:'Colmenas · Primavera 2026'},
+      {type:'placeholder', label:'SLIDE 02', caption:'Aromáticas melíferas'},
+      {type:'placeholder', label:'SLIDE 03', caption:'Extracción'}
+    ],
+    almendras: [
+      {type:'placeholder', label:'SLIDE 01', caption:'Almendro en flor'},
+      {type:'placeholder', label:'SLIDE 02', caption:'Marco de plantación'},
+      {type:'placeholder', label:'SLIDE 03', caption:'Cosecha'}
+    ],
+    pistachos: [
+      {type:'placeholder', label:'SLIDE 01', caption:'Pistacho Kerman'},
+      {type:'placeholder', label:'SLIDE 02', caption:'Portainjerto UCB1'},
+      {type:'placeholder', label:'SLIDE 03', caption:'Polinización'}
+    ]
+  };
+
+  function renderSlide(slide) {
+    if (slide.type === 'image') {
+      return `<div class="carousel-slide"><img src="${slide.src}" alt="${slide.caption||''}" loading="lazy"></div>`;
+    }
+    if (slide.type === 'video') {
+      return `<div class="carousel-slide"><video src="${slide.src}" muted playsinline loop preload="none"></video></div>`;
+    }
+    return `<div class="carousel-slide placeholder"><div class="placeholder-label">${slide.label}<span>${slide.caption||''}</span></div></div>`;
+  }
+
+  document.querySelectorAll('.carousel').forEach(carousel => {
+    const section = carousel.dataset.section;
+    const slides = mediaMap[section] || [];
+    const track = carousel.querySelector('.carousel-track');
+    const dotsContainer = carousel.querySelector('.carousel-dots');
+    const counterCur = carousel.querySelector('.cc-cur');
+    const counterTot = carousel.querySelector('.cc-tot');
+
+    track.innerHTML = slides.map(renderSlide).join('');
+    dotsContainer.innerHTML = slides.map((_,i) => `<button class="carousel-dot${i===0?' active':''}" data-i="${i}" aria-label="Slide ${i+1}"></button>`).join('');
+    counterTot.textContent = String(slides.length).padStart(2,'0');
+
+    let idx = 0;
+    function goTo(i) {
+      idx = (i + slides.length) % slides.length;
+      track.style.transform = `translateX(-${idx*100}%)`;
+      dotsContainer.querySelectorAll('.carousel-dot').forEach((d,di) => d.classList.toggle('active', di===idx));
+      counterCur.textContent = String(idx+1).padStart(2,'0');
+      track.querySelectorAll('video').forEach((v,vi) => {
+        if (vi === idx) v.play().catch(()=>{});
+        else v.pause();
+      });
+    }
+
+    carousel.querySelector('.prev').addEventListener('click', () => goTo(idx-1));
+    carousel.querySelector('.next').addEventListener('click', () => goTo(idx+1));
+    dotsContainer.querySelectorAll('.carousel-dot').forEach(dot => {
+      dot.addEventListener('click', () => goTo(parseInt(dot.dataset.i)));
+    });
+
+    let autoInt = null;
+    const co = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { autoInt = setInterval(() => goTo(idx+1), 6000); }
+        else { clearInterval(autoInt); }
+      });
+    }, {threshold:0.3});
+    co.observe(carousel);
+  });
 </script>
 </body>
 </html>
