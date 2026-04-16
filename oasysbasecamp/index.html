@@ -1,1 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OASYS BASE CAMP LAT 40°N</title>
+<meta name="description" content="OASYS BASE CAMP LAT 40°N — Yunclillos, Toledo. Coming Soon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #070a09;
+    --teal: #00D4AA;
+    --teal-dim: rgba(0, 212, 170, 0.12);
+    --teal-glow: rgba(0, 212, 170, 0.35);
+    --gold: #C9A84C;
+    --cream: #f0ece4;
+    --white: #e8e6e1;
+    --font-title: 'Orbitron', sans-serif;
+    --font-narrative: 'Cormorant Garamond', serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; background:var(--dark); color:var(--white); }
 
+  /* ── VIDEO ── */
+  .video-bg { position:fixed; inset:0; z-index:0; overflow:hidden; }
+  .video-bg video {
+    position:absolute; top:50%; left:50%;
+    min-width:100%; min-height:100%; width:auto; height:auto;
+    transform:translate(-50%,-50%); object-fit:cover;
+  }
+  .video-bg::after {
+    content:''; position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(7,10,9,0.15) 0%, rgba(7,10,9,0.55) 55%, rgba(7,10,9,0.9) 100%),
+      linear-gradient(180deg, rgba(7,10,9,0.75) 0%, transparent 18%, transparent 72%, rgba(7,10,9,0.85) 100%);
+    z-index:1;
+  }
+  .scanlines {
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,170,0.012) 2px, rgba(0,212,170,0.012) 4px);
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    position:fixed; top:0; left:0; right:0; z-index:10;
+    padding:0.6rem 1.2rem;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid rgba(0,212,170,0.08);
+    background:linear-gradient(180deg, rgba(7,10,9,0.92) 0%, rgba(7,10,9,0.3) 80%, transparent 100%);
+  }
+  .top-bar .logo {
+    font-family:var(--font-title); font-size:0.55rem; font-weight:700;
+    letter-spacing:0.2em; color:var(--teal); white-space:nowrap;
+  }
+  .top-bar .live {
+    font-family:var(--font-mono); font-size:0.55rem;
+    letter-spacing:0.1em; color:var(--gold);
+    display:flex; align-items:center; gap:0.35rem; white-space:nowrap;
+  }
+  .top-bar .live .dot {
+    width:5px; height:5px; border-radius:50%; background:var(--gold);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── TOP TICKER ── */
+  .top-ticker {
+    position:fixed; top:2.2rem; left:0; right:0; z-index:9;
+    padding:0.25rem 0; background:rgba(7,10,9,0.5);
+    border-bottom:1px solid rgba(0,212,170,0.04); overflow:hidden;
+  }
+  .top-ticker .track {
+    display:flex; gap:2rem; white-space:nowrap;
+    animation:scroll 35s linear infinite;
+  }
+  .top-ticker .tl { font-family:var(--font-mono); font-size:0.45rem; letter-spacing:0.12em; color:var(--teal); opacity:0.35; }
+  .top-ticker .tv { font-family:var(--font-mono); font-size:0.45rem; letter-spacing:0.12em; color:var(--gold); opacity:0.6; }
+  .top-ticker .ts { color:var(--teal); opacity:0.12; font-size:0.45rem; }
+  @keyframes scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+  /* ── MAIN GRID ── */
+  .grid {
+    position:relative; z-index:2;
+    width:100%; height:100%;
+    display:grid;
+    grid-template-columns:240px 1fr 240px;
+    padding:3.5rem 0 2.2rem 0;
+  }
+
+  /* ── HUD PANEL ── */
+  .p {
+    background:linear-gradient(145deg, rgba(7,10,9,0.72) 0%, rgba(0,212,170,0.03) 100%);
+    border:1px solid rgba(0,212,170,0.1);
+    padding:0.7rem 0.85rem; position:relative;
+    backdrop-filter:blur(5px);
+  }
+  .p::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, var(--teal-glow), transparent);
+  }
+  .p-t {
+    font-family:var(--font-mono); font-size:0.45rem;
+    letter-spacing:0.25em; color:var(--teal); margin-bottom:0.55rem;
+    text-transform:uppercase;
+  }
+  .p-t::before { content:'· '; color:var(--gold); }
+
+  .r { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.3rem; }
+  .r .l { font-family:var(--font-mono); font-size:0.45rem; letter-spacing:0.1em; color:var(--teal); opacity:0.45; text-transform:uppercase; }
+  .r .v { font-family:var(--font-title); font-size:0.6rem; font-weight:600; color:var(--white); }
+  .r .v.g { color:var(--gold); }
+  .r .v.t { color:var(--teal); }
+
+  .bar { width:100%; height:2px; background:rgba(0,212,170,0.08); margin:0.1rem 0 0.4rem; border-radius:1px; }
+  .bar i { display:block; height:100%; border-radius:1px; background:linear-gradient(90deg, var(--teal), var(--gold)); }
+
+  .big { font-family:var(--font-title); font-weight:800; font-size:1.4rem; color:var(--gold); line-height:1; }
+  .unit { font-family:var(--font-mono); font-size:0.4rem; letter-spacing:0.2em; color:var(--teal); opacity:0.45; margin-top:0.1rem; }
+
+  .name { font-family:var(--font-title); font-size:0.58rem; font-weight:700; color:var(--white); letter-spacing:0.08em; margin-bottom:0.25rem; }
+  .sub { font-family:var(--font-mono); font-size:0.4rem; letter-spacing:0.1em; color:var(--teal); opacity:0.45; margin-bottom:0.1rem; }
+
+  .sr { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem; }
+  .sr .sl { font-family:var(--font-mono); font-size:0.45rem; letter-spacing:0.1em; color:var(--teal); opacity:0.45; text-transform:uppercase; }
+  .sr .sv { font-family:var(--font-title); font-size:0.55rem; font-weight:600; }
+  .sv.on { color:var(--teal); }
+  .sv.z { color:var(--gold); }
+
+  /* COLUMNS */
+  .col-l { display:flex; flex-direction:column; gap:0.5rem; padding:0.8rem 0.6rem 0.8rem 0.8rem; justify-content:center; }
+  .col-r { display:flex; flex-direction:column; gap:0.5rem; padding:0.8rem 0.8rem 0.8rem 0.6rem; justify-content:center; }
+
+  /* CENTER */
+  .col-c {
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center; padding:0 1rem;
+  }
+  .hero-pre {
+    font-family:var(--font-mono); font-size:0.5rem;
+    letter-spacing:0.45em; color:var(--gold); opacity:0.65; margin-bottom:0.7rem;
+  }
+  .hero-title {
+    font-family:var(--font-title); font-weight:900;
+    font-size:clamp(1.5rem, 3.8vw, 3.2rem);
+    letter-spacing:0.05em; line-height:1.15; color:var(--white);
+    text-shadow:0 0 50px rgba(0,212,170,0.08); margin-bottom:0.15em;
+  }
+  .hero-title .a { color:var(--teal); }
+  .hero-sub {
+    font-family:var(--font-narrative); font-size:clamp(0.8rem, 1.4vw, 1.05rem);
+    font-style:italic; font-weight:300; color:var(--cream); opacity:0.45;
+    letter-spacing:0.04em; margin-bottom:2rem;
+  }
+
+  /* COUNTDOWN — compact */
+  .cd-box {
+    background:linear-gradient(135deg, rgba(7,10,9,0.55) 0%, rgba(0,212,170,0.04) 100%);
+    border:1px solid rgba(0,212,170,0.12); padding:0.8rem 1.8rem; position:relative;
+  }
+  .cd-box::before {
+    content:''; position:absolute; top:0; left:25%; right:25%; height:1px;
+    background:linear-gradient(90deg, transparent, var(--teal-glow), transparent);
+  }
+  .cd-lbl {
+    font-family:var(--font-mono); font-size:0.4rem;
+    letter-spacing:0.35em; color:var(--gold); opacity:0.55; margin-bottom:0.6rem;
+  }
+  .cd { display:flex; align-items:center; justify-content:center; gap:clamp(0.5rem,1.5vw,1.2rem); }
+  .cd-u { text-align:center; }
+  .cd-n {
+    font-family:var(--font-title); font-weight:700;
+    font-size:clamp(1.1rem, 3vw, 1.8rem);
+    color:var(--white); line-height:1; min-width:2ch; display:block;
+    text-shadow:0 0 15px rgba(0,212,170,0.12);
+  }
+  .cd-s {
+    font-family:var(--font-mono); font-size:0.35rem;
+    letter-spacing:0.25em; color:var(--teal); opacity:0.45; margin-top:0.25rem;
+  }
+  .cd-sep {
+    font-family:var(--font-title); font-size:clamp(0.8rem,2vw,1.3rem);
+    color:var(--teal); opacity:0.2; animation:blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:0.2} 50%{opacity:0.05} }
+  .cd-date {
+    font-family:var(--font-mono); font-size:0.4rem;
+    letter-spacing:0.15em; color:var(--teal); opacity:0.35; margin-top:0.6rem;
+  }
+  .loc {
+    margin-top:1.2rem;
+    font-family:var(--font-mono); font-size:0.45rem;
+    letter-spacing:0.15em; color:var(--teal); opacity:0.35;
+  }
+
+  /* ── BOTTOM TICKER ── */
+  .bot-bar {
+    position:fixed; bottom:1.5rem; left:0; right:0; z-index:10;
+    padding:0.4rem 0; overflow:hidden;
+    border-top:1px solid rgba(0,212,170,0.05);
+  }
+  .bot-track {
+    display:flex; gap:2.5rem; white-space:nowrap;
+    animation:scroll 42s linear infinite;
+  }
+  .bot-track span {
+    font-family:var(--font-mono); font-size:0.4rem;
+    letter-spacing:0.12em; color:var(--teal); opacity:0.25;
+  }
+  .bot-track span.g { color:var(--gold); opacity:0.4; }
+
+  /* ── COPYRIGHT ── */
+  .copy {
+    position:fixed; bottom:0; left:0; right:0; z-index:11;
+    text-align:center; padding:0.3rem 1rem;
+    font-family:var(--font-mono); font-size:0.38rem;
+    letter-spacing:0.12em; color:var(--teal); opacity:0.22;
+    background:rgba(7,10,9,0.95);
+    border-top:1px solid rgba(0,212,170,0.03); line-height:1.5;
+  }
+  .copy .mc {
+    font-family:var(--font-narrative); font-style:italic;
+    font-size:0.48rem; letter-spacing:0.05em; color:var(--gold); opacity:0.45;
+  }
+
+  /* ── SOUND ── */
+  .snd {
+    position:fixed; bottom:2.2rem; right:0.8rem; z-index:15;
+    width:30px; height:30px; border-radius:50%;
+    border:1px solid rgba(0,212,170,0.18);
+    background:rgba(7,10,9,0.55); backdrop-filter:blur(5px);
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all 0.3s; color:var(--teal); opacity:0.35;
+  }
+  .snd:hover { opacity:1; border-color:var(--teal); box-shadow:0 0 8px rgba(0,212,170,0.12); }
+  .snd svg { width:11px; height:11px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+
+  /* ── CORNERS ── */
+  .c { position:fixed; width:20px; height:20px; z-index:5; opacity:0.12; }
+  .c::before,.c::after { content:''; position:absolute; background:var(--teal); }
+  .c1{top:8px;left:8px} .c1::before{top:0;left:0;width:14px;height:1px} .c1::after{top:0;left:0;width:1px;height:14px}
+  .c2{top:8px;right:8px} .c2::before{top:0;right:0;width:14px;height:1px} .c2::after{top:0;right:0;width:1px;height:14px}
+  .c3{bottom:8px;left:8px} .c3::before{bottom:0;left:0;width:14px;height:1px} .c3::after{bottom:0;left:0;width:1px;height:14px}
+  .c4{bottom:8px;right:8px} .c4::before{bottom:0;right:0;width:14px;height:1px} .c4::after{bottom:0;right:0;width:1px;height:14px}
+
+  /* ── ANIMATION ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .col-l .p { animation:fadeUp 0.7s ease-out both; }
+  .col-l .p:nth-child(1){animation-delay:0.15s} .col-l .p:nth-child(2){animation-delay:0.3s} .col-l .p:nth-child(3){animation-delay:0.45s}
+  .col-c { animation:fadeUp 0.9s ease-out 0.1s both; }
+  .col-r .p { animation:fadeUp 0.7s ease-out both; }
+  .col-r .p:nth-child(1){animation-delay:0.25s} .col-r .p:nth-child(2){animation-delay:0.4s} .col-r .p:nth-child(3){animation-delay:0.55s}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:960px) {
+    .grid {
+      grid-template-columns:1fr;
+      grid-template-rows:auto 1fr auto;
+      padding:3.2rem 0.6rem 2.2rem;
+      gap:0.4rem; overflow-y:auto;
+    }
+    .col-l,.col-r { flex-direction:row; flex-wrap:wrap; gap:0.35rem; padding:0; justify-content:center; }
+    .col-l{order:2} .col-c{order:1;padding:0} .col-r{order:3}
+    .p { min-width:130px; flex:1; max-width:190px; }
+    .hero-title { font-size:clamp(1.2rem,5.5vw,1.8rem); }
+    .hero-sub { margin-bottom:1.2rem; }
+    .cd-box { padding:0.6rem 0.8rem; }
+    .top-bar .logo { font-size:0.4rem; letter-spacing:0.12em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="video-bg"><video id="videoBg" muted playsinline preload="auto"></video></div>
+<div class="scanlines"></div>
+<div class="c c1"></div><div class="c c2"></div><div class="c c3"></div><div class="c c4"></div>
+
+<!-- TOP -->
+<div class="top-bar">
+  <div class="logo">OASYS BASE CAMP LAT 40°N</div>
+  <div class="live"><span class="dot"></span><span>INCOMING SIGNAL</span></div>
+</div>
+<div class="top-ticker"><div class="track" id="topT"></div></div>
+
+<!-- ═══ GRID ═══ -->
+<div class="grid">
+
+  <!-- LEFT -->
+  <div class="col-l">
+    <div class="p">
+      <div class="p-t">Terreno</div>
+      <div class="r"><span class="l">Superficie total</span><span class="v g">3.4668 ha</span></div>
+      <div class="r"><span class="l">Parcela 9 (regadío)</span><span class="v">1.7743 ha</span></div>
+      <div class="bar"><i style="width:52%"></i></div>
+      <div class="r"><span class="l">Parcela 10</span><span class="v">1.4578 ha</span></div>
+      <div class="bar"><i style="width:42%"></i></div>
+      <div class="r"><span class="l">Altitud</span><span class="v t">604 m</span></div>
+      <div class="r"><span class="l">Polígono</span><span class="v">503</span></div>
+    </div>
+    <div class="p">
+      <div class="p-t">Exposición Solar</div>
+      <div class="big">+2900</div>
+      <div class="unit">HORAS / AÑO</div>
+      <div style="margin-top:0.5rem">
+        <div class="r"><span class="l">Clasificación</span><span class="v t">ÓPTIMA</span></div>
+      </div>
+    </div>
+    <div class="p">
+      <div class="p-t">Concesión Agua CHT</div>
+      <div class="r"><span class="l">Expediente</span><span class="v g">12.297/76</span></div>
+      <div class="r"><span class="l">Caudal</span><span class="v t">1.59 l/s</span></div>
+      <div class="r"><span class="l">Tipo</span><span class="v">Superficial</span></div>
+      <div class="r"><span class="l">Vigencia</span><span class="v">~2076</span></div>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="col-c">
+    <div class="hero-pre">· EARTH MISSION ·</div>
+    <h1 class="hero-title">OASYS BASE CAMP<br><span class="a">LAT 40°N</span></h1>
+    <div class="hero-sub">Yunclillos, Toledo — Planet Earth</div>
+    <div class="cd-box">
+      <div class="cd-lbl">· LAUNCH COUNTDOWN ·</div>
+      <div class="cd" id="countdown">
+        <div class="cd-u"><span class="cd-n" id="cd-d">--</span><span class="cd-s">DAYS</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-u"><span class="cd-n" id="cd-h">--</span><span class="cd-s">HRS</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-u"><span class="cd-n" id="cd-m">--</span><span class="cd-s">MIN</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-u"><span class="cd-n" id="cd-s">--</span><span class="cd-s">SEC</span></div>
+      </div>
+      <div class="cd-date">15 MAYO 2026 · YUNCLILLOS, TOLEDO</div>
+    </div>
+    <div class="loc">40°03'N · 3°52'W · POL. 503 · P9 + P10</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="col-r">
+    <div class="p">
+      <div class="p-t">Titular Explotación</div>
+      <div class="name">LEONARDO MUÑOZ PÉREZ</div>
+      <div class="sub">JOVEN AGRICULTOR</div>
+      <div class="sub">YUNCLILLOS · TOLEDO · 45591</div>
+      <div style="margin-top:0.4rem">
+        <div class="r"><span class="l">Modelo</span><span class="v t">AGROFORESTAL</span></div>
+      </div>
+    </div>
+    <div class="p">
+      <div class="p-t">Plan Productivo</div>
+      <div class="r"><span class="l">Pistacho</span><span class="v">1.60 ha</span></div>
+      <div class="bar"><i style="width:46%"></i></div>
+      <div class="r"><span class="l">Almendro</span><span class="v">1.10 ha</span></div>
+      <div class="bar"><i style="width:32%"></i></div>
+      <div class="r"><span class="l">Aromáticas</span><span class="v">0.30 ha</span></div>
+      <div class="bar"><i style="width:9%"></i></div>
+      <div class="r"><span class="l">Apicultura</span><span class="v t">Polinización</span></div>
+    </div>
+    <div class="p">
+      <div class="p-t">Eco-Schemes</div>
+      <div class="sr"><span class="sl">Cubierta vegetal</span><span class="sv on">ON</span></div>
+      <div class="sr"><span class="sl">Agroforestería</span><span class="sv on">ON</span></div>
+      <div class="sr"><span class="sl">Polinización</span><span class="sv on">ON</span></div>
+      <div class="sr"><span class="sl">Fitosanitarios</span><span class="sv z">ZERO</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM -->
+<div class="bot-bar"><div class="bot-track" id="botT"></div></div>
+<div class="copy">
+  © 2026 OASYS.CAMP · Yunclillos, Toledo, España · Todos los derechos reservados<br>
+  <span class="mc">♪ The Man That Got Away (Eric Kupper Mix/Radio Edit) · Judy Garland</span>
+</div>
+
+<!-- AUDIO -->
+<audio id="audio" loop preload="auto"><source src="soundtrack.mp3" type="audio/mpeg"></audio>
+<button class="snd" id="sndBtn" aria-label="Sound" title="Sound on/off">
+  <svg id="iM" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6m0-6l6 6"/></svg>
+  <svg id="iP" viewBox="0 0 24 24" style="display:none"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>
+</button>
+
+<script>
+  // COUNTDOWN
+  const T=new Date('2026-05-15T09:00:00+02:00').getTime();
+  function tick(){
+    const df=Math.max(0,T-Date.now());
+    document.getElementById('cd-d').textContent=String(Math.floor(df/864e5)).padStart(2,'0');
+    document.getElementById('cd-h').textContent=String(Math.floor(df%864e5/36e5)).padStart(2,'0');
+    document.getElementById('cd-m').textContent=String(Math.floor(df%36e5/6e4)).padStart(2,'0');
+    document.getElementById('cd-s').textContent=String(Math.floor(df%6e4/1e3)).padStart(2,'0');
+    if(df<=0)document.querySelector('.cd-lbl').textContent='· MISSION ACTIVE ·';
+  }
+  tick(); setInterval(tick,1000);
+
+  // VIDEO CAROUSEL
+  const PL=['oasys_video.mp4','oasys_video_pedreras.mp4'];
+  const vb=document.getElementById('videoBg');
+  let ci=0;
+  function pv(i){
+    vb.style.opacity='0';
+    setTimeout(()=>{
+      vb.src=PL[i]; vb.load();
+      vb.play().then(()=>{vb.style.opacity='1'}).catch(()=>{
+        document.addEventListener('click',()=>{vb.play();vb.style.opacity='1'},{once:true});
+      });
+    },600);
+  }
+  vb.style.transition='opacity 0.8s ease';
+  vb.addEventListener('ended',()=>{ci=(ci+1)%PL.length;pv(ci)});
+  window.addEventListener('load',()=>pv(0));
+
+  // AUDIO
+  const au=document.getElementById('audio'),sb=document.getElementById('sndBtn'),
+        iM=document.getElementById('iM'),iP=document.getElementById('iP');
+  let as=false;
+  function sa(){if(!as){au.volume=0.35;au.play().then(()=>{as=true;iM.style.display='none';iP.style.display='block';sb.style.opacity='0.6'}).catch(()=>{})}}
+  document.addEventListener('click',sa,{once:true});
+  document.addEventListener('touchstart',sa,{once:true});
+  sb.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(!as){sa();return}
+    if(au.paused){au.play();iM.style.display='none';iP.style.display='block'}
+    else{au.pause();iM.style.display='block';iP.style.display='none'}
+  });
+
+  // TOP TICKER
+  const td=[{l:'TEMP',v:'17°C'},{l:'SENSACIÓN',v:'15°C'},{l:'HUMEDAD',v:'58%'},
+    {l:'SOLAR',v:'+2900h/AÑO'},{l:'VIENTO',v:'7 km/h'},{l:'ALTITUD',v:'604m'},
+    {l:'LAT',v:"40°03'N"},{l:'LONG',v:"3°52'W"}];
+  const tt=document.getElementById('topT');
+  tt.innerHTML=[...td,...td,...td].map(d=>`<span class="tl">${d.l}</span> <span class="tv">${d.v}</span> <span class="ts">·</span>`).join('');
+
+  // BOTTOM TICKER
+  const bi=['EARTH MISSION','REGENERATIVE AGRICULTURE','AGROFORESTRY','YUNCLILLOS 45591',
+    'POLÍGONO 503','PLANET EARTH','+2900 H.SOLAR/YEAR','CUBIERTA VEGETAL PERMANENTE'];
+  const bt=document.getElementById('botT');
+  bt.innerHTML=[...bi,...bi,...bi].map((t,i)=>`<span class="${i%3===0?'g':''}">${t}</span>`).join('<span style="opacity:0.08;color:var(--teal)">·</span>');
+</script>
+</body>
+</html>
