@@ -919,7 +919,7 @@
 
 <!-- ══════════ HERO BRUTAL ══════════ -->
 <section class="sec-1" id="top">
-  <div class="video-bg"><video id="videoBg" muted playsinline preload="auto" autoplay></video></div>
+  <div class="video-bg">   <video id="videoBg" muted playsinline webkit-playsinline preload="auto" autoplay loop>     <source src="bombonypeluche1.mp4" type="video/mp4">   </video> </div>
   <div class="scanlines"></div>
   <div class="c c1"></div><div class="c c2"></div><div class="c c3"></div><div class="c c4"></div>
 
@@ -1104,7 +1104,7 @@
 <!-- ══════════════════════════════════════════════ -->
 <section class="sec-bosque" id="bosque">
   <div class="bosque-bg">
-    <video id="videoBosque" muted playsinline loop preload="metadata" autoplay></video>
+    <video id="videoBosque" muted playsinline webkit-playsinline preload="auto" autoplay loop>   <source src="bombonypeluche1.mp4" type="video/mp4"> </video>
   </div>
   <div class="bosque-content">
     <div class="bs-badge">
@@ -1364,10 +1364,10 @@
   let as = false;
   let currentSrc = 'soundtrack.mp3';
 
-  const TRACKS = {
+const TRACKS = {
     hero: { src:'soundtrack.mp3', name:'The Man That Got Away · Judy Garland', label:'Hero soundtrack' },
     bosque: { src:'soundtrack-bosquesagrado.mp3', name:'El Bosque Sagrado · Ambient', label:'Bosque Sagrado soundtrack' }
-  };
+};
 
   function sa(){
     if (!as) {
