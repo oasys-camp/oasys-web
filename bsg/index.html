@@ -972,9 +972,9 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
         email: g('email'),
         telefono: g('telefono'),
         nombre_mascota: g('mascota'),
-        especie_raza: g('especie'),
+        especie_raza: g('especie_mascota'),
         peso_kg: g('peso') ? parseFloat(g('peso')) : null,
-        especie_arbol: form.querySelector('select')?.value || 'sin preferencia',
+        especie_arbol: g('especie'),
         nota: form.querySelector('textarea')?.value?.trim() || '',
         fecha_reserva: new Date().toISOString()
       })
