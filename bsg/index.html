@@ -927,229 +927,71 @@ function stopNature() {
 </div>
 
 <script>
-// Form submission → Supabase
+// BSG · Supabase Connector v2
+const BSG_URL = 'https://brphqjjxnsdalvhgntck.supabase.co';
+const BSG_KEY = 'sb_publishable_4gMqdVEq3vrRvHZW2tijTQ_bl-6_bmn';
+
 document.getElementById('semilla-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   const form = this;
-  const btn = form.querySelector('.submit-btn');
-  const originalText = btn ? btn.textContent : '';
-
-  const BSG_URL = 'https://brphqjjxnsdalvhgntck.supabase.co';
-  const BSG_KEY = 'sb_publishable_4gMqdVEq3vrRvHZW2tijTQ_bl-6_bmn';
-
-  const g = (n) => { const el = form.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ''; };
+  const btn  = form.querySelector('.submit-btn');
+  const g    = n => { const el = form.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ''; };
 
   if (!g('nombre') || !g('nif') || !g('domicilio') || !g('email') || !g('mascota')) {
     alert('Por favor completa todos los campos obligatorios.');
     return;
   }
 
-  if (btn) { btn.textContent = 'Enviando...'; btn.disabled = true; }
+  if (btn) { btn.textContent = 'Enviando…'; btn.disabled = true; }
 
   try {
-    // Obtener próxima plaza libre
-    const r1 = await fetch(`${BSG_URL}/rest/v1/bsg_plazas?tipo=eq.libre&select=numero_plaza&order=numero_plaza.asc&limit=1`, {
-      headers: { 'apikey': BSG_KEY, 'Authorization': `Bearer ${BSG_KEY}` }
-    });
+    const r1 = await fetch(
+      `${BSG_URL}/rest/v1/bsg_plazas?tipo=eq.libre&select=numero_plaza&order=numero_plaza.asc&limit=1`,
+      { headers: { 'apikey': BSG_KEY, 'Authorization': `Bearer ${BSG_KEY}` } }
+    );
     const plazas = await r1.json();
     if (!plazas || plazas.length === 0) throw new Error('No quedan plazas');
     const numero_plaza = plazas[0].numero_plaza;
 
-    // Grabar en Supabase
-    const r2 = await fetch(`${BSG_URL}/rest/v1/bsg_plazas?numero_plaza=eq.${numero_plaza}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': BSG_KEY,
-        'Authorization': `Bearer ${BSG_KEY}`,
-        'Prefer': 'return=representation'
-      },
-      body: JSON.stringify({
-        tipo: 'pendiente',
-        nombre_fundador: g('nombre'),
-        nif: g('nif'),
-        domicilio_fiscal: g('domicilio'),
-        email: g('email'),
-        telefono: g('telefono'),
-        nombre_mascota: g('mascota'),
-        especie_raza: g('especie_mascota'),
-        peso_kg: g('peso') ? parseFloat(g('peso')) : null,
-        especie_arbol: g('especie'),
-        nota: form.querySelector('textarea')?.value?.trim() || '',
-        fecha_reserva: new Date().toISOString()
-      })
-    });
+    const r2 = await fetch(
+      `${BSG_URL}/rest/v1/bsg_plazas?numero_plaza=eq.${numero_plaza}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': BSG_KEY,
+          'Authorization': `Bearer ${BSG_KEY}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          tipo:             'pendiente',
+          nombre_fundador:  g('nombre'),
+          nif:              g('nif'),
+          domicilio_fiscal: g('domicilio'),
+          email:            g('email'),
+          telefono:         g('telefono'),
+          nombre_mascota:   g('mascota'),
+          especie_raza:     g('especie_mascota'),
+          peso_kg:          g('peso') ? parseFloat(g('peso')) : null,
+          especie_arbol:    g('especie'),
+          nota:             form.querySelector('textarea')?.value?.trim() || '',
+          fecha_reserva:    new Date().toISOString()
+        })
+      }
+    );
     if (!r2.ok) throw new Error('Error Supabase');
 
-    // Éxito — mostrar overlay original con número de plaza
-    var d = new Date();
-    var num = 'BSG-' + numero_plaza.toString().padStart(3,'0');
-    document.getElementById('ticket-num').textContent = num;
-    var overlay = document.getElementById('gracias-overlay');
+    document.getElementById('ticket-num').textContent = 'BSG-' + String(numero_plaza).padStart(3, '0');
+    const overlay = document.getElementById('gracias-overlay');
     overlay.style.display = 'flex';
-    window.scrollTo(0,0);
-    gtag('event','purchase',{event_category:'Conversion',event_label:'SEMILLA Reserva',value:450,currency:'EUR'});
+    window.scrollTo(0, 0);
+    gtag('event', 'purchase', { event_category: 'Conversion', event_label: 'SEMILLA Reserva', value: 450, currency: 'EUR' });
 
-  } catch(err) {
+  } catch (err) {
     console.error('BSG error:', err);
-    if (btn) { btn.textContent = originalText; btn.disabled = false; }
+    if (btn) { btn.textContent = 'Confirmar reserva · 450€ →'; btn.disabled = false; }
     alert('Error al enviar. Por favor escríbenos directamente a hola@elbosquesagrado.org');
   }
-});
-</script>
-<script>
-// // ============================================
-// BSG · Supabase Connector v1 · 21/04/2026
-// Pegar antes de </body> en bsg/index.html
-// ============================================
-
-const BSG_URL = 'https://brphqjjxnsdalvhgntck.supabase.co';
-const BSG_KEY = 'sb_publishable_4gMqdVEq3vrRvHZW2tijTQ_bl-6_bmn';
-
-async function bsgInsert(data) {
-  const res = await fetch(`${BSG_URL}/rest/v1/bsg_plazas`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': BSG_KEY,
-      'Authorization': `Bearer ${BSG_KEY}`,
-      'Prefer': 'return=representation'
-    },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || 'Error Supabase');
-  }
-  return res.json();
-}
-
-async function bsgGetNextPlaza() {
-  const res = await fetch(
-    `${BSG_URL}/rest/v1/bsg_plazas?tipo=eq.libre&select=numero_plaza&order=numero_plaza.asc&limit=1`,
-    {
-      headers: {
-        'apikey': BSG_KEY,
-        'Authorization': `Bearer ${BSG_KEY}`
-      }
-    }
-  );
-  const data = await res.json();
-  if (!data || data.length === 0) throw new Error('No quedan plazas disponibles');
-  return data[0].numero_plaza;
-}
-
-async function bsgReserveplaza(numero_plaza) {
-  const res = await fetch(
-    `${BSG_URL}/rest/v1/bsg_plazas?numero_plaza=eq.${numero_plaza}`,
-    {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': BSG_KEY,
-        'Authorization': `Bearer ${BSG_KEY}`,
-        'Prefer': 'return=representation'
-      },
-      body: JSON.stringify({ tipo: 'pendiente' })
-    }
-  );
-  if (!res.ok) throw new Error('Error reservando plaza');
-  return res.json();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector('form');
-  if (!form) return;
-
-  const btn = form.querySelector('.submit-btn');
-  const originalBtnText = btn ? btn.textContent : 'Confirmar reserva · 450€ →';
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Recoger datos
-    const get = (name) => {
-      const el = form.querySelector(`[name="${name}"]`);
-      return el ? el.value.trim() : '';
-    };
-
-    const nombre = get('nombre') || form.querySelector('input[placeholder*="María"]')?.value?.trim() || '';
-    const nif = get('nif') || form.querySelector('input[placeholder*="12345678"]')?.value?.trim() || '';
-    const domicilio = get('domicilio') || form.querySelector('input[placeholder*="Calle"]')?.value?.trim() || '';
-    const email = get('email') || form.querySelector('input[type="email"]')?.value?.trim() || '';
-    const telefono = get('telefono') || form.querySelector('input[type="tel"]')?.value?.trim() || '';
-    const nombre_mascota = get('mascota') || form.querySelector('input[placeholder*="nombre"]')?.value?.trim() || '';
-    const especie_raza = get('especie') || form.querySelector('input[placeholder*="Labrador"]')?.value?.trim() || '';
-    const peso_raw = get('peso') || form.querySelector('input[placeholder*="25"]')?.value?.trim() || '';
-    const peso_kg = peso_raw ? parseFloat(peso_raw) : null;
-    const especie_arbol = form.querySelector('select')?.value || 'sin preferencia';
-    const nota = form.querySelector('textarea')?.value?.trim() || '';
-
-    // Validación básica
-    if (!nombre || !nif || !domicilio || !email || !nombre_mascota) {
-      alert('Por favor completa todos los campos obligatorios.');
-      return;
-    }
-
-    // UI: loading
-    if (btn) { btn.textContent = 'Enviando...'; btn.disabled = true; }
-
-    try {
-      // 1. Obtener próxima plaza libre
-      const numero_plaza = await bsgGetNextPlaza();
-
-      // 2. Actualizar plaza a pendiente con datos
-      const res = await fetch(
-        `${BSG_URL}/rest/v1/bsg_plazas?numero_plaza=eq.${numero_plaza}`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': BSG_KEY,
-            'Authorization': `Bearer ${BSG_KEY}`,
-            'Prefer': 'return=representation'
-          },
-          body: JSON.stringify({
-            tipo: 'pendiente',
-            nombre_fundador: nombre,
-            nif: nif,
-            domicilio_fiscal: domicilio,
-            email: email,
-            telefono: telefono,
-            nombre_mascota: nombre_mascota,
-            especie_raza: especie_raza,
-            peso_kg: peso_kg,
-            especie_arbol: especie_arbol,
-            nota: nota,
-            fecha_reserva: new Date().toISOString()
-          })
-        }
-      );
-
-      if (!res.ok) throw new Error('Error al guardar reserva');
-
-      // 3. UI: éxito
-      form.innerHTML = `
-        <div style="text-align:center;padding:40px 0;">
-          <div style="font-family:'Orbitron',monospace;font-size:11px;color:#00D4AA;letter-spacing:3px;margin-bottom:16px;">⬡ RESERVA REGISTRADA</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:16px;">Plaza ${numero_plaza} · ${nombre_mascota}</div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(220,232,226,0.6);line-height:1.8;">
-            Hemos recibido tu reserva.<br>
-            En 24–48h recibirás confirmación con toda la documentación.<br><br>
-            <strong style="color:#C9A84C;">Recuerda realizar la transferencia:</strong><br>
-            IBAN: ES16 3081 0151 9650 0081 2750<br>
-            Concepto: SEMILLA + ${nombre_mascota}<br>
-            Importe: 450,00 €
-          </div>
-        </div>
-      `;
-
-    } catch (err) {
-      console.error('BSG error:', err);
-      if (btn) { btn.textContent = originalBtnText; btn.disabled = false; }
-      alert('Ha ocurrido un error. Por favor inténtalo de nuevo o escríbenos por Instagram.');
-    }
-  });
 });
 </script></body>
 </html>
