@@ -945,18 +945,10 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
   if (btn) { btn.textContent = 'Enviando…'; btn.disabled = true; }
 
   try {
-    const r1 = await fetch(
-      `${BSG_URL}/rest/v1/bsg_plazas?tipo=eq.libre&select=numero_plaza&order=numero_plaza.asc&limit=1`,
-      { headers: { 'apikey': BSG_KEY, 'Authorization': `Bearer ${BSG_KEY}` } }
-    );
-    const plazas = await r1.json();
-    if (!plazas || plazas.length === 0) throw new Error('No quedan plazas');
-    const numero_plaza = plazas[0].numero_plaza;
-
-    const r2 = await fetch(
-      `${BSG_URL}/rest/v1/bsg_plazas?numero_plaza=eq.${numero_plaza}`,
+    const r = await fetch(
+      `${BSG_URL}/rest/v1/bsg_plazas`,
       {
-        method: 'PATCH',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': BSG_KEY,
@@ -979,7 +971,9 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
         })
       }
     );
-    if (!r2.ok) throw new Error('Error Supabase');
+    if (!r.ok) throw new Error('Error Supabase');
+    const [row] = await r.json();
+    const numero_plaza = row.numero_plaza;
 
     document.getElementById('ticket-num').textContent = 'BSG-' + String(numero_plaza).padStart(3, '0');
     const overlay = document.getElementById('gracias-overlay');
@@ -990,7 +984,7 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
   } catch (err) {
     console.error('BSG error:', err);
     if (btn) { btn.textContent = 'Confirmar reserva · 450€ →'; btn.disabled = false; }
-    alert('Error al enviar. Por favor escríbenos directamente a hola@elbosquesagrado.org');
+    alert('Error al enviar. Por favor escríbenos directamente a leonardo@oasysbasecamp.com');
   }
 });
 </script></body>
