@@ -356,9 +356,9 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
     if (!res.ok) {
       if (btn) { btn.textContent = 'Confirmar reserva · 450€ →'; btn.disabled = false; }
       if (res.error === 'sin_plazas') {
-        alert('No quedan plazas disponibles en este momento. Escríbenos a leonardo@oasysbasecamp.com para apuntarte a la lista de espera.');
+        alert('No quedan plazas disponibles en este momento. Escríbenos a info@elbosquesagrado.org para apuntarte a la lista de espera.');
       } else {
-        alert('Error al enviar. Por favor escríbenos directamente a leonardo@oasysbasecamp.com');
+        alert('Error al enviar. Por favor escríbenos directamente a info@elbosquesagrado.org');
       }
       return;
     }
@@ -372,7 +372,7 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
   } catch (err) {
     console.error('BSG error:', err);
     if (btn) { btn.textContent = 'Confirmar reserva · 450€ →'; btn.disabled = false; }
-    alert('Error al enviar. Por favor escríbenos directamente a leonardo@oasysbasecamp.com');
+    alert('Error al enviar. Por favor escríbenos directamente a info@elbosquesagrado.org');
   }
 });
 });
@@ -619,7 +619,7 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
       <div class="price-counter">
         <div class="counter-label">Plazas ocupadas</div>
         <div class="counter-bar"><div class="counter-fill" id="cfill"></div></div>
-        <div class="counter-nums"><span id="taken">13 reservadas</span><span>50 total</span></div>
+        <div class="counter-nums"><span id="taken">14 reservadas</span><span>50 total</span></div>
       </div>
       <a class="btn-cta-main" href="#reserva" onclick="gtag('event','click_pack_cta',{event_category:'CTA',event_label:'Pack Fundador CTA'});">Reservar mi plaza · 450€ →</a>
     </div>
