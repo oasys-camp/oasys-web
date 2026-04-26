@@ -30,12 +30,11 @@ exports.handler = async function(event) {
   }
   const numero_plaza = plazas[0].numero_plaza;
 
-  // INSERT reserva
-  const insRes = await fetch(`${SUPABASE_URL}/rest/v1/bsg_plazas`, {
-    method: 'POST',
+  // PATCH reserva
+  const insRes = await fetch(`${SUPABASE_URL}/rest/v1/bsg_plazas?numero_plaza=eq.${numero_plaza}`, {
+    method: 'PATCH',
     headers: { ...headers, 'Prefer': 'return=minimal' },
     body: JSON.stringify({
-      numero_plaza,
       tipo:             'pendiente',
       nombre_fundador:  data.nombre    || '',
       nif:              data.nif       || '',
