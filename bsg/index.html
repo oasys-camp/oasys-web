@@ -319,6 +319,82 @@ footer{padding:40px 64px;border-top:1px solid var(--border);display:flex;align-i
   .form-row{grid-template-columns:1fr;}
 }
 </style>
+<script>
+// BSG · Supabase Connector v2
+const BSG_URL = 'https://brphqjjxnsdalvhgntck.supabase.co';
+const BSG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJycGhxamp4bnNkYWx2aGdudGNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3OTE4MjYsImV4cCI6MjA5MjM2NzgyNn0.V5SF_2oAtHzojD-jT9TMOrkvkdpj83ODGBd7VRwJdb0';
+
+document.addEventListener('DOMContentLoaded', function() {
+document.getElementById('semilla-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const form = this;
+  const btn  = form.querySelector('.submit-btn');
+  const g    = n => { const el = form.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ''; };
+
+  if (!g('nombre') || !g('nif') || !g('domicilio') || !g('email') || !g('mascota')) {
+    alert('Por favor completa todos los campos obligatorios.');
+    return;
+  }
+
+  if (btn) { btn.textContent = 'Enviando…'; btn.disabled = true; }
+
+  try {
+    const rg = await fetch(
+      `${BSG_URL}/rest/v1/bsg_plazas?select=numero_plaza&tipo=eq.libre&order=numero_plaza.asc&limit=1`,
+      { headers: { 'apikey': BSG_KEY, 'Authorization': `Bearer ${BSG_KEY}` } }
+    );
+    const plazas = await rg.json();
+    if (!plazas || plazas.length === 0) {
+      if (btn) { btn.textContent = 'Confirmar reserva · 450€ →'; btn.disabled = false; }
+      alert('No quedan plazas disponibles en este momento. Escríbenos a leonardo@oasysbasecamp.com para apuntarte a la lista de espera.');
+      return;
+    }
+    const numero_plaza = plazas[0].numero_plaza;
+
+    const r = await fetch(
+      `${BSG_URL}/rest/v1/bsg_plazas`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': BSG_KEY,
+          'Authorization': `Bearer ${BSG_KEY}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          numero_plaza:     numero_plaza,
+          tipo:             'pendiente',
+          nombre_fundador:  g('nombre'),
+          nif:              g('nif'),
+          domicilio_fiscal: g('domicilio'),
+          email:            g('email'),
+          telefono:         g('telefono'),
+          nombre_mascota:   g('mascota'),
+          especie_raza:     g('especie_mascota'),
+          peso_kg:          g('peso') ? parseFloat(g('peso')) : null,
+          especie_arbol:    g('especie'),
+          nota:             form.querySelector('textarea')?.value?.trim() || '',
+          fecha_reserva:    new Date().toISOString()
+        })
+      }
+    );
+    if (!r.ok) throw new Error('Error Supabase');
+    const [row] = await r.json();
+
+    document.getElementById('ticket-num').textContent = 'BSG-' + String(numero_plaza).padStart(3, '0');
+    const overlay = document.getElementById('gracias-overlay');
+    overlay.style.display = 'flex';
+    window.scrollTo(0, 0);
+    gtag('event', 'purchase', { event_category: 'Conversion', event_label: 'SEMILLA Reserva', value: 450, currency: 'EUR' });
+
+  } catch (err) {
+    console.error('BSG error:', err);
+    if (btn) { btn.textContent = 'Confirmar reserva · 450€ →'; btn.disabled = false; }
+    alert('Error al enviar. Por favor escríbenos directamente a leonardo@oasysbasecamp.com');
+  }
+});
+});
+</script>
 </head>
 <body>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5T2LL98X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -927,78 +1003,5 @@ function stopNature() {
   </div>
 </div>
 
-<script>
-// BSG · Supabase Connector v2
-const BSG_URL = 'https://brphqjjxnsdalvhgntck.supabase.co';
-const BSG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJycGhxamp4bnNkYWx2aGdudGNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3OTE4MjYsImV4cCI6MjA5MjM2NzgyNn0.V5SF_2oAtHzojD-jT9TMOrkvkdpj83ODGBd7VRwJdb0';
-
-document.getElementById('semilla-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const form = this;
-  const btn  = form.querySelector('.submit-btn');
-  const g    = n => { const el = form.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ''; };
-
-  if (!g('nombre') || !g('nif') || !g('domicilio') || !g('email') || !g('mascota')) {
-    alert('Por favor completa todos los campos obligatorios.');
-    return;
-  }
-
-  if (btn) { btn.textContent = 'Enviando…'; btn.disabled = true; }
-
-  try {
-    const rg = await fetch(
-      `${BSG_URL}/rest/v1/bsg_plazas?select=numero_plaza&tipo=eq.libre&order=numero_plaza.asc&limit=1`,
-      { headers: { 'apikey': BSG_KEY, 'Authorization': `Bearer ${BSG_KEY}` } }
-    );
-    const plazas = await rg.json();
-    if (!plazas || plazas.length === 0) {
-      if (btn) { btn.textContent = 'Confirmar reserva · 450€ →'; btn.disabled = false; }
-      alert('No quedan plazas disponibles en este momento. Escríbenos a leonardo@oasysbasecamp.com para apuntarte a la lista de espera.');
-      return;
-    }
-    const numero_plaza = plazas[0].numero_plaza;
-
-    const r = await fetch(
-      `${BSG_URL}/rest/v1/bsg_plazas`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': BSG_KEY,
-          'Authorization': `Bearer ${BSG_KEY}`,
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify({
-          numero_plaza:     numero_plaza,
-          tipo:             'pendiente',
-          nombre_fundador:  g('nombre'),
-          nif:              g('nif'),
-          domicilio_fiscal: g('domicilio'),
-          email:            g('email'),
-          telefono:         g('telefono'),
-          nombre_mascota:   g('mascota'),
-          especie_raza:     g('especie_mascota'),
-          peso_kg:          g('peso') ? parseFloat(g('peso')) : null,
-          especie_arbol:    g('especie'),
-          nota:             form.querySelector('textarea')?.value?.trim() || '',
-          fecha_reserva:    new Date().toISOString()
-        })
-      }
-    );
-    if (!r.ok) throw new Error('Error Supabase');
-    const [row] = await r.json();
-
-    document.getElementById('ticket-num').textContent = 'BSG-' + String(numero_plaza).padStart(3, '0');
-    const overlay = document.getElementById('gracias-overlay');
-    overlay.style.display = 'flex';
-    window.scrollTo(0, 0);
-    gtag('event', 'purchase', { event_category: 'Conversion', event_label: 'SEMILLA Reserva', value: 450, currency: 'EUR' });
-
-  } catch (err) {
-    console.error('BSG error:', err);
-    if (btn) { btn.textContent = 'Confirmar reserva · 450€ →'; btn.disabled = false; }
-    alert('Error al enviar. Por favor escríbenos directamente a leonardo@oasysbasecamp.com');
-  }
-});
-</script></body>
+</body>
 </html>
