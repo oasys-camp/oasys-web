@@ -1,3 +1,0 @@
-[build]
-  publish = "bsg"
-  functions = "bsg/netlify/functions"
