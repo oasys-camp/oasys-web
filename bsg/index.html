@@ -945,6 +945,18 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
   if (btn) { btn.textContent = 'Enviando…'; btn.disabled = true; }
 
   try {
+    const rg = await fetch(
+      `${BSG_URL}/rest/v1/bsg_plazas?select=numero_plaza&tipo=eq.libre&order=numero_plaza.asc&limit=1`,
+      { headers: { 'apikey': BSG_KEY, 'Authorization': `Bearer ${BSG_KEY}` } }
+    );
+    const plazas = await rg.json();
+    if (!plazas || plazas.length === 0) {
+      if (btn) { btn.textContent = 'Confirmar reserva · 450€ →'; btn.disabled = false; }
+      alert('No quedan plazas disponibles en este momento. Escríbenos a leonardo@oasysbasecamp.com para apuntarte a la lista de espera.');
+      return;
+    }
+    const numero_plaza = plazas[0].numero_plaza;
+
     const r = await fetch(
       `${BSG_URL}/rest/v1/bsg_plazas`,
       {
@@ -956,6 +968,7 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
           'Prefer': 'return=representation'
         },
         body: JSON.stringify({
+          numero_plaza:     numero_plaza,
           tipo:             'pendiente',
           nombre_fundador:  g('nombre'),
           nif:              g('nif'),
@@ -973,7 +986,6 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
     );
     if (!r.ok) throw new Error('Error Supabase');
     const [row] = await r.json();
-    const numero_plaza = row.numero_plaza;
 
     document.getElementById('ticket-num').textContent = 'BSG-' + String(numero_plaza).padStart(3, '0');
     const overlay = document.getElementById('gracias-overlay');
