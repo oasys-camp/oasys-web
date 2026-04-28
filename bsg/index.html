@@ -619,7 +619,7 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
       <div class="price-counter">
         <div class="counter-label">Plazas ocupadas</div>
         <div class="counter-bar"><div class="counter-fill" id="cfill"></div></div>
-        <div class="counter-nums"><span id="taken">14 reservadas</span><span>50 total</span></div>
+        <div class="counter-nums"><span id="taken">— reservadas</span><span>50 total</span></div>
       </div>
       <a class="btn-cta-main" href="#reserva" onclick="gtag('event','click_pack_cta',{event_category:'CTA',event_label:'Pack Fundador CTA'});">Reservar mi plaza · 450€ →</a>
     </div>
@@ -818,12 +818,12 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
   <div class="cta-content">
     <span class="cta-eyebrow">⬡ Earth Mission · Nodo 1 · Toledo · 2026</span>
     <h2>Transformemos el duelo<br>en un <em>pulmón verde</em><br>para Toledo.</h2>
-    <p class="cta-desc">50 plazas fundadoras. 13 ya reservadas. Esta tarifa no se repetirá.</p>
+    <p class="cta-desc">50 plazas fundadoras. <span id="cta-taken">—</span> ya reservadas. Esta tarifa no se repetirá.</p>
     <div class="cta-actions">
       <a class="btn-large" href="#reserva" onclick="gtag('event','click_cta_final',{event_category:'CTA',event_label:'CTA Final'});">Reservar mi plaza · 450€ →</a>
       <a class="cta-wa" href="https://instagram.com/elbosque_sagrado" target="_blank">O escríbenos por Instagram</a>
     </div>
-    <p class="cta-micro"><span>13 fundadores activos</span> · <span>37 plazas</span> disponibles · Plaza Fundadora · 450€</p>
+    <p class="cta-micro"><span id="cta-founders">—</span> fundadores activos · <span id="cta-avail">—</span> plazas disponibles · Plaza Fundadora · 450€</p>
   </div>
 </section>
 
@@ -873,11 +873,25 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// ── COUNTER BAR ──
-setTimeout(function() {
-  var fill = document.getElementById('cfill');
-  if (fill) fill.style.width = '26%';
-}, 500);
+// ── COUNTER BAR (dynamic) ──
+fetch('/.netlify/functions/count')
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    var fill  = document.getElementById('cfill');
+    var taken = document.getElementById('taken');
+    var ctaTaken   = document.getElementById('cta-taken');
+    var ctaFounders= document.getElementById('cta-founders');
+    var ctaAvail   = document.getElementById('cta-avail');
+    if (fill)       fill.style.width = (d.taken / d.total * 100) + '%';
+    if (taken)      taken.textContent = d.taken + ' reservadas';
+    if (ctaTaken)   ctaTaken.textContent = d.taken;
+    if (ctaFounders)ctaFounders.textContent = d.taken;
+    if (ctaAvail)   ctaAvail.textContent = d.available;
+  })
+  .catch(function(){
+    var fill = document.getElementById('cfill');
+    if (fill) fill.style.width = '26%';
+  });
 
 // ── FAQ ──
 document.querySelectorAll('.faq-item').forEach(function(item) {
