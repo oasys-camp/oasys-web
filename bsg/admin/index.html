@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BSG Admin · El Bosque Sagrado</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#060d08;--bg2:#0a1a12;--bg3:#0d2018;--green:#00D4AA;--gold:#C9A84C;--text:#DCE8E2;--muted:rgba(220,232,226,0.45);--border:rgba(0,212,170,0.12);--red:#e05252}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;min-height:100vh;padding:48px 24px}
+header{max-width:960px;margin:0 auto 48px;display:flex;align-items:baseline;gap:20px;border-bottom:1px solid var(--border);padding-bottom:20px}
+.hdr-id{font-family:monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--green)}
+.hdr-title{font-family:monospace;font-size:13px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+.hdr-count{margin-left:auto;font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+#token-screen{max-width:420px;margin:80px auto;text-align:center}
+#token-screen p{font-family:monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
+#token-input{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:monospace;font-size:13px;padding:12px 16px;margin-bottom:12px;outline:none}
+#token-input:focus{border-color:var(--green)}
+#token-btn{width:100%;background:var(--green);color:var(--bg);border:none;font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;padding:12px;cursor:pointer;font-weight:700}
+#token-btn:hover{opacity:0.85}
+#main{max-width:960px;margin:0 auto;display:none}
+#status-msg{font-family:monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:32px}
+.plaza-card{background:var(--bg2);border:1px solid var(--border);margin-bottom:16px;padding:24px 28px;display:grid;grid-template-columns:64px 1fr auto;gap:24px;align-items:start}
+.plaza-num{font-family:monospace;font-size:24px;font-weight:700;color:var(--gold);line-height:1}
+.plaza-num span{display:block;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-weight:400}
+.plaza-data{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+.field{display:flex;flex-direction:column;gap:2px}
+.field-label{font-family:monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+.field-val{font-size:13px;color:var(--text)}
+.field-val a{color:var(--green);text-decoration:none}
+.plaza-actions{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fecha{font-family:monospace;font-size:9px;color:var(--muted);text-align:right}
+.btn-confirm{background:var(--green);color:var(--bg);border:none;font-family:monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;padding:10px 20px;cursor:pointer;font-weight:700;white-space:nowrap}
+.btn-confirm:hover:not(:disabled){opacity:0.85}
+.btn-confirm:disabled{opacity:0.4;cursor:default}
+.tag{display:inline-block;font-family:monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;padding:3px 8px;border:1px solid}
+.tag-ok{color:var(--green);border-color:var(--green)}
+.tag-err{color:var(--red);border-color:var(--red)}
+#empty{font-family:monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:48px 0;text-align:center;display:none}
+@media(max-width:640px){.plaza-card{grid-template-columns:1fr;gap:16px}.plaza-num{display:flex;align-items:baseline;gap:12px}.plaza-data{grid-template-columns:1fr}.plaza-actions{align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="hdr-id">BSG Admin</span>
+  <span class="hdr-title">El Bosque Sagrado · Plazas pendientes</span>
+  <span class="hdr-count" id="hdr-count"></span>
+</header>
+
+<div id="token-screen">
+  <p>Token de acceso</p>
+  <input id="token-input" type="password" placeholder="ADMIN_SECRET" autocomplete="off">
+  <button id="token-btn">Acceder</button>
+</div>
+
+<div id="main">
+  <div id="status-msg">Cargando…</div>
+  <div id="plaza-list"></div>
+  <div id="empty">No hay plazas pendientes de confirmar.</div>
+</div>
+
+<script>
+let TOKEN = '';
+
+function getTokenFromUrl() {
+  return new URLSearchParams(window.location.search).get('token') || '';
+}
+
+function init(token) {
+  TOKEN = token;
+  document.getElementById('token-screen').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+  loadPlazas();
+}
+
+async function loadPlazas() {
+  const msg = document.getElementById('status-msg');
+  msg.textContent = 'Cargando…';
+
+  try {
+    const r = await fetch(`/.netlify/functions/plazas-admin?token=${encodeURIComponent(TOKEN)}`);
+    const res = await r.json();
+
+    if (!res.ok) {
+      msg.textContent = r.status === 401 ? 'Token incorrecto.' : 'Error al cargar plazas.';
+      return;
+    }
+
+    const plazas = res.plazas || [];
+    document.getElementById('hdr-count').textContent = `${plazas.length} pendiente${plazas.length !== 1 ? 's' : ''}`;
+
+    if (plazas.length === 0) {
+      msg.style.display = 'none';
+      document.getElementById('empty').style.display = 'block';
+      return;
+    }
+
+    msg.style.display = 'none';
+    renderPlazas(plazas);
+  } catch (e) {
+    msg.textContent = 'Error de red.';
+  }
+}
+
+function renderPlazas(plazas) {
+  const list = document.getElementById('plaza-list');
+  list.innerHTML = '';
+
+  plazas.forEach(p => {
+    const pad = String(p.numero_plaza).padStart(2, '0');
+    const fecha = p.fecha_reserva
+      ? new Date(p.fecha_reserva).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : '—';
+
+    const card = document.createElement('div');
+    card.className = 'plaza-card';
+    card.id = `plaza-${p.numero_plaza}`;
+    card.innerHTML = `
+      <div class="plaza-num">
+        <span>Plaza</span>
+        Nº${pad}
+      </div>
+      <div class="plaza-data">
+        <div class="field"><span class="field-label">Fundador</span><span class="field-val">${esc(p.nombre_fundador)}</span></div>
+        <div class="field"><span class="field-label">Animal</span><span class="field-val">${esc(p.nombre_mascota)} ${p.especie_raza ? '· ' + esc(p.especie_raza) : ''}</span></div>
+        <div class="field"><span class="field-label">Email</span><span class="field-val"><a href="mailto:${esc(p.email)}">${esc(p.email)}</a></span></div>
+        <div class="field"><span class="field-label">Árbol</span><span class="field-val">${esc(p.especie_arbol) || '—'}</span></div>
+        <div class="field"><span class="field-label">Teléfono</span><span class="field-val">${esc(p.telefono) || '—'}</span></div>
+        <div class="field"><span class="field-label">NIF</span><span class="field-val">${esc(p.nif) || '—'}</span></div>
+      </div>
+      <div class="plaza-actions">
+        <span class="fecha">${fecha}</span>
+        <button class="btn-confirm" data-plaza="${p.numero_plaza}">Confirmar pago →</button>
+        <span class="tag" id="tag-${p.numero_plaza}" style="display:none"></span>
+      </div>`;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll('.btn-confirm').forEach(btn => {
+    btn.addEventListener('click', () => confirmar(parseInt(btn.dataset.plaza, 10)));
+  });
+}
+
+async function confirmar(numero_plaza) {
+  const btn = document.querySelector(`.btn-confirm[data-plaza="${numero_plaza}"]`);
+  const tag = document.getElementById(`tag-${numero_plaza}`);
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
+  try {
+    const r = await fetch('/.netlify/functions/confirmar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numero_plaza, token: TOKEN })
+    });
+    const res = await r.json();
+
+    if (res.ok) {
+      btn.style.display = 'none';
+      tag.className = 'tag tag-ok';
+      tag.textContent = '✓ Confirmada';
+      tag.style.display = 'inline-block';
+      document.getElementById(`plaza-${numero_plaza}`).style.opacity = '0.5';
+      const count = document.querySelectorAll('.btn-confirm:not([style*="none"])').length;
+      document.getElementById('hdr-count').textContent = `${count} pendiente${count !== 1 ? 's' : ''}`;
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Confirmar pago →';
+      tag.className = 'tag tag-err';
+      tag.textContent = res.error || 'Error';
+      tag.style.display = 'inline-block';
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Confirmar pago →';
+    tag.className = 'tag tag-err';
+    tag.textContent = 'Error de red';
+    tag.style.display = 'inline-block';
+  }
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Entrada
+const urlToken = getTokenFromUrl();
+if (urlToken) {
+  init(urlToken);
+} else {
+  document.getElementById('token-screen').style.display = 'block';
+  document.getElementById('token-btn').addEventListener('click', () => {
+    const t = document.getElementById('token-input').value.trim();
+    if (t) init(t);
+  });
+  document.getElementById('token-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('token-btn').click();
+  });
+}
+</script>
+</body>
+</html>
