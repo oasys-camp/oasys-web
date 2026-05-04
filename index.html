@@ -573,9 +573,9 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     document.getElementById('canvas-container').appendChild(renderer.domElement);
-    camera.position.z = 45;
+    camera.position.z = 55;
 
-    const COUNT = 25000;
+    const COUNT = 18000;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(COUNT * 3);
     const col = new Float32Array(COUNT * 3);
@@ -587,7 +587,7 @@
     for (let i = 0; i < COUNT; i++) {
         const phi = Math.acos(-1 + (2 * i) / COUNT);
         const theta = Math.sqrt(COUNT * Math.PI) * phi;
-        const r = 18 + Math.sin(i * 0.005) * 2;
+        const r = 22;
         pos[i*3]   = r * Math.cos(theta) * Math.sin(phi);
         pos[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
         pos[i*3+2] = r * Math.cos(phi);
