@@ -71,27 +71,27 @@
             letter-spacing: 0.35em; color: var(--teal);
         }
         .logo em { color: var(--gold); font-style: normal; }
+        .nav-menu {
+            display: flex;
+            gap: 1.4rem;
+            align-items: center;
+        }
+        .nav-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: rgba(245,240,232,0.5);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        .nav-menu a:hover {
+            color: var(--teal);
+        }
         .header-right {
             font-size: 10px; letter-spacing: 0.15em;
             color: rgba(245,240,232,0.3);
             display: flex; align-items: center; gap: 12px;
-        }
-        .team-identify-btn {
-            background: rgba(0,212,170,0.08);
-            border: 1px solid rgba(0,212,170,0.2);
-            color: var(--teal);
-            padding: 6px 12px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 9px; letter-spacing: 0.1em;
-            cursor: pointer;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-            opacity: 0.7;
-        }
-        .team-identify-btn:hover {
-            background: rgba(0,212,170,0.15);
-            border-color: var(--teal);
-            opacity: 1;
         }
 
         /* ── LOGIN SCREEN ── */
@@ -203,7 +203,7 @@
 
         .chat-container {
             width: 100%; max-width: 780px;
-            height: min(680px, 88vh);
+            height: min(476px, 88vh);
             background: rgba(6,13,8,0.65);
             border: 1px solid rgba(0,212,170,0.15);
             border-radius: 4px;
@@ -384,28 +384,6 @@
             margin-top: 8px; text-align: center;
         }
 
-        /* Suggested questions */
-        .suggested-questions {
-            display: flex; flex-wrap: wrap; gap: 8px;
-            margin-bottom: 20px;
-        }
-        .suggestion {
-            background: transparent;
-            border: 1px solid rgba(0,212,170,0.15);
-            border-radius: 2px;
-            padding: 7px 12px;
-            font-size: 11px;
-            color: rgba(245,240,232,0.45);
-            cursor: pointer;
-            font-family: 'IBM Plex Mono', monospace;
-            letter-spacing: 0.05em;
-            transition: all 0.2s;
-        }
-        .suggestion:hover {
-            border-color: rgba(0,212,170,0.4);
-            color: var(--teal);
-        }
-
         /* Email capture */
         .email-capture {
             background: rgba(201,168,76,0.05);
@@ -443,6 +421,61 @@
 
         /* Scrollbar body */
         ::-webkit-scrollbar { width: 0; }
+
+        /* Live clock widget */
+        .live-clock {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: var(--teal);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .live-clock .time {
+            font-weight: 400;
+        }
+        .live-clock .label {
+            color: rgba(245,240,232,0.4);
+            font-size: 9px;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 40px;
+            background: rgba(6,13,8,0.8);
+            border-top: 1px solid rgba(0,212,170,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+        }
+        .footer-left {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            color: rgba(245,240,232,0.4);
+        }
+        .footer-right {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            color: rgba(245,240,232,0.3);
+        }
+        .footer-right a {
+            color: rgba(245,240,232,0.4);
+            text-decoration: none;
+            margin-left: 16px;
+            transition: color 0.2s;
+        }
+        .footer-right a:hover {
+            color: var(--teal);
+        }
     </style>
 </head>
 <body>
@@ -463,11 +496,17 @@
     <!-- Header -->
     <header id="header">
         <div class="logo">OASYS<em>·</em>EARTH</div>
+        <nav class="nav-menu">
+            <a href="#mission">Mission</a>
+            <a href="https://oasysbasecamp.com" target="_blank">oasysbasecamp</a>
+            <a href="https://elbosquesagrado.org" target="_blank">elbosquesagrado</a>
+        </nav>
         <div class="header-right">
-            LAT 40°N · YUNCLILLOS · TOLEDO
-            <button class="team-identify-btn" onclick="openTeamIdentification()" title="Identificación equipo OASYS">
-                👥 Equipos
-            </button>
+            <div class="live-clock">
+                <span class="label">LIVE</span>
+                <span class="time" id="live-time">--:--:--</span>
+            </div>
+            oasys.earth
         </div>
     </header>
 
@@ -507,15 +546,6 @@
             </div>
 
             <div id="messages">
-                <!-- Suggested questions -->
-                <div class="suggested-questions" id="suggestions">
-                    <button class="suggestion" onclick="askSuggestion(this)">¿Qué es OASYS?</button>
-                    <button class="suggestion" onclick="askSuggestion(this)">¿Cómo funciona El Bosque Sagrado?</button>
-                    <button class="suggestion" onclick="askSuggestion(this)">¿Cómo puedo participar?</button>
-                    <button class="suggestion" onclick="askSuggestion(this)">¿Dónde estáis?</button>
-                    <button class="suggestion" onclick="askSuggestion(this)">¿Qué es la biotransformación regenerativa?</button>
-                    <button class="suggestion" onclick="askSuggestion(this)">¿Cuál es vuestra visión a largo plazo?</button>
-                </div>
             </div>
 
             <div class="chat-input-area">
@@ -692,12 +722,6 @@ TONO: Responde de forma cálida, honesta y poética cuando sea apropiado. Usa 'n
         }, 200);
     }
 
-    function askSuggestion(btn) {
-        const text = btn.textContent;
-        document.getElementById('suggestions').style.display = 'none';
-        processUserMessage(text);
-    }
-
     function addMessage(role, text) {
         const messages = document.getElementById('messages');
         const div = document.createElement('div');
@@ -837,9 +861,31 @@ TONO: Responde de forma cálida, honesta y poética cuando sea apropiado. Usa 'n
         el.style.height = 'auto';
         el.style.height = Math.min(el.scrollHeight, 120) + 'px';
     }
+
+    // Live clock
+    function updateLiveClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('live-time').textContent = `${hours}:${minutes}:${seconds}`;
+    }
+    setInterval(updateLiveClock, 1000);
+    updateLiveClock();
     </script>
     <script src="analytics.js"></script>
     <script src="transparency-panel.js"></script>
     <script src="team-identification.js"></script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-left">
+            © 2026 OASYS · Sistema Operativo de la Tierra
+        </div>
+        <div class="footer-right">
+            <a href="https://oasysbasecamp.com" target="_blank">oasysbasecamp.com</a>
+            <a href="https://elbosquesagrado.org" target="_blank">elbosquesagrado.org</a>
+        </div>
+    </footer>
 </body>
 </html>
