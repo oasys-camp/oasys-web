@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Partículas Interactivo</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+        #ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(30, 30, 30, 0.85);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 260px;
+        }
+        h2 { margin: 0 0 15px 0; font-size: 18px; font-weight: 500; text-align: center; }
+        .control-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-size: 13px; color: #aaa; }
+        select { 
+            width: 100%; padding: 8px; background: #222; color: white; 
+            border: 1px solid #444; border-radius: 6px; outline: none;
+        }
+        input[type="range"] { width: 100%; cursor: pointer; }
+        input[type="color"] {
+            width: 100%; height: 40px; border: none; border-radius: 6px;
+            background: none; cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <div id="ui-panel">
+        <h2>Control de Partículas</h2>
+        
+        <div class="control-group">
+            <label for="template">Forma (Plantilla)</label>
+            <select id="template">
+                <option value="esfera">Esfera</option>
+                <option value="corazon">Corazón</option>
+                <option value="saturno">Saturno</option>
+                <option value="fuegos">Fuegos Artificiales</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="tension">Expansión / Tensión (Manos)</label>
+            <input type="range" id="tension" min="0.1" max="3" step="0.05" value="1">
+        </div>
+
+        <div class="control-group">
+            <label for="color">Color de las Partículas</label>
+            <input type="color" id="color" value="#00ffcc">
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <!-- Importar Three.js desde un CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // Configuración básica de Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        camera.position.z = 50;
+
+        // Variables del sistema de partículas
+        let particleSystem;
+        const particleCount = 15000;
+        let geometry = new THREE.BufferGeometry();
+        let positions = new Float32Array(particleCount * 3);
+        
+        // Material brillante de las partículas
+        const material = new THREE.PointsMaterial({
+            color: 0x00ffcc,
+            size: 0.3,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        // Funciones matemáticas para las formas
+        function getSpherePosition(i) {
+            const phi = Math.acos(-1 + (2 * i) / particleCount);
+            const theta = Math.sqrt(particleCount * Math.PI) * phi;
+            const r = 20;
+            return {
+                x: r * Math.cos(theta) * Math.sin(phi),
+                y: r * Math.sin(theta) * Math.sin(phi),
+                z: r * Math.cos(phi)
+            };
+        }
+
+        function getHeartPosition(i) {
+            const t = (i / particleCount) * Math.PI * 2;
+            const u = (Math.random() - 0.5) * 2; // dispersión
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+            const z = u * 5; 
+            return { x: x * 1.5, y: y * 1.5, z: z };
+        }
+
+        function getSaturnPosition(i) {
+            // Mitad de las partículas para el planeta, mitad para los anillos
+            if (i < particleCount / 2) {
+                const phi = Math.acos(-1 + (4 * i) / particleCount);
+                const theta = Math.sqrt((particleCount/2) * Math.PI) * phi;
+                const r = 10;
+                return {
+                    x: r * Math.cos(theta) * Math.sin(phi),
+                    y: r * Math.sin(theta) * Math.sin(phi),
+                    z: r * Math.cos(phi)
+                };
+            } else {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 15 + Math.random() * 15;
+                return {
+                    x: Math.cos(angle) * radius,
+                    y: (Math.random() - 0.5) * 2, // anillo plano
+                    z: Math.sin(angle) * radius
+                };
+            }
+        }
+
+        function getFireworkPosition(i) {
+            const r = Math.random() * 35;
+            const theta = Math.random() * 2 * Math.PI;
+            const phi = Math.acos(Math.random() * 2 - 1);
+            return {
+                x: r * Math.sin(phi) * Math.cos(theta),
+                y: r * Math.sin(phi) * Math.sin(theta),
+                z: r * Math.cos(phi)
+            };
+        }
+
+        // Función para actualizar la forma geométrica
+        function updateShape(shapeType) {
+            for (let i = 0; i < particleCount; i++) {
+                let pos;
+                if (shapeType === 'corazon') pos = getHeartPosition(i);
+                else if (shapeType === 'saturno') pos = getSaturnPosition(i);
+                else if (shapeType === 'fuegos') pos = getFireworkPosition(i);
+                else pos = getSpherePosition(i); // por defecto esfera
+
+                positions[i * 3] = pos.x;
+                positions[i * 3 + 1] = pos.y;
+                positions[i * 3 + 2] = pos.z;
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        }
+
+        // Inicializar sistema
+        updateShape('esfera');
+        particleSystem = new THREE.Points(geometry, material);
+        scene.add(particleSystem);
+
+        // --- Controles de la Interfaz ---
+        
+        // 1. Cambio de Plantilla
+        document.getElementById('template').addEventListener('change', (e) => {
+            updateShape(e.target.value);
+        });
+
+        // 2. Simulador de Gestos (Expansión)
+        document.getElementById('tension').addEventListener('input', (e) => {
+            const scale = parseFloat(e.target.value);
+            // Escalar el grupo entero simula la apertura de manos expandiendo las partículas
+            particleSystem.scale.set(scale, scale, scale);
+        });
+
+        // 3. Selector de Color
+        document.getElementById('color').addEventListener('input', (e) => {
+            material.color.set(e.target.value);
+        });
+
+        // Ciclo de Animación
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotación suave continua para efecto 3D
+            particleSystem.rotation.y += 0.002;
+            particleSystem.rotation.x += 0.001;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Ajuste al redimensionar la ventana
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

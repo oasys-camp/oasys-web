@@ -22,6 +22,12 @@ exports.handler = async function(event) {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-store'
     },
-    body: JSON.stringify({ taken, available: TOTAL - taken, total: TOTAL })
+    body: JSON.stringify({
+      taken,
+      available: TOTAL - taken,
+      total: TOTAL,
+      debug_url: (process.env.SUPABASE_URL || 'NOT_SET').substring(0, 30),
+      debug_key: (process.env.SUPABASE_SERVICE_KEY || 'NOT_SET').substring(0, 10)
+    })
   };
 };

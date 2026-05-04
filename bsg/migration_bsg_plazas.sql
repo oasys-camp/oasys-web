@@ -1,4 +1,4 @@
--- ================================================================
+﻿-- ================================================================
 -- MIGRACIÓN bsg_plazas · El Bosque Sagrado
 -- Ejecutar en: Supabase → SQL Editor → Run
 -- Seguro re-ejecutar: usa IF NOT EXISTS / ON CONFLICT DO NOTHING

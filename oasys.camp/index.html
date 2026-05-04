@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>OASYS BASE CAMP LAT 40°N</title>
+<meta name="description" content="OASYS BASE CAMP LAT 40°N — Explotación agroforestal regenerativa. Yunclillos, Toledo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --space-black: #000000;
+  --spectral-white: #f0f0fa;
+  --ghost-surface: rgba(240, 240, 250, 0.1);
+  --ghost-border: rgba(240, 240, 250, 0.35);
+  --dark-overlay: rgba(0, 0, 0, 0.5);
+  --font-display: 'Orbitron', 'Arial', sans-serif;
+  --font-body: 'Share Tech Mono', 'Verdana', sans-serif;
+  --oasys-gold: #C9A84C;
+  --oasys-teal: #00D4AA;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{width:100%;background:var(--space-black);color:var(--spectral-white);overflow-x:hidden;font-family:var(--font-body)}
+
+/* NAVIGATION */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.nav-logo{font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.96px;color:var(--spectral-white);text-decoration:none;text-transform:uppercase;white-space:nowrap}
+.nav-menu{display:flex;gap:24px;align-items:center}
+.nav-menu a{font-family:var(--font-body);font-size:12px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);text-decoration:none;text-transform:uppercase;opacity:0.6;transition:all 0.3s;line-height:2}
+.nav-menu a:hover{opacity:1}
+.nav-menu a.cta{background:var(--ghost-surface);color:var(--spectral-white);border:1px solid var(--ghost-border);padding:18px 32px;border-radius:32px;font-weight:700;letter-spacing:1.17px;font-size:13px;transition:all 0.3s}
+.nav-menu a.cta:hover{background:rgba(240, 240, 250, 0.2)}
+.nav-toggle{display:none;background:transparent;border:none;cursor:pointer;color:var(--spectral-white);font-family:var(--font-body);font-size:10px;letter-spacing:1px;text-transform:uppercase}
+
+/* CINEMATIC SECTIONS */
+.cinematic-section{position:relative;width:100%;height:100vh;min-height:600px;overflow:hidden}
+.cinematic-bg{position:absolute;inset:0;z-index:0}
+.cinematic-bg video{position:absolute;top:50%;left:50%;width:100%;height:100%;transform:translate(-50%,-50%);-webkit-transform:translate(-50%,-50%);object-fit:cover}
+.cinematic-bg::after{content:'';position:absolute;inset:0;background:var(--dark-overlay);z-index:1}
+.cinematic-content{position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:60px 24px;max-width:none}
+
+/* PARTICLETEXT CANVAS */
+#particleCanvas{position:absolute;inset:0;z-index:2;pointer-events:none}
+
+/* HERO SECTION */
+.hero-content{padding-left:60px;max-width:800px;opacity:0;transition:opacity 0.5s ease}
+.hero-content.visible{opacity:1}
+.hero-eyebrow{font-family:var(--font-body);font-size:10px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.6;text-transform:uppercase;margin-bottom:15px;line-height:1}
+.hero-title{font-family:var(--font-display);font-size:48px;font-weight:700;letter-spacing:0.96px;line-height:1.1;color:var(--spectral-white);margin-bottom:20px;text-transform:uppercase}
+.hero-title .gradient{background:linear-gradient(90deg, #C9A84C 0%, #00D4AA 50%, #C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-family:var(--font-body);font-size:16px;font-weight:400;letter-spacing:0.5px;color:var(--spectral-white);opacity:0.7;line-height:1.7;margin-bottom:30px;max-width:600px}
+.hero-cta{display:inline-flex;align-items:center;gap:12px;background:var(--ghost-surface);color:var(--spectral-white);border:1px solid var(--ghost-border);padding:18px 32px;border-radius:32px;font-family:var(--font-body);font-size:13px;font-weight:700;letter-spacing:1.17px;text-decoration:none;text-transform:uppercase;transition:all 0.3s}
+.hero-cta:hover{background:rgba(240, 240, 250, 0.2)}
+
+/* DATA OVERLAY */
+.data-overlay{position:absolute;right:60px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:12px}
+.data-item{background:var(--ghost-surface);border:1px solid var(--ghost-border);padding:12px 18px;border-radius:4px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);min-width:180px}
+.data-label{font-family:var(--font-body);font-size:10px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.6;text-transform:uppercase;margin-bottom:4px}
+.data-value{font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:0.5px;color:var(--spectral-white)}
+.data-value.highlight{color:#00D4AA}
+
+/* MISSION SECTION */
+.mission-content{padding-left:60px;max-width:700px}
+.mission-eyebrow{font-family:var(--font-body);font-size:10px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.6;text-transform:uppercase;margin-bottom:15px;line-height:1}
+.mission-title{font-family:var(--font-display);font-size:36px;font-weight:700;letter-spacing:0.96px;line-height:1.1;color:var(--spectral-white);margin-bottom:20px;text-transform:uppercase}
+.mission-description{font-family:var(--font-body);font-size:16px;font-weight:400;letter-spacing:0.5px;color:var(--spectral-white);opacity:0.7;line-height:1.7;margin-bottom:30px}
+
+/* BOSQUE SECTION */
+.bosque-content{padding-left:60px;max-width:800px}
+.bosque-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-body);font-size:10px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.8;padding:12px 18px;border:1px solid var(--ghost-border);background:var(--ghost-surface);margin-bottom:20px;text-transform:uppercase;border-radius:4px}
+.bosque-eyebrow{font-family:var(--font-body);font-size:13px;font-weight:700;letter-spacing:1.17px;color:var(--spectral-white);opacity:0.9;margin-bottom:15px;text-transform:uppercase}
+.bosque-title{font-family:var(--font-display);font-size:42px;font-weight:700;letter-spacing:0.96px;line-height:1.1;color:var(--spectral-white);margin-bottom:15px;text-transform:uppercase}
+.bosque-subtitle{font-family:var(--font-body);font-size:12px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.7;margin-bottom:30px;text-transform:uppercase}
+.bosque-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:30px}
+.bosque-item{background:var(--ghost-surface);border:1px solid var(--ghost-border);padding:15px;border-radius:4px;text-align:center}
+.bosque-item-emoji{font-size:24px;margin-bottom:8px}
+.bosque-item-value{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.5px;color:var(--spectral-white);margin-bottom:4px}
+.bosque-item-label{font-family:var(--font-body);font-size:10px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.6;text-transform:uppercase}
+.bosque-cta{display:inline-flex;align-items:center;gap:12px;background:var(--ghost-surface);color:var(--spectral-white);border:1px solid var(--ghost-border);padding:18px 32px;border-radius:32px;font-family:var(--font-body);font-size:13px;font-weight:700;letter-spacing:1.17px;text-decoration:none;text-transform:uppercase;transition:all 0.3s}
+.bosque-cta:hover{background:rgba(240, 240, 250, 0.2)}
+
+/* COUNTDOWN */
+.countdown-container{position:absolute;bottom:60px;left:60px;z-index:3;display:flex;align-items:center;gap:20px}
+.countdown-label{font-family:var(--font-body);font-size:10px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.6;text-transform:uppercase}
+.countdown-values{display:flex;gap:12px}
+.countdown-unit{display:flex;flex-direction:column;align-items:center}
+.countdown-number{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:0.5px;color:var(--spectral-white)}
+.countdown-unit-label{font-family:var(--font-body);font-size:10px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.6;text-transform:uppercase}
+.countdown-separator{font-family:var(--font-display);font-size:24px;color:var(--spectral-white);opacity:0.3}
+
+/* SCROLL HINT */
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:10;font-family:var(--font-body);font-size:10px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.5;text-transform:uppercase;animation:bounce 2s ease-in-out infinite;text-decoration:none}
+@keyframes bounce{0%,100%{transform:translate(-50%,0);opacity:0.5}50%{transform:translate(-50%,10px);opacity:0.9}}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .nav{padding:15px 20px}
+  .nav-logo{font-size:11px}
+  .nav-menu{display:none;position:fixed;top:73px;left:0;right:0;flex-direction:column;gap:0;background:rgba(0,0,0,0.95);padding:20px}
+  .nav-menu.open{display:flex}
+  .nav-menu a{padding:15px 0;font-size:12px;text-align:center}
+  .nav-menu a.cta{margin-top:10px}
+  .nav-toggle{display:block}
+  .hero-content,.mission-content,.bosque-content{padding-left:24px;padding-right:24px;max-width:none}
+  .data-overlay{position:relative;right:auto;top:auto;transform:none;margin-top:30px;flex-direction:row;flex-wrap:wrap}
+  .data-item{flex:1 1 calc(50% - 6px);min-width:140px}
+  .countdown-container{position:relative;bottom:auto;left:auto;margin-top:30px;flex-direction:column;align-items:flex-start;gap:15px}
+  .countdown-values{flex-wrap:wrap}
+  .bosque-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-title{font-size:32px}
+  .mission-title{font-size:28px}
+  .bosque-title{font-size:32px}
+}
+@media(max-width:600px){
+  .hero-title{font-size:24px}
+  .mission-title{font-size:20px}
+  .bosque-title{font-size:24px}
+  .data-overlay{flex-direction:column}
+  .data-item{width:100%}
+  .bosque-grid{grid-template-columns:1fr}
+  .countdown-values{gap:8px}
+  .countdown-number{font-size:18px}
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="#top" class="nav-logo">OASYS BASE CAMP</a>
+  <button class="nav-toggle" id="navToggle">MENU</button>
+  <div class="nav-menu" id="navMenu">
+    <a href="#mission">MISSION</a>
+    <a href="#bosque">BOSQUE SAGRADO</a>
+    <a href="#bosque" class="cta">RESERVE →</a>
+  </div>
+</nav>
+
+<section class="cinematic-section" id="top">
+  <div class="cinematic-bg">
+    <video id="videoBg" muted playsinline webkit-playsinline preload="auto" autoplay loop></video>
+  </div>
+
+  <!-- ParticleText Canvas -->
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="cinematic-content">
+    <div class="hero-content" id="heroContent">
+      <div class="hero-eyebrow">EARTH MISSION · LAT 40°N</div>
+      <h1 class="hero-title">
+        <span class="gradient">OASYS</span><br>
+        BASE CAMP<br>
+        LAT 40°N
+      </h1>
+      <p class="hero-subtitle">
+        3.4668 hectares of regenerative agroforestry in Yunclillos, Toledo.
+        Pistachio, almond, aromatic plants, and apiculture.
+        Permanent vegetation cover, zero synthetic pesticides,
+        water concession from the Guadarrama since 1977.
+      </p>
+      <a href="#mission" class="hero-cta">EXPLORE MISSION →</a>
+    </div>
+
+    <div class="data-overlay">
+      <div class="data-item">
+        <div class="data-label">ALTITUDE</div>
+        <div class="data-value">604m</div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">SOLAR EXPOSURE</div>
+        <div class="data-value highlight">+2900h/YEAR</div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">PESTICIDES</div>
+        <div class="data-value">ZERO</div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">WATER CONCESSION</div>
+        <div class="data-value">12.297/76</div>
+      </div>
+    </div>
+
+    <div class="countdown-container">
+      <div class="countdown-label">LAUNCH COUNTDOWN</div>
+      <div class="countdown-values">
+        <div class="countdown-unit">
+          <span class="countdown-number" id="cd-d">--</span>
+          <span class="countdown-unit-label">DAYS</span>
+        </div>
+        <span class="countdown-separator">:</span>
+        <div class="countdown-unit">
+          <span class="countdown-number" id="cd-h">--</span>
+          <span class="countdown-unit-label">HOURS</span>
+        </div>
+        <span class="countdown-separator">:</span>
+        <div class="countdown-unit">
+          <span class="countdown-number" id="cd-m">--</span>
+          <span class="countdown-unit-label">MIN</span>
+        </div>
+        <span class="countdown-separator">:</span>
+        <div class="countdown-unit">
+          <span class="countdown-number" id="cd-s">--</span>
+          <span class="countdown-unit-label">SEC</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#mission" class="scroll-hint">SCROLL TO EXPLORE</a>
+</section>
+
+<section class="cinematic-section" id="mission">
+  <div class="cinematic-bg">
+    <video id="videoMission" muted playsinline webkit-playsinline loop preload="metadata" autoplay></video>
+  </div>
+  <div class="cinematic-content">
+    <div class="mission-content">
+      <div class="mission-eyebrow">AGROFORESTRY IN REAL TIME</div>
+      <h2 class="mission-title">
+        REGENERATIVE<br>
+        PRODUCTION<br>
+        SYSTEM
+      </h2>
+      <p class="mission-description">
+        Digital twin in operation at Lat 40°03'N. Permanent vegetation cover,
+        zero synthetic pesticides, water concession CHT 12.297/76 with validity
+        until ~2076. Continuous climate and soil monitoring.
+      </p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div class="data-item">
+          <div class="data-label">TOTAL SURFACE</div>
+          <div class="data-value">3.4668 ha</div>
+        </div>
+        <div class="data-item">
+          <div class="data-label">PISTACHIO</div>
+          <div class="data-value">1.60 ha</div>
+        </div>
+        <div class="data-item">
+          <div class="data-label">ALMOND</div>
+          <div class="data-value">1.10 ha</div>
+        </div>
+        <div class="data-item">
+          <div class="data-label">AROMATICS</div>
+          <div class="data-value">0.30 ha</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cinematic-section" id="bosque">
+  <div class="cinematic-bg">
+    <video id="videoBosque" muted playsinline webkit-playsinline loop preload="metadata" autoplay></video>
+  </div>
+  <div class="cinematic-content">
+    <div class="bosque-content">
+      <div class="bosque-badge">◇ FOUNDING MEMBERS ◇</div>
+      <div class="bosque-eyebrow">SEED SPACE Nº 1 & 2 · EL BOSQUE SAGRADO</div>
+      <h2 class="bosque-title">
+        BOMBÓN<br>
+        & PELUCHE
+      </h2>
+      <div class="bosque-subtitle">ALMOND TREE · FOUNDING MEMBERS</div>
+
+      <div class="bosque-grid">
+        <div class="bosque-item">
+          <div class="bosque-item-emoji">🌿</div>
+          <div class="bosque-item-value">ALMOND</div>
+          <div class="bosque-item-label">SPECIES</div>
+        </div>
+        <div class="bosque-item">
+          <div class="bosque-item-emoji">🌞</div>
+          <div class="bosque-item-value">LAT 40°N<br>3.8°W</div>
+          <div class="bosque-item-label">COORDINATES</div>
+        </div>
+        <div class="bosque-item">
+          <div class="bosque-item-emoji">🍯</div>
+          <div class="bosque-item-value">2027</div>
+          <div class="bosque-item-label">HONEY</div>
+        </div>
+        <div class="bosque-item">
+          <div class="bosque-item-emoji">🌱</div>
+          <div class="bosque-item-value">+18 t/ha</div>
+          <div class="bosque-item-label">CO₂ / YEAR</div>
+        </div>
+      </div>
+
+      <p style="font-family:var(--font-body);font-size:14px;font-weight:400;letter-spacing:0.5px;color:var(--spectral-white);opacity:0.8;line-height:1.7;margin-bottom:30px;max-width:600px;">
+        Their memory lives in the land of <strong>La Sagra toledana</strong>,
+        root to root, season after season.
+      </p>
+
+      <a href="https://elbosquesagrado.org" class="bosque-cta" target="_blank" rel="noopener">
+        RESERVE SPACE →
+      </a>
+
+      <div style="margin-top:20px;font-family:var(--font-body);font-size:10px;font-weight:400;letter-spacing:1px;color:var(--spectral-white);opacity:0.6;text-transform:uppercase;">
+        50 FOUNDING SPACES · 14 RESERVED · 36 AVAILABLE
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// COUNTDOWN
+const targetTime = new Date('2026-05-15T09:00:00+02:00').getTime();
+function updateCountdown() {
+  const diff = Math.max(0, targetTime - Date.now());
+  const updateElement = (id, value) => {
+    const el = document.getElementById(id);
+    const str = String(value).padStart(2, '0');
+    if (el.textContent !== str) el.textContent = str;
+  };
+  updateElement('cd-d', Math.floor(diff / 86400000));
+  updateElement('cd-h', Math.floor(diff % 86400000 / 3600000));
+  updateElement('cd-m', Math.floor(diff % 3600000 / 60000));
+  updateElement('cd-s', Math.floor(diff % 60000 / 1000));
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// VIDEO HANDLING
+const videoPlaylist = ['oasys_video.mp4', 'oasys_video_pedreras.mp4'];
+const heroVideo = document.getElementById('videoBg');
+let currentVideoIndex = 0;
+
+function playVideo(index) {
+  heroVideo.style.opacity = '0';
+  setTimeout(() => {
+    heroVideo.src = videoPlaylist[index];
+    heroVideo.load();
+    const playPromise = heroVideo.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        heroVideo.style.opacity = '1';
+      }).catch(() => {
+        heroVideo.style.opacity = '1';
+        document.addEventListener('touchstart', () => heroVideo.play(), { once: true });
+        document.addEventListener('click', () => heroVideo.play(), { once: true });
+      });
+    }
+  }, 600);
+}
+
+heroVideo.style.transition = 'opacity 0.8s ease';
+heroVideo.addEventListener('ended', () => {
+  currentVideoIndex = (currentVideoIndex + 1) % videoPlaylist.length;
+  playVideo(currentVideoIndex);
+});
+
+window.addEventListener('load', () => playVideo(0));
+
+// MISSION VIDEO
+const missionVideo = document.getElementById('videoMission');
+if (missionVideo) {
+  missionVideo.src = 'oasys_video_pedreras.mp4';
+  missionVideo.load();
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        missionVideo.play().catch(() => {});
+      } else {
+        missionVideo.pause();
+      }
+    });
+  }, { threshold: 0.15 });
+  observer.observe(missionVideo);
+}
+
+// BOSQUE VIDEO
+const bosqueVideo = document.getElementById('videoBosque');
+if (bosqueVideo) {
+  bosqueVideo.src = 'bombonypeluche.mp4';
+  bosqueVideo.load();
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        bosqueVideo.play().catch(() => {});
+      } else {
+        bosqueVideo.pause();
+      }
+    });
+  }, { threshold: 0.15 });
+  observer.observe(bosqueVideo);
+}
+
+// MOBILE MENU
+document.getElementById('navToggle').addEventListener('click', () => {
+  document.getElementById('navMenu').classList.toggle('open');
+});
+
+document.getElementById('navMenu').querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    document.getElementById('navMenu').classList.remove('open');
+  });
+});
+
+// PARTICLETEXT ENGINE
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+
+// Configuration
+const N = 8000; // Particle count
+const AMBIENT_PARTICLES = 500; // Extra floating particles
+let baseDim = Math.min(window.innerWidth, window.innerHeight);
+const R = baseDim > 1200 ? baseDim * 0.28 : baseDim * 0.42;
+
+// Particle arrays (Float32Array for performance)
+const px = new Float32Array(N);
+const py = new Float32Array(N);
+const pz = new Float32Array(N);
+const vx = new Float32Array(N);
+const vy = new Float32Array(N);
+const vz = new Float32Array(N);
+const tx = new Float32Array(N);
+const ty = new Float32Array(N);
+const tz = new Float32Array(N);
+const ox = new Float32Array(N);
+const oy = new Float32Array(N);
+const oz = new Float32Array(N);
+const hue = new Float32Array(N);
+const phase = new Float32Array(N);
+
+// State
+let appState = 1; // 0 = sphere, 1 = text
+let rotY = 0;
+let mouseX = 0, mouseY = 0;
+let targetText = "OASYS";
+let textCycleIndex = 0;
+const textCycle = ["OASYS", "BASE CAMP", "LAT 40°N", "EARTH MISSION"];
+let lastTextChange = 0;
+const TEXT_CYCLE_INTERVAL = 4000; // Change text every 4 seconds
+let transitionProgress = 0; // For smooth transitions
+
+// Initialize particles in Fibonacci sphere
+function initSphere() {
+  const phi = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < N; i++) {
+    const y = 1 - (i / (N - 1)) * 2;
+    const radius = Math.sqrt(1 - y * y);
+    const theta = phi * i;
+
+    ox[i] = Math.cos(theta) * radius * R;
+    oy[i] = y * R;
+    oz[i] = Math.sin(theta) * radius * R;
+
+    px[i] = ox[i];
+    py[i] = oy[i];
+    pz[i] = oz[i];
+
+    tx[i] = ox[i];
+    ty[i] = oy[i];
+    tz[i] = oz[i];
+
+    hue[i] = (i / N) * 360;
+    phase[i] = Math.random() * Math.PI * 2;
+  }
+}
+
+// Sample text from off-screen canvas
+function sampleText(text) {
+  const offCanvas = document.createElement('canvas');
+  const offCtx = offCanvas.getContext('2d');
+
+  const fontSize = Math.min(120, window.innerWidth / text.length * 1.5);
+  offCanvas.width = window.innerWidth;
+  offCanvas.height = window.innerHeight;
+
+  offCtx.font = `900 ${fontSize}px Arial`;
+  offCtx.fillStyle = '#ffffff';
+  offCtx.textAlign = 'center';
+  offCtx.textBaseline = 'middle';
+
+  // Handle multi-line text
+  const lines = text.split(' ');
+  const lineHeight = fontSize * 1.2;
+  const startY = (window.innerHeight - (lines.length - 1) * lineHeight) / 2;
+
+  lines.forEach((line, i) => {
+    offCtx.fillText(line, window.innerWidth / 2, startY + i * lineHeight);
+  });
+
+  const imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
+  const pixels = [];
+
+  for (let y = 0; y < offCanvas.height; y += 2) {
+    for (let x = 0; x < offCanvas.width; x += 2) {
+      const idx = (y * offCanvas.width + x) * 4;
+      if (imageData.data[idx + 3] > 128) {
+        pixels.push({ x, y });
+      }
+    }
+  }
+
+  // Shuffle and assign targets with explosion effect
+  for (let i = 0; i < N; i++) {
+    if (i < pixels.length) {
+      const p = pixels[i];
+      // Add random offset for explosion effect
+      const explosion = 50;
+      tx[i] = p.x - window.innerWidth / 2 + (Math.random() - 0.5) * explosion;
+      ty[i] = p.y - window.innerHeight / 2 + (Math.random() - 0.5) * explosion;
+      tz[i] = (Math.random() - 0.5) * explosion * 0.5;
+    } else {
+      // Extra particles return to sphere
+      tx[i] = ox[i];
+      ty[i] = oy[i];
+      tz[i] = oz[i];
+    }
+  }
+}
+
+// Animation loop
+function animate() {
+  const t = Date.now() * 0.001;
+
+  // Auto-cycle text
+  if (appState === 1 && t - lastTextChange > TEXT_CYCLE_INTERVAL / 1000) {
+    textCycleIndex = (textCycleIndex + 1) % textCycle.length;
+    targetText = textCycle[textCycleIndex];
+    sampleText(targetText);
+    lastTextChange = t;
+  }
+
+  // Clear canvas
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Update particles
+  for (let i = 0; i < N; i++) {
+    // Spring force toward target
+    const dx = tx[i] - px[i];
+    const dy = ty[i] - py[i];
+    const dz = tz[i] - pz[i];
+
+    const sp = appState === 0 ? 0.02 : 0.022;
+    vx[i] += dx * sp;
+    vy[i] += dy * sp;
+    vz[i] += dz * sp;
+
+    // Friction
+    vx[i] *= 0.82;
+    vy[i] *= 0.82;
+    vz[i] *= 0.82;
+
+    // Update position
+    px[i] += vx[i];
+    py[i] += vy[i];
+    pz[i] += vz[i];
+
+    // Sphere rotation
+    if (appState === 0) {
+      const cos = Math.cos(rotY);
+      const sin = Math.sin(rotY);
+      const nx = px[i] * cos - pz[i] * sin;
+      const nz = px[i] * sin + pz[i] * cos;
+      px[i] = nx;
+      pz[i] = nz;
+
+      // Orbital wobble
+      const wobble = Math.sin(t + phase[i]) * 1.8;
+      px[i] += Math.cos(t * 2 + phase[i]) * wobble * 0.5;
+      py[i] += Math.sin(t * 2 + phase[i]) * wobble * 0.5;
+    } else {
+      // Add subtle movement to text particles
+      const textWobble = Math.sin(t * 3 + phase[i]) * 0.8;
+      const textWobbleY = Math.cos(t * 2 + phase[i]) * 0.6;
+      px[i] += textWobble;
+      py[i] += textWobbleY;
+
+      // Add subtle Z-depth breathing
+      pz[i] += Math.sin(t + phase[i]) * 2;
+    }
+
+    // Cursor repulsion
+    if (appState === 1) {
+      const screenX = (px[i] * 550) / (pz[i] + 600) + canvas.width / 2;
+      const screenY = (py[i] * 550) / (pz[i] + 600) + canvas.height / 2;
+
+      const dist = Math.sqrt((screenX - mouseX) ** 2 + (screenY - mouseY) ** 2);
+      if (dist < 100) {
+        const force = (1 - dist / 100) * 8;
+        const angle = Math.atan2(screenY - mouseY, screenX - mouseX);
+        vx[i] += Math.cos(angle) * force;
+        vy[i] += Math.sin(angle) * force;
+      }
+    }
+
+    // 3D projection
+    const projX = (px[i] * 550) / (pz[i] + 600) + canvas.width / 2;
+    const projY = (py[i] * 550) / (pz[i] + 600) + canvas.height / 2;
+
+    // Color (OASYS brand colors with dynamic cycling)
+    let h, s, l;
+    if (appState === 0) {
+      // Sphere: gold/teal gradient with time-based cycling
+      h = ((hue[i] + t * 25) % 360);
+      s = 70;
+      l = 60;
+    } else {
+      // Text: brand colors with subtle variation
+      const colorShift = Math.sin(t + phase[i]) * 10;
+      h = i % 2 === 0 ? 50 + colorShift : 170 + colorShift; // Gold and teal with variation
+      s = 80 + Math.sin(t * 2 + phase[i]) * 10;
+      l = 70 + Math.cos(t + phase[i]) * 5;
+    }
+
+    // Dynamic particle size based on velocity and pulse
+    const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i] + vz[i] * vz[i]);
+    const pulse = Math.sin(t * 4 + phase[i]) * 0.5 + 1;
+    const size = (1.5 + speed * 0.4) * pulse;
+
+    ctx.fillStyle = `hsl(${h}, ${s}%, ${l}%)`;
+    ctx.beginPath();
+    ctx.arc(projX, projY, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Rotate sphere
+  if (appState === 0) {
+    rotY += 0.006;
+  }
+
+  requestAnimationFrame(animate);
+}
+
+// Event listeners
+canvas.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+canvas.addEventListener('dblclick', () => {
+  appState = 0;
+  for (let i = 0; i < N; i++) {
+    tx[i] = ox[i];
+    ty[i] = oy[i];
+    tz[i] = oz[i];
+  }
+});
+
+// Add click to cycle through text manually
+canvas.addEventListener('click', (e) => {
+  if (appState === 1) {
+    textCycleIndex = (textCycleIndex + 1) % textCycle.length;
+    targetText = textCycle[textCycleIndex];
+    sampleText(targetText);
+    lastTextChange = Date.now() * 0.001;
+  }
+});
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  baseDim = Math.min(window.innerWidth, window.innerHeight);
+  initSphere();
+  sampleText(targetText);
+});
+
+// Initialize
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+initSphere();
+sampleText(targetText);
+appState = 1; // Start in text mode
+lastTextChange = Date.now() * 0.001; // Initialize timer
+animate();
+
+// REAL-TIME DATA TICKER
+function updateRealTimeData() {
+  const now = new Date();
+
+  // Update time display
+  const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const dateStr = now.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' });
+
+  // Simulate sensor data with realistic variations
+  const tempBase = 22 + Math.sin(now.getTime() / 10000000) * 5; // Daily temperature cycle
+  const humidity = 45 + Math.sin(now.getTime() / 5000000) * 15;
+  const windSpeed = 8 + Math.random() * 12;
+  const soilMoisture = 60 + Math.sin(now.getTime() / 8000000) * 10;
+
+  // Update or create ticker element
+  let ticker = document.getElementById('realtime-ticker');
+  if (!ticker) {
+    ticker = document.createElement('div');
+    ticker.id = 'realtime-ticker';
+    ticker.style.cssText = `
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      border-top: 1px solid rgba(240, 240, 250, 0.2);
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #f0f0fa;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    `;
+    document.body.appendChild(ticker);
+  }
+
+  ticker.innerHTML = `
+    <div style="display: flex; gap: 24px; align-items: center;">
+      <span style="opacity: 0.6;">LIVE DATA</span>
+      <span style="color: #00D4AA;">●</span>
+      <span>${timeStr}</span>
+      <span style="opacity: 0.5;">|</span>
+      <span>${dateStr}</span>
+    </div>
+    <div style="display: flex; gap: 24px; align-items: center;">
+      <span>TEMP: <span style="color: #C9A84C;">${tempBase.toFixed(1)}°C</span></span>
+      <span>HUMIDITY: <span style="color: #00D4AA;">${humidity.toFixed(0)}%</span></span>
+      <span>WIND: <span style="color: #f0f0fa;">${windSpeed.toFixed(1)} km/h</span></span>
+      <span>SOIL: <span style="color: #C9A84C;">${soilMoisture.toFixed(0)}%</span></span>
+    </div>
+  `;
+}
+
+// Update real-time data every second
+updateRealTimeData();
+setInterval(updateRealTimeData, 1000);
+
+// DYNAMIC DATA OVERLAY UPDATES
+function updateDataOverlay() {
+  // Add subtle pulsing effect to highlight values
+  const highlights = document.querySelectorAll('.data-value.highlight');
+  highlights.forEach(el => {
+    const pulse = Math.sin(Date.now() / 1000) * 0.1 + 0.9;
+    el.style.opacity = pulse;
+  });
+  requestAnimationFrame(updateDataOverlay);
+}
+updateDataOverlay();
+</script>
+</body>
+</html>
