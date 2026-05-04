@@ -466,14 +466,14 @@
         <div class="header-right">
             LAT 40°N · YUNCLILLOS · TOLEDO
             <button class="team-identify-btn" onclick="openTeamIdentification()" title="Identificación equipo OASYS">
-                👥 Equipo
+                👥 Equipos
             </button>
         </div>
     </header>
 
     <!-- LOGIN SCREEN -->
     <div id="login-screen">
-        <div class="login-pre">Sistema de conocimiento abierto</div>
+        <div class="login-pre">Sistema Operativo de la Tierra</div>
         <h1 class="login-title">
             LOGIN<span class="colon">:</span><br>
             <span class="humans">HUMANS</span>
@@ -543,9 +543,9 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     document.getElementById('canvas-container').appendChild(renderer.domElement);
-    camera.position.z = 50;
+    camera.position.z = 45;
 
-    const COUNT = 28000;
+    const COUNT = 25000;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(COUNT * 3);
     const col = new Float32Array(COUNT * 3);
@@ -557,7 +557,7 @@
     for (let i = 0; i < COUNT; i++) {
         const phi = Math.acos(-1 + (2 * i) / COUNT);
         const theta = Math.sqrt(COUNT * Math.PI) * phi;
-        const r = 22 + Math.sin(i * 0.008) * 3;
+        const r = 18 + Math.sin(i * 0.005) * 2;
         pos[i*3]   = r * Math.cos(theta) * Math.sin(phi);
         pos[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
         pos[i*3+2] = r * Math.cos(phi);
