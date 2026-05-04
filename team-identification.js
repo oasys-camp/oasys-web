@@ -88,20 +88,20 @@ class TeamIdentification {
   }
 
   createIdentificationUI() {
-    // Crear modal de identificación
+    // Crear modal de identificación (DISCRETO - sin exposición del team)
     const modal = document.createElement('div');
     modal.id = 'team-identification-modal';
     modal.innerHTML = `
       <div class="ti-overlay" id="ti-overlay"></div>
       <div class="ti-modal" id="ti-modal">
         <div class="ti-header">
-          <h2>👋 Identificación OASYS</h2>
+          <h2>🌱 Acceso OASYS</h2>
           <button class="ti-close" onclick="teamIdentification.closeModal()">✕</button>
         </div>
         <div class="ti-content">
           <div class="ti-intro">
-            <p>¿Eres miembro del equipo OASYS?</p>
-            <p class="ti-sub">Identifícate para acceder a los documentos construidos bajo tu supervisión.</p>
+            <p>¿Eres parte del equipo OASYS?</p>
+            <p class="ti-sub">Identifícate para acceder a recursos exclusivos.</p>
           </div>
 
           <div class="ti-form">
@@ -112,15 +112,8 @@ class TeamIdentification {
               onkeypress="if(event.key === 'Enter') teamIdentification.identify()"
             />
             <button onclick="teamIdentification.identify()" class="ti-identify-btn">
-              Identificarse
+              Acceder
             </button>
-          </div>
-
-          <div class="ti-team-list">
-            <p class="ti-team-title">Miembros del equipo:</p>
-            <div class="ti-members">
-              ${this.getTeamMembersList()}
-            </div>
           </div>
 
           <div class="ti-footer">
@@ -443,17 +436,6 @@ class TeamIdentification {
     document.body.appendChild(modal);
   }
 
-  getTeamMembersList() {
-    return Object.entries(this.teamMembers)
-      .map(([key, member]) => `
-        <div class="ti-member" onclick="teamIdentification.identifyMember('${key}')">
-          <div class="ti-member-name">${member.name}</div>
-          <div class="ti-member-role">${member.role}</div>
-          <div class="ti-member-track ${member.track.toLowerCase()}">TRACK ${member.track}</div>
-        </div>
-      `).join('');
-  }
-
   identify() {
     const identifier = document.getElementById('ti-identifier').value.trim().toLowerCase();
     this.findAndShowMember(identifier);
@@ -488,11 +470,11 @@ class TeamIdentification {
       timestamp: new Date().toISOString()
     }));
 
-    // Actualizar modal con mensaje de bienvenida
+    // Actualizar modal con mensaje de bienvenida EFUSIVO (sorpresa)
     const modal = document.getElementById('ti-modal');
     modal.innerHTML = `
       <div class="ti-header">
-        <h2>🎉 ¡Bienvenido de nuevo!</h2>
+        <h2>🎉 ¡BIENVENIDO A CASA!</h2>
         <button class="ti-close" onclick="teamIdentification.closeModal()">✕</button>
       </div>
       <div class="ti-content">
@@ -501,6 +483,9 @@ class TeamIdentification {
           <p>
             <strong>${member.name}</strong><br>
             <span style="color: rgba(245, 240, 232, 0.6);">${member.role}</span>
+          </p>
+          <p style="margin-top: 16px; color: rgba(245, 240, 232, 0.8); font-size: 14px;">
+            🌱 Tu visión está construyendo el futuro de la regeneración agrícola.
           </p>
         </div>
 
@@ -546,16 +531,16 @@ class TeamIdentification {
     const modal = document.getElementById('ti-modal');
     modal.innerHTML = `
       <div class="ti-header">
-        <h2>🤔 No encontrado</h2>
+        <h2>🤔 Acceso no disponible</h2>
         <button class="ti-close" onclick="teamIdentification.closeModal()">✕</button>
       </div>
       <div class="ti-content">
         <div class="ti-welcome">
           <p>
-            No encontramos a "<strong>${identifier}</strong>" en nuestro equipo.
+            No encontramos acceso para "<strong>${identifier}</strong>".
           </p>
-          <p style="color: rgba(245, 240, 232, 0.6); font-size: 13px;">
-            Si eres miembro del equipo, por favor contacta con el administrador.
+          <p style="color: rgba(245, 240, 232, 0.6); font-size: 13px; margin-top: 12px;">
+            Si deberías tener acceso, por favor contacta con el administrador del sistema.
           </p>
         </div>
 

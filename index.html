@@ -101,6 +101,7 @@
             align-items: center; justify-content: center;
             text-align: center;
             transition: opacity 0.8s ease, transform 0.8s ease;
+            background: transparent;
         }
         #login-screen.hidden {
             opacity: 0; transform: scale(0.96); pointer-events: none;
@@ -203,12 +204,12 @@
         .chat-container {
             width: 100%; max-width: 780px;
             height: min(680px, 88vh);
-            background: rgba(6,13,8,0.92);
-            border: 1px solid rgba(0,212,170,0.2);
+            background: rgba(6,13,8,0.65);
+            border: 1px solid rgba(0,212,170,0.15);
             border-radius: 4px;
             display: flex; flex-direction: column;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 0 80px rgba(0,212,170,0.04);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 60px rgba(0,212,170,0.03);
             transform: translateY(20px);
             transition: transform 0.6s ease;
         }
@@ -303,15 +304,15 @@
             letter-spacing: 0.01em;
         }
         .msg.ai .msg-bubble {
-            background: rgba(0,212,170,0.05);
-            border: 1px solid rgba(0,212,170,0.1);
+            background: rgba(0,212,170,0.03);
+            border: 1px solid rgba(0,212,170,0.08);
             color: rgba(245,240,232,0.85);
             font-family: 'Cormorant Garamond', serif;
             font-size: 15px;
         }
         .msg.user .msg-bubble {
-            background: rgba(201,168,76,0.07);
-            border: 1px solid rgba(201,168,76,0.15);
+            background: rgba(201,168,76,0.04);
+            border: 1px solid rgba(201,168,76,0.1);
             color: rgba(245,240,232,0.7);
             font-family: 'IBM Plex Mono', monospace;
             font-size: 12.5px;
@@ -345,8 +346,8 @@
         }
         #user-input {
             flex: 1;
-            background: rgba(0,212,170,0.04);
-            border: 1px solid rgba(0,212,170,0.15);
+            background: rgba(0,212,170,0.02);
+            border: 1px solid rgba(0,212,170,0.1);
             border-radius: 3px;
             padding: 12px 16px;
             color: var(--cream);
@@ -478,7 +479,8 @@
             <span class="humans">HUMANS</span>
         </h1>
         <p class="login-sub">
-            Somos un proyecto de regeneración de la tierra.<br>
+            El sistema operativo de la Tierra.<br>
+            OASYS es el sistema operativo de la tierra: un modelo agrícola regenerativo donde la inteligencia artificial y la experiencia agraria trabajan juntas para mejorar el suelo, aumentar las cosechas y restaurar ecosistemas.<br>
             Pregúntanos lo que quieras.
         </p>
         <button class="enter-btn" onclick="enterChat()">
@@ -541,21 +543,21 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     document.getElementById('canvas-container').appendChild(renderer.domElement);
-    camera.position.z = 55;
+    camera.position.z = 50;
 
-    const COUNT = 16000;
+    const COUNT = 28000;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(COUNT * 3);
     const col = new Float32Array(COUNT * 3);
     const C_TEAL = new THREE.Color('#00D4AA');
     const C_GOLD = new THREE.Color('#C9A84C');
     const C_CREAM = new THREE.Color('#F5F0E8');
-    const palette = [C_TEAL, C_TEAL, C_TEAL, C_GOLD, C_CREAM];
+    const palette = [C_GOLD, C_CREAM, C_CREAM, C_GOLD, C_TEAL];
 
     for (let i = 0; i < COUNT; i++) {
         const phi = Math.acos(-1 + (2 * i) / COUNT);
         const theta = Math.sqrt(COUNT * Math.PI) * phi;
-        const r = 20 + Math.sin(i * 0.01) * 5;
+        const r = 22 + Math.sin(i * 0.008) * 3;
         pos[i*3]   = r * Math.cos(theta) * Math.sin(phi);
         pos[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
         pos[i*3+2] = r * Math.cos(phi);
@@ -567,8 +569,8 @@
     geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
 
     const mat = new THREE.PointsMaterial({
-        size: 0.25, vertexColors: true,
-        transparent: true, opacity: 0.8,
+        size: 0.22, vertexColors: true,
+        transparent: true, opacity: 0.9,
         blending: THREE.AdditiveBlending, depthWrite: false
     });
     const particles = new THREE.Points(geo, mat);
@@ -580,20 +582,54 @@
         mouse.y = -(e.clientY / window.innerHeight - 0.5) * 2;
     });
 
+    // Target rotation for interactive movement
+    let targetRotationY = 0;
+    let targetRotationX = 0;
+    let isMovingToForest = false;
+    let forestAnimationProgress = 0;
+
+    function moveToForest() {
+        if (isMovingToForest) return;
+        isMovingToForest = true;
+        forestAnimationProgress = 0;
+        // Set target rotation to "forest" position
+        targetRotationY = particles.rotation.y + Math.PI * 0.8;
+        targetRotationX = particles.rotation.x + Math.PI * 0.3;
+    }
+
     let t = 0;
     const posAttr = geo.getAttribute('position');
     function animate() {
         requestAnimationFrame(animate);
-        t += 0.006;
+        t += 0.005;
+
+        // Forest movement animation
+        if (isMovingToForest) {
+            forestAnimationProgress = Math.min(forestAnimationProgress + 0.008, 1);
+            const ease = forestAnimationProgress * (2 - forestAnimationProgress); // Ease out
+            particles.rotation.y += (targetRotationY - particles.rotation.y) * ease * 0.1;
+            particles.rotation.x += (targetRotationX - particles.rotation.x) * ease * 0.1;
+            if (forestAnimationProgress >= 1) {
+                isMovingToForest = false;
+            }
+        }
+
+        // Organic breathing animation - more subtle and natural
         for (let i = 0; i < COUNT; i++) {
-            const w = Math.sin(t + i * 0.004) * 0.04;
-            posAttr.array[i*3]   = pos[i*3]   * (1 + w);
-            posAttr.array[i*3+1] = pos[i*3+1] * (1 + w * 0.6);
-            posAttr.array[i*3+2] = pos[i*3+2] * (1 + w * 0.3);
+            const wave = Math.sin(t * 1.5 + i * 0.002) * 0.03;
+            const wave2 = Math.cos(t * 0.8 + i * 0.003) * 0.02;
+            posAttr.array[i*3]   = pos[i*3]   * (1 + wave);
+            posAttr.array[i*3+1] = pos[i*3+1] * (1 + wave * 0.7 + wave2);
+            posAttr.array[i*3+2] = pos[i*3+2] * (1 + wave * 0.5);
         }
         posAttr.needsUpdate = true;
-        particles.rotation.y += 0.0012 + mouse.x * 0.0006;
-        particles.rotation.x += 0.0006 + mouse.y * 0.0003;
+
+        // Normal rotation with mouse influence - smoother
+        if (!isMovingToForest) {
+            particles.rotation.y += 0.0008 + mouse.x * 0.0004;
+            particles.rotation.x += 0.0004 + mouse.y * 0.0002;
+        }
+
         renderer.render(scene, camera);
     }
     animate();
@@ -712,6 +748,15 @@ TONO: Responde de forma cálida, honesta y poética cuando sea apropiado. Usa 'n
         if (!text.trim() || isLoading) return;
         isLoading = true;
         document.getElementById('send-btn').disabled = true;
+
+        // Check for forest-related keywords and trigger movement
+        const forestKeywords = ['bosque', 'forest', 'árboles', 'trees', 'bsg', 'bosque sagrado', 'el bosque'];
+        const hasForestKeyword = forestKeywords.some(keyword =>
+            text.toLowerCase().includes(keyword)
+        );
+        if (hasForestKeyword) {
+            moveToForest();
+        }
 
         addMessage('human', text);
         conversationHistory.push({ role: 'user', content: text });
