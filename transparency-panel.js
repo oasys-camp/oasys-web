@@ -62,6 +62,13 @@ class TransparencyPanel {
         </div>
 
         <div class="tp-section">
+          <h4>👥 Identificación del Equipo</h4>
+          <div class="tp-identity" id="tp-identity-data">
+            <p id="tp-identity-status">Cargando estado...</p>
+          </div>
+        </div>
+
+        <div class="tp-section">
           <h4>📈 Sesión Actual</h4>
           <div class="tp-session" id="tp-session-data">
             <p>Cargando datos...</p>
@@ -213,6 +220,16 @@ class TransparencyPanel {
         overflow-y: auto;
       }
 
+      .tp-identity {
+        background: rgba(0, 212, 170, 0.05);
+        border: 1px solid rgba(0, 212, 170, 0.15);
+        padding: 12px;
+        border-radius: 4px;
+        font-size: 11px;
+        color: rgba(245, 240, 232, 0.8);
+        line-height: 1.6;
+      }
+
       .tp-tools {
         display: flex;
         gap: 8px;
@@ -267,6 +284,31 @@ class TransparencyPanel {
       const sessionElement = document.getElementById('tp-session-data');
       if (sessionElement) {
         sessionElement.textContent = JSON.stringify(sessionData, null, 2);
+      }
+    }
+
+    // Actualizar información de identificación del equipo
+    this.updateIdentityInfo();
+  }
+
+  updateIdentityInfo() {
+    const identityElement = document.getElementById('tp-identity-status');
+    if (identityElement && window.teamIdentification) {
+      const currentUser = window.teamIdentification.getCurrentUser();
+      if (currentUser) {
+        identityElement.innerHTML = `
+          <strong>✅ Miembro del equipo identificado:</strong><br>
+          <span style="color: #00D4AA;">${currentUser.name}</span><br>
+          <span style="color: rgba(245, 240, 232, 0.6);">${currentUser.role}</span><br>
+          <span style="color: #C9A84C;">TRACK ${currentUser.track}</span><br>
+          <span style="font-size: 10px; color: rgba(245, 240, 232, 0.4);">Documentos bajo supervisión: ${currentUser.documents.length}</span>
+        `;
+      } else {
+        identityElement.innerHTML = `
+          <strong>👤 Visitante</strong><br>
+          <span style="color: rgba(245, 240, 232, 0.6);">No identificado como miembro del equipo</span><br>
+          <span style="font-size: 10px; color: rgba(245, 240, 232, 0.4);">Presiona "👥 Equipo" para identificarte</span>
+        `;
       }
     }
   }

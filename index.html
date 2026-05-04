@@ -74,6 +74,24 @@
         .header-right {
             font-size: 10px; letter-spacing: 0.15em;
             color: rgba(245,240,232,0.3);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .team-identify-btn {
+            background: rgba(0,212,170,0.08);
+            border: 1px solid rgba(0,212,170,0.2);
+            color: var(--teal);
+            padding: 6px 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px; letter-spacing: 0.1em;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        .team-identify-btn:hover {
+            background: rgba(0,212,170,0.15);
+            border-color: var(--teal);
+            opacity: 1;
         }
 
         /* ── LOGIN SCREEN ── */
@@ -444,7 +462,12 @@
     <!-- Header -->
     <header id="header">
         <div class="logo">OASYS<em>·</em>EARTH</div>
-        <div class="header-right">LAT 40°N · YUNCLILLOS · TOLEDO</div>
+        <div class="header-right">
+            LAT 40°N · YUNCLILLOS · TOLEDO
+            <button class="team-identify-btn" onclick="openTeamIdentification()" title="Identificación equipo OASYS">
+                👥 Equipo
+            </button>
+        </div>
     </header>
 
     <!-- LOGIN SCREEN -->
@@ -772,5 +795,6 @@ TONO: Responde de forma cálida, honesta y poética cuando sea apropiado. Usa 'n
     </script>
     <script src="analytics.js"></script>
     <script src="transparency-panel.js"></script>
+    <script src="team-identification.js"></script>
 </body>
 </html>
