@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OASYS · Singularidad Test</title>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #cesiumContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .mission {
+            max-width: 800px;
+            margin-bottom: 3rem;
+        }
+
+        .mission h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .mission p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .milestones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .milestone {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .milestone:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 212, 170, 0.5);
+        }
+
+        .milestone h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #4CAF50;
+        }
+
+        .milestone p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .milestone .metric {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00D4AA;
+            margin: 0.5rem 0;
+        }
+
+        .milestone .label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+        }
+
+        .realtime-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            z-index: 10;
+            min-width: 220px;
+        }
+
+        .realtime-indicator h4 {
+            margin: 0 0 0.5rem 0;
+            color: #00D4AA;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .connection-status {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .realtime-indicator .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.3rem 0;
+            font-size: 0.8rem;
+        }
+
+        .realtime-indicator .metric-value {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .alerts-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            z-index: 10;
+            min-width: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alerts-panel h4 {
+            margin: 0 0 0.5rem 0;
+            color: #FF4444;
+            font-size: 0.9rem;
+        }
+
+        .alert-item {
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .alert-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .alert-item.critical {
+            background: rgba(255, 68, 68, 0.2);
+            border-left: 3px solid #FF4444;
+        }
+
+        .alert-item.warning {
+            background: rgba(255, 170, 0, 0.2);
+            border-left: 3px solid #FFAA00;
+        }
+
+        .alert-summary {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .alert-badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 212, 170, 0.3);
+            border-top-color: #00D4AA;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .diagnostic-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            z-index: 10;
+            max-width: 300px;
+            font-size: 0.8rem;
+        }
+
+        .diagnostic-panel h4 {
+            margin: 0 0 0.5rem 0;
+            color: #00D4AA;
+        }
+
+        .diagnostic-status {
+            margin: 0.25rem 0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .diagnostic-status.success {
+            background: rgba(68, 255, 68, 0.2);
+            color: #44FF44;
+        }
+
+        .diagnostic-status.error {
+            background: rgba(255, 68, 68, 0.2);
+            color: #FF4444;
+        }
+
+        .diagnostic-status.warning {
+            background: rgba(255, 170, 0, 0.2);
+            color: #FFAA00;
+        }
+
+        @media (max-width: 768px) {
+            .mission h1 {
+                font-size: 2rem;
+            }
+
+            .mission p {
+                font-size: 1rem;
+            }
+
+            .milestones {
+                grid-template-columns: 1fr;
+            }
+
+            .realtime-indicator,
+            .alerts-panel,
+            .diagnostic-panel {
+                position: relative;
+                top: auto;
+                right: auto;
+                bottom: auto;
+                left: auto;
+                margin: 1rem;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">🌍 Cargando OASYS...</div>
+    </div>
+
+    <!-- Cesium Container -->
+    <div id="cesiumContainer"></div>
+
+    <!-- Diagnostic Panel -->
+    <div class="diagnostic-panel">
+        <h4>🔍 Diagnóstico</h4>
+        <div id="diagnostic-cesium" class="diagnostic-status">⏳ Verificando Cesium...</div>
+        <div id="diagnostic-viewer" class="diagnostic-status">⏳ Creando viewer...</div>
+        <div id="diagnostic-camera" class="diagnostic-status">⏳ Configurando cámara...</div>
+        <div id="diagnostic-rotation" class="diagnostic-status">⏳ Iniciando rotación...</div>
+        <div id="diagnostic-data" class="diagnostic-status">⏳ Cargando datos...</div>
+        <div id="diagnostic-final" class="diagnostic-status">⏳ Finalizando...</div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="hero-content">
+        <div class="mission">
+            <h1>OASYS · Sistema Operativo de la Tierra</h1>
+            <p>Transformando la relación entre humanidad y naturaleza a través de la regeneración ecosistémica y la innovación sostenible.</p>
+        </div>
+
+        <div class="milestones">
+            <div class="milestone">
+                <h3>🌱 Regeneración</h3>
+                <div class="metric" id="carbonMetric">40%</div>
+                <p>Captura de carbono y restauración de ecosistemas degradados mediante prácticas agrícolas regenerativas.</p>
+                <div class="label">Índice de Carbono</div>
+            </div>
+
+            <div class="milestone">
+                <h3>🔬 Innovación</h3>
+                <div class="metric" id="waterMetric">70%</div>
+                <p>Desarrollo de tecnologías sostenibles que respetan los ciclos naturales de la Tierra.</p>
+                <div class="label">Eficiencia Hídrica</div>
+            </div>
+
+            <div class="milestone">
+                <h3>🤝 Comunidad</h3>
+                <div class="metric" id="bsgMetric">26%</div>
+                <p>Construcción de redes colaborativas que fomentan el aprendizaje y la acción colectiva.</p>
+                <div class="label">Conversión BSG</div>
+            </div>
+
+            <div class="milestone">
+                <h3>🌍 Impacto</h3>
+                <div class="metric" id="faunaMetric">50%</div>
+                <p>Creación de modelos escalables que inspiran cambios sistémicos en la gestión ambiental.</p>
+                <div class="label">Biodiversidad</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Realtime Indicator -->
+    <div class="realtime-indicator">
+        <h4>
+            📊 DATOS EN TIEMPO REAL
+            <span class="connection-status" id="connectionStatus">🔄 Conectando...</span>
+        </h4>
+        <div class="metric-row">
+            <span>Visitantes:</span>
+            <span class="metric-value" id="totalVisitors">0</span>
+        </div>
+        <div class="metric-row">
+            <span>BSG Fundadores:</span>
+            <span class="metric-value" id="bsgFounders">13/50</span>
+        </div>
+        <div class="metric-row">
+            <span>Page Views:</span>
+            <span class="metric-value" id="pageViews">0</span>
+        </div>
+        <div class="metric-row">
+            <span>Progreso:</span>
+            <span class="metric-value pulse" id="projectProgress">35%</span>
+        </div>
+    </div>
+
+    <!-- Alerts Panel -->
+    <div class="alerts-panel" id="alertsPanel">
+        <h4>🚨 ALERTAS ACTIVAS</h4>
+        <div class="alert-summary" id="alertSummary">
+            <span class="alert-badge" id="alertTotal">0 total</span>
+            <span class="alert-badge" id="alertCritical" style="color: #FF4444;">0 críticas</span>
+            <span class="alert-badge" id="alertWarning" style="color: #FFAA00;">0 advertencias</span>
+        </div>
+        <div id="alertsList">
+            <div style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">Cargando alertas...</div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SISTEMA DE LOGGING
+        // ============================================
+
+        function logStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.className = 'diagnostic-status ' + type;
+            }
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // ============================================
+        // VALIDACIÓN DE COORDENADAS
+        // ============================================
+
+        function isValidCoordinate(longitude, latitude) {
+            return (
+                typeof longitude === 'number' &&
+                typeof latitude === 'number' &&
+                !isNaN(longitude) &&
+                !isNaN(latitude) &&
+                isFinite(longitude) &&
+                isFinite(latitude) &&
+                longitude >= -180 && longitude <= 180 &&
+                latitude >= -90 && latitude <= 90
+            );
+        }
+
+        function validateGeographicData(data) {
+            if (!Array.isArray(data)) {
+                console.warn('⚠️ Datos geográficos no son un array');
+                return false;
+            }
+
+            return data.every(location => {
+                const valid = isValidCoordinate(location.lon, location.lat);
+                if (!valid) {
+                    console.warn('⚠️ Coordenadas inválidas:', location);
+                }
+                return valid;
+            });
+        }
+
+        // ============================================
+        // DATOS DE PRUEBA
+        // ============================================
+
+        const testData = {
+            totalVisitors: 78,
+            activeUsers: 78,
+            pageViews: 195,
+            bsgFounders: 13,
+            bsgAvailable: 37,
+            projectProgress: 0.35,
+            carbon: 0.4,
+            water: 0.7,
+            bsgConversion: 0.26,
+            fauna: 0.5,
+            geographicDistribution: [
+                { lat: 40.0, lon: -3.5, count: 45, name: "Yunclillos", percentage: 0.45 },
+                { lat: 40.1, lon: -3.6, count: 12, name: "Madrid", percentage: 0.25 },
+                { lat: 41.39, lon: 2.16, count: 8, name: "Barcelona", percentage: 0.15 },
+                { lat: 37.39, lon: -5.98, count: 5, name: "Sevilla", percentage: 0.10 },
+                { lat: 43.36, lon: -5.84, count: 3, name: "Oviedo", percentage: 0.05 }
+            ],
+            alerts: [
+                { urgency: 'critical', title: 'Escritura 15/05', daysRemaining: -10, responsible: 'Leonardo' },
+                { urgency: 'warning', title: 'Operador SANDACH', daysRemaining: 5, responsible: 'Leonardo' },
+                { urgency: 'critical', title: 'CHT Resolución', daysRemaining: 0, responsible: 'Leonardo' }
+            ]
+        };
+
+        // ============================================
+        // FUNCIÓN PRINCIPAL
+        // ============================================
+
+        async function runOasysTest() {
+            try {
+                console.log('🧪 Iniciando test de OASYS...');
+
+                // Test 1: Verificar Cesium
+                logStatus('diagnostic-cesium', '⏳ Verificando Cesium...', 'warning');
+
+                if (typeof Cesium === 'undefined') {
+                    logStatus('diagnostic-cesium', '❌ Cesium no cargado', 'error');
+                    throw new Error('Cesium no está cargado');
+                }
+
+                logStatus('diagnostic-cesium', '✅ Cesium cargado', 'success');
+                console.log('✅ Cesium versión:', Cesium.VERSION);
+
+                // Test 2: Crear viewer
+                logStatus('diagnostic-viewer', '⏳ Creando viewer...', 'warning');
+
+                const container = document.getElementById('cesiumContainer');
+                if (!container) {
+                    logStatus('diagnostic-viewer', '❌ Contenedor no encontrado', 'error');
+                    throw new Error('Contenedor cesiumContainer no encontrado');
+                }
+
+                const viewer = new Cesium.Viewer('cesiumContainer', {
+                    terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+                    baseLayerPicker: false,
+                    geocoder: false,
+                    homeButton: false,
+                    sceneModePicker: false,
+                    navigationHelpButton: false,
+                    animation: false,
+                    timeline: false,
+                    fullscreenButton: false,
+                    vrButton: false,
+                    infoBox: false,
+                    selectionIndicator: false,
+                    shadows: false,
+                    shouldAnimate: false
+                });
+
+                logStatus('diagnostic-viewer', '✅ Viewer creado', 'success');
+                console.log('✅ Viewer creado exitosamente');
+
+                // Test 3: Configurar cámara
+                logStatus('diagnostic-camera', '⏳ Configurando cámara...', 'warning');
+
+                // Coordenadas seguras para evitar RangeError
+                const cameraPosition = {
+                    longitude: -3.5,
+                    latitude: 40.0,
+                    height: 15000000 // 15,000 km - altura segura
+                };
+
+                // Validar coordenadas de cámara
+                if (!isValidCoordinate(cameraPosition.longitude, cameraPosition.latitude)) {
+                    throw new Error('Coordenadas de cámara inválidas');
+                }
+
+                viewer.camera.flyTo({
+                    destination: Cesium.Cartesian3.fromDegrees(
+                        cameraPosition.longitude,
+                        cameraPosition.latitude,
+                        cameraPosition.height
+                    ),
+                    orientation: {
+                        heading: Cesium.Math.toRadians(0),
+                        pitch: Cesium.Math.toRadians(-90),
+                        roll: 0.0
+                    },
+                    duration: 0
+                });
+
+                logStatus('diagnostic-camera', '✅ Cámara configurada', 'success');
+                console.log('✅ Cámara configurada en:', cameraPosition);
+
+                // Test 4: Iniciar rotación
+                logStatus('diagnostic-rotation', '⏳ Iniciando rotación...', 'warning');
+
+                let rotationCount = 0;
+                const rotationInterval = setInterval(() => {
+                    try {
+                        if (viewer && viewer.camera) {
+                            viewer.camera.rotateRight(0.0005);
+                            rotationCount++;
+                            if (rotationCount % 60 === 0) {
+                                console.log(`🔄 Rotación: ${rotationCount} ciclos`);
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Error durante rotación:', error);
+                    }
+                }, 16);
+
+                logStatus('diagnostic-rotation', '✅ Rotación iniciada', 'success');
+                console.log('✅ Rotación iniciada');
+
+                // Test 5: Validar datos geográficos
+                logStatus('diagnostic-data', '⏳ Validando datos...', 'warning');
+
+                if (!validateGeographicData(testData.geographicDistribution)) {
+                    logStatus('diagnostic-data', '❌ Datos geográficos inválidos', 'error');
+                    throw new Error('Datos geográficos contienen coordenadas inválidas');
+                }
+
+                logStatus('diagnostic-data', '✅ Datos validados', 'success');
+                console.log('✅ Datos geográficos validados:', testData.geographicDistribution.length, 'ubicaciones');
+
+                // Test 6: Actualizar UI
+                updateRealtimeIndicators(testData);
+                updateAlertsPanel(testData.alerts);
+
+                // Test 7: Crear entidades en el globo
+                try {
+                    console.log('🌍 Creando entidades en el globo...');
+
+                    testData.geographicDistribution.forEach((location, index) => {
+                        try {
+                            // Validar coordenadas antes de crear entidad
+                            if (!isValidCoordinate(location.lon, location.lat)) {
+                                console.warn(`⚠️ Saltando ubicación inválida ${index}:`, location);
+                                return;
+                            }
+
+                            const entity = viewer.entities.add({
+                                position: Cesium.Cartesian3.fromDegrees(location.lon, location.lat),
+                                point: {
+                                    pixelSize: 10,
+                                    color: Cesium.Color.fromCssColorString('#00D4AA'),
+                                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                                },
+                                label: {
+                                    text: `${location.name}\n${location.count}`,
+                                    font: '12px sans-serif',
+                                    fillColor: Cesium.Color.WHITE,
+                                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                                }
+                            });
+
+                            console.log(`✅ Entidad creada: ${location.name}`);
+                        } catch (error) {
+                            console.error(`❌ Error creando entidad ${index}:`, error);
+                        }
+                    });
+
+                    console.log('✅ Entidades creadas exitosamente');
+                } catch (error) {
+                    console.warn('⚠️ Error creando entidades:', error);
+                }
+
+                // Test final
+                logStatus('diagnostic-final', '✅ Test completado exitosamente', 'success');
+                console.log('🎉 Todos los tests pasados');
+
+                // Ocultar loading overlay
+                setTimeout(() => {
+                    const loadingOverlay = document.getElementById('loading-overlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.classList.add('hidden');
+                        setTimeout(() => {
+                            loadingOverlay.remove();
+                        }, 500);
+                    }
+                }, 1000);
+
+                // Exponer para debugging
+                window.testViewer = viewer;
+                window.testRotationInterval = rotationInterval;
+                window.testData = testData;
+
+                // Simular actualizaciones en tiempo real
+                setInterval(() => {
+                    testData.totalVisitors += Math.floor(Math.random() * 3);
+                    testData.pageViews += Math.floor(Math.random() * 5);
+                    updateRealtimeIndicators(testData);
+                }, 5000);
+
+                return true;
+
+            } catch (error) {
+                console.error('❌ Error en test de OASYS:', error);
+                logStatus('diagnostic-final', `❌ Error: ${error.message}`, 'error');
+
+                // Mostrar error detallado
+                if (error instanceof RangeError) {
+                    console.error('🔍 RangeError detectado');
+                    logStatus('diagnostic-final', '❌ RangeError - revisa coordenadas o arrays', 'error');
+                }
+
+                // Ocultar loading overlay
+                const loadingOverlay = document.getElementById('loading-overlay');
+                if (loadingOverlay) {
+                    loadingOverlay.classList.add('hidden');
+                    setTimeout(() => {
+                        loadingOverlay.remove();
+                    }, 500);
+                }
+
+                return false;
+            }
+        }
+
+        // ============================================
+        // FUNCIONES DE UI
+        // ============================================
+
+        function updateRealtimeIndicators(data) {
+            try {
+                document.getElementById('totalVisitors').textContent = data.totalVisitors.toLocaleString();
+                document.getElementById('bsgFounders').textContent = `${data.bsgFounders}/${data.bsgFounders + data.bsgAvailable}`;
+                document.getElementById('pageViews').textContent = data.pageViews.toLocaleString();
+                document.getElementById('projectProgress').textContent = `${Math.round(data.projectProgress * 100)}%`;
+
+                // Actualizar métricas ambientales
+                document.getElementById('carbonMetric').textContent = `${Math.round(data.carbon * 100)}%`;
+                document.getElementById('waterMetric').textContent = `${Math.round(data.water * 100)}%`;
+                document.getElementById('bsgMetric').textContent = `${Math.round(data.bsgConversion * 100)}%`;
+                document.getElementById('faunaMetric').textContent = `${Math.round(data.fauna * 100)}%`;
+
+                // Actualizar estado de conexión
+                const statusElement = document.getElementById('connectionStatus');
+                if (statusElement) {
+                    statusElement.textContent = '🟢 Conectado';
+                    statusElement.style.color = '#44FF44';
+                }
+            } catch (error) {
+                console.error('❌ Error actualizando indicadores:', error);
+            }
+        }
+
+        function updateAlertsPanel(alerts) {
+            try {
+                const summary = {
+                    total: alerts.length,
+                    critical: alerts.filter(a => a.urgency === 'critical' || a.urgency === 'overdue' || a.urgency === 'today').length,
+                    warning: alerts.filter(a => a.urgency === 'warning').length
+                };
+
+                document.getElementById('alertTotal').textContent = `${summary.total} total`;
+                document.getElementById('alertCritical').textContent = `${summary.critical} críticas`;
+                document.getElementById('alertWarning').textContent = `${summary.warning} advertencias`;
+
+                const alertsList = document.getElementById('alertsList');
+
+                if (alerts.length === 0) {
+                    alertsList.innerHTML = '<div style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">Sin alertas activas</div>';
+                    return;
+                }
+
+                alertsList.innerHTML = alerts.map(alert => {
+                    const urgencyText = {
+                        overdue: '❌ Vencido',
+                        today: '🔴 Hoy',
+                        critical: '⚠️ Crítico',
+                        warning: '⚡ Advertencia'
+                    }[alert.urgency] || alert.urgency;
+
+                    const daysText = alert.daysRemaining === 0 ? 'Hoy' :
+                        alert.daysRemaining < 0 ? `${Math.abs(alert.daysRemaining)} días vencido` :
+                        `${alert.daysRemaining} días`;
+
+                    return `
+                        <div class="alert-item ${alert.urgency}">
+                            <div style="font-weight: bold; margin-bottom: 0.25rem;">${urgencyText} · ${alert.title}</div>
+                            <div style="opacity: 0.8;">${daysText}</div>
+                            <div style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.25rem;">${alert.responsible}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('❌ Error actualizando panel de alertas:', error);
+            }
+        }
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+
+        // Iniciar test cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', runOasysTest);
+        } else {
+            runOasysTest();
+        }
+
+        // Manejador de errores global
+        window.addEventListener('error', (event) => {
+            console.error('❌ Error global:', event.error);
+            logStatus('diagnostic-final', `❌ Error: ${event.message}`, 'error');
+        });
+
+        // Manejador de promesas rechazadas
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('❌ Promesa rechazada:', event.reason);
+            logStatus('diagnostic-final', `❌ Error: ${event.reason}`, 'error');
+        });
+
+        console.log('🔧 Sistema de diagnóstico cargado');
+    </script>
+</body>
+</html>
