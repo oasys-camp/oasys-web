@@ -1,6 +1,25 @@
 {
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",
-    "dotenv": "^17.4.2"
-  }
+    "dotenv": "^17.4.2",
+    "resend": "^6.12.3",
+    "stripe": "^17.7.0"
+  },
+  "description": "OASYS Web - Sistema Operativo de la Tierra",
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "name": "oasys-web",
+  "scripts": {
+    "build": "netlify build",
+    "deploy": "netlify deploy --prod",
+    "dev": "netlify dev",
+    "setup:stripe": "powershell -ExecutionPolicy Bypass -File setup-stripe.ps1",
+    "stripe:listen": "stripe listen --forward-to localhost:8888/.netlify/functions/stripe-webhook",
+    "stripe:login": "stripe login",
+    "stripe:trigger:fail": "stripe trigger payment_intent.payment_failed",
+    "stripe:trigger:success": "stripe trigger checkout.session.completed",
+    "test:checkout": "node test-checkout.js"
+  },
+  "version": "1.0.0"
 }
