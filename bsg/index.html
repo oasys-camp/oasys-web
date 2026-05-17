@@ -198,12 +198,36 @@ section{position:relative;}
 #transferencia{padding:80px 64px;background:var(--cream);border-bottom:1px solid rgba(0,0,0,0.08);}
 #transferencia .section-tag{color:#6a4e10;text-align:left;}
 #transferencia h2{font-size:clamp(28px,3vw,44px);font-weight:300;margin-bottom:32px;color:var(--ink);}
-.transfer-box-light{background:white;border:1px solid rgba(201,168,76,0.3);padding:36px;max-width:560px;margin-bottom:32px;}
+.transfer-container{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:1100px;}
+.transfer-box-light{background:white;border:1px solid rgba(201,168,76,0.3);padding:36px;}
 .transfer-row-light{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.07);font-size:14px;}
 .transfer-row-light:last-child{border-bottom:none;}
 .t-key{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink2);letter-spacing:0.1em;}
 .t-val{font-family:'Share Tech Mono',monospace;font-size:12px;color:#6a4e10;font-weight:600;}
 .transfer-note{font-size:15px;color:var(--ink2);line-height:1.7;max-width:560px;}
+
+/* PAYMENT BLOCK — light, coherente con transferencia */
+.payment-box-stripe{background:white;border:1px solid rgba(0,0,0,0.1);padding:36px;position:relative;}
+.payment-box-stripe::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#00D4AA,#C9A84C);}
+.payment-stripe-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#00967a;letter-spacing:0.25em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:8px;}
+.payment-stripe-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--ink);margin-bottom:24px;line-height:1.2;}
+.payment-methods{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+.payment-method{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid rgba(0,0,0,0.08);background:transparent;cursor:pointer;transition:all 0.2s;}
+.payment-method.active{border-color:rgba(0,150,122,0.4);background:rgba(0,150,122,0.04);}
+.payment-method-info{flex:1;}
+.payment-method-name{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink);letter-spacing:0.06em;}
+.payment-method-name.muted{color:#888;}
+.payment-method-desc{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#aaa;letter-spacing:0.1em;margin-top:2px;}
+.payment-method-radio{width:12px;height:12px;border:1.5px solid #ccc;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.payment-method-radio.active{border-color:#00967a;}
+.payment-method-radio.active::after{content:'';width:5px;height:5px;background:#00967a;border-radius:50%;}
+.payment-total{border-top:1px solid rgba(0,0,0,0.07);border-bottom:1px solid rgba(0,0,0,0.07);padding:14px 0;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;}
+.payment-total-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#888;letter-spacing:0.2em;text-transform:uppercase;}
+.payment-total-amount{font-family:'Share Tech Mono',monospace;font-size:18px;color:#6a4e10;font-weight:600;}
+.payment-cta{background:#00D4AA;color:#0a1f14;border:none;padding:15px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;font-weight:700;cursor:pointer;transition:opacity 0.2s;width:100%;}
+.payment-cta:hover{opacity:0.9;}
+.payment-secure{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#aaa;letter-spacing:0.1em;}
+.payment-secure svg{width:10px;height:10px;stroke:#aaa;}
 
 /* FORMULARIO (dark) */
 #reserva{padding:120px 64px;border-bottom:1px solid var(--border);}
@@ -308,7 +332,7 @@ footer{padding:40px 64px;border-top:1px solid var(--border);display:flex;align-i
   .hero-content{margin-bottom:180px;padding-top:80px;}
   .hero-stats{position:static;flex-direction:row;flex-wrap:wrap;margin-top:48px;}
   .stat{text-align:left;border-right:none;border-left:2px solid var(--border);padding-left:16px;}
-  #problema,#bosque,.oferta-grid,.form-grid{grid-template-columns:1fr;gap:48px;}
+  #problema,#bosque,.oferta-grid,.form-grid,.transfer-container{grid-template-columns:1fr;gap:48px;}
   #problema,#reserva,#oferta,#legal,#faq,#cta-final{padding:80px 24px;}
   #bosque,#transferencia{padding:80px 24px;}
   .steps{grid-template-columns:1fr 1fr;}
@@ -660,24 +684,98 @@ document.getElementById('semilla-form').addEventListener('submit', async functio
 <!-- -- TRANSFERENCIA (cream) -- -->
 <section id="transferencia">
   <span class="section-tag">Cómo reservar</span>
-  <h2>Una transferencia y ya está.</h2>
-  <p style="font-size:16px;color:var(--ink2);max-width:560px;margin-bottom:28px;line-height:1.7;">Rellena el formulario de abajo y realiza la transferencia con los datos indicados. En 24–48h recibes confirmación, ficha de tu Árbol y toda la documentación.</p>
-  <div class="transfer-box-light">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#6a4e10;margin-bottom:16px;"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" style="vertical-align:middle;display:inline-block;flex-shrink:0;"><path d="M10 2 L17 6 L3 6 Z" stroke-linejoin="round"/><path d="M5 7 L5 14 M9 7 L9 14 M11 7 L11 14 M15 7 L15 14"/><path d="M2 16 L18 16" stroke-linecap="round" stroke-width="1.5"/></svg> Transferencia bancaria</div>
-    <div class="transfer-row-light">
-      <span class="t-key">IBAN</span>
-      <span class="t-val">ES16 3081 0151 9650 0081 2750</span>
+  <h2>Elige cómo pagar.</h2>
+  <p style="font-size:16px;color:var(--ink2);max-width:560px;margin-bottom:48px;line-height:1.7;">Rellena el formulario de abajo y elige tu método de pago. En 24–48h recibes confirmación, ficha de tu Árbol y toda la documentación.</p>
+
+  <div class="transfer-container">
+
+    <!-- Transferencia bancaria -->
+    <div class="transfer-box-light">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#6a4e10;margin-bottom:24px;display:flex;align-items:center;gap:8px;">
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="#6a4e10" stroke-width="1.3"><path d="M10 2L17 6H3Z" stroke-linejoin="round"/><path d="M5 7v7M9 7v7M11 7v7M15 7v7"/><path d="M2 16h16" stroke-linecap="round" stroke-width="1.5"/></svg>
+        TRANSFERENCIA BANCARIA
+      </div>
+      <div class="transfer-row-light">
+        <span class="t-key">IBAN</span>
+        <span class="t-val">ES16 3081 0151 9650 0081 2750</span>
+      </div>
+      <div class="transfer-row-light">
+        <span class="t-key">Concepto</span>
+        <span class="t-val">SEMILLA + nombre de tu mascota</span>
+      </div>
+      <div class="transfer-row-light">
+        <span class="t-key">Importe</span>
+        <span class="t-val">450,00 €</span>
+      </div>
+      <div class="transfer-row-light">
+        <span class="t-key">Banco</span>
+        <span class="t-val">CaixaBank</span>
+      </div>
+      <div class="transfer-row-light">
+        <span class="t-key">SWIFT/BIC</span>
+        <span class="t-val">CAIXESBBXXX</span>
+      </div>
+      <div style="margin-top:24px;padding-top:24px;border-top:1px solid rgba(201,168,76,0.2);">
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#888;line-height:1.7;margin:0;">Confirmación en 24–48h tras verificar el ingreso.</p>
+      </div>
     </div>
-    <div class="transfer-row-light">
-      <span class="t-key">Concepto</span>
-      <span class="t-val">SEMILLA + nombre de tu mascota</span>
+
+    <!-- Pago con tarjeta Stripe -->
+    <div class="payment-box-stripe">
+      <div class="payment-stripe-tag">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00967a" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        PAGO CON TARJETA · STRIPE
+      </div>
+
+      <div class="payment-stripe-title">Pago instantáneo<br><em style="color:#00967a;font-style:italic;">con tarjeta</em></div>
+
+      <div class="payment-methods">
+        <div class="payment-method active" id="pm-card" onclick="selectPaymentMethod(this,'card')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00967a" stroke-width="1.5" style="flex-shrink:0;"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          <div class="payment-method-info">
+            <div class="payment-method-name">Tarjeta crédito/débito</div>
+            <div class="payment-method-desc">VISA · MASTERCARD · AMEX</div>
+          </div>
+          <div class="payment-method-radio active" id="pr-card"></div>
+        </div>
+
+        <div class="payment-method" id="pm-apple" onclick="selectPaymentMethod(this,'apple')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.5" style="flex-shrink:0;"><path d="M17 12.5c0-2.5 2-3.5 2-3.5s-1-3-3.5-3c-1.5 0-2.5 1-3.5 1s-2-1-3-1C6 6 4 9 4 12c0 3.5 2.5 6 4 6 1 0 1.5-.5 3-.5s2 .5 3 .5c1.5 0 3-2.5 3-2.5s-2-1-2-3.5z"/><path d="M14.5 4.5c.5-1 .5-2 .5-2s-1.5.5-2.5 1.5-1 2.5-1 2.5 1.5-.5 3-2z"/></svg>
+          <div class="payment-method-info">
+            <div class="payment-method-name muted">Apple Pay</div>
+            <div class="payment-method-desc">TOUCH ID · FACE ID</div>
+          </div>
+          <div class="payment-method-radio" id="pr-apple"></div>
+        </div>
+
+        <div class="payment-method" id="pm-google" onclick="selectPaymentMethod(this,'google')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.5" style="flex-shrink:0;"><path d="M12 11v2h5.5a5.5 5.5 0 1 1-1.6-4.6"/></svg>
+          <div class="payment-method-info">
+            <div class="payment-method-name muted">Google Pay</div>
+            <div class="payment-method-desc">CUENTA GOOGLE</div>
+          </div>
+          <div class="payment-method-radio" id="pr-google"></div>
+        </div>
+      </div>
+
+      <div class="payment-total">
+        <span class="payment-total-label">Total</span>
+        <span class="payment-total-amount">450,00 €</span>
+      </div>
+
+      <button class="payment-cta" id="stripe-pay-btn" onclick="initiateStripeCheckout()">
+        PAGAR AHORA · 450,00 €
+      </button>
+
+      <div class="payment-secure">
+        <svg viewBox="0 0 20 20" fill="none" stroke-width="1.5"><path d="M10 2L5 7v6l5 5 5-5V7z" stroke-linejoin="round"/><circle cx="10" cy="10" r="2.5"/></svg>
+        PAGO SEGURO · STRIPE · SSL
+      </div>
     </div>
-    <div class="transfer-row-light">
-      <span class="t-key">Importe</span>
-      <span class="t-val">450,00 ·</span>
-    </div>
+
   </div>
-  <p class="transfer-note">Una vez verificado el ingreso, recibirás confirmación por email con el número de plaza, la ficha de tu Árbol y el contrato de servicio en formato digital.</p>
+
+  <p class="transfer-note" style="margin-top:32px;">Una vez verificado el pago (transferencia o tarjeta), recibirás confirmación por email con el número de plaza, la ficha de tu Árbol y el contrato de servicio en formato digital.</p>
 </section>
 
 <!-- -- FORMULARIO (dark) -- -->
@@ -968,6 +1066,76 @@ function stopNature() {
   if (masterVol) { masterVol.gain.setValueAtTime(masterVol.gain.value, AC.currentTime); masterVol.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + 1); }
   setTimeout(function() { try { noiseSource.stop(); } catch(e){} try { AC.close(); } catch(e){} AC = null; }, 1100);
 }
+
+// -- PAYMENT MODAL FUNCTIONS --
+var selectedPaymentMethod = null;
+
+function selectPaymentMethod(element, method) {
+  ['card','apple','google'].forEach(function(m) {
+    var mb = document.getElementById('pm-' + m);
+    var rb = document.getElementById('pr-' + m);
+    var icon = mb ? mb.querySelector('svg') : null;
+    var label = mb ? mb.querySelector('.payment-method-name') : null;
+    if (m === method) {
+      if (mb) { mb.classList.add('active'); }
+      if (rb) { rb.classList.add('active'); }
+      if (icon) { icon.style.stroke = '#00967a'; }
+      if (label) { label.classList.remove('muted'); }
+    } else {
+      if (mb) { mb.classList.remove('active'); }
+      if (rb) { rb.classList.remove('active'); }
+      if (icon) { icon.style.stroke = '#aaa'; }
+      if (label) { label.classList.add('muted'); }
+    }
+  });
+  selectedPaymentMethod = method;
+  var labels = { card:'PAGAR · TARJETA · 450,00 €', apple:'PAGAR · APPLE PAY · 450,00 €', google:'PAGAR · GOOGLE PAY · 450,00 €' };
+  var btn = document.getElementById('stripe-pay-btn');
+  if (btn) btn.textContent = labels[method] || 'PAGAR AHORA · 450,00 €';
+  gtag('event', 'payment_method_selected', { event_category: 'Payment', event_label: method });
+}
+
+function initiateStripeCheckout() {
+  if (!selectedPaymentMethod) {
+    alert('Por favor, selecciona un método de pago');
+    return;
+  }
+
+  // Show loading state
+  var ctaButton = document.querySelector('.payment-cta');
+  var originalText = ctaButton.textContent;
+  ctaButton.textContent = 'Procesando...';
+  ctaButton.disabled = true;
+
+  // Track checkout initiation
+  gtag('event', 'checkout_initiated', {
+    event_category: 'Payment',
+    event_label: selectedPaymentMethod,
+    value: 450.00,
+    currency: 'EUR'
+  });
+
+  // Simulate Stripe checkout (replace with actual implementation)
+  setTimeout(function() {
+    // Here you would call your Stripe checkout function
+    // For example: createStripeCheckoutSession(selectedPaymentMethod);
+
+    // Reset button for demo
+    ctaButton.textContent = originalText;
+    ctaButton.disabled = false;
+
+    // Show success message (in production, this would redirect to Stripe)
+    alert('¡Demo: Iniciando checkout con ' + selectedPaymentMethod + '!\n\nEn producción, esto redirigiría a Stripe para procesar el pago de 450,00€.');
+  }, 1500);
+}
+
+// Initialize first payment method as selected
+document.addEventListener('DOMContentLoaded', function() {
+  var firstMethod = document.getElementById('pm-card');
+  if (firstMethod) {
+    selectPaymentMethod(firstMethod, 'card');
+  }
+});
 </script>
 <!-- GRACIAS OVERLAY -->
 <div id="gracias-overlay" style="display:none;position:fixed;inset:0;background:#070a09;z-index:9999;overflow-y:auto;display:none;align-items:center;justify-content:center;padding:40px 24px;">
