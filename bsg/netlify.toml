@@ -1,6 +1,7 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  command = "cd .. && npm install --ignore-scripts"
 
 [functions]
   node_bundler = "esbuild"
