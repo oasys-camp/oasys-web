@@ -13,13 +13,6 @@
   to = "/.netlify/functions/telemetry"
   status = 200
 
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-
 [[redirects]]
   from = '/success.html'
   to = '/bsg/success.html'
@@ -33,4 +26,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "script-src 'self' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com; frame-src https://js.stripe.com https://checkout.stripe.com;"
