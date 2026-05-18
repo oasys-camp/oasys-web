@@ -177,7 +177,7 @@
 
         if (sessionId) {
             // Verify session and get details
-            fetch('/api/verify-session', {
+            fetch('/.netlify/functions/verify-session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: sessionId })
