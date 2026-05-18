@@ -7,7 +7,7 @@ const { createClient } = require('@supabase/supabase-js');
 // Initialize Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 exports.handler = async (event, context) => {
@@ -57,7 +57,7 @@ exports.handler = async (event, context) => {
     const { data: plaza, error: plazaError } = await supabase
       .from('bsg_plazas')
       .select('*')
-      .eq('plaza_number', plazaNumber)
+      .eq('numero_plaza', plazaNumber)
       .single();
 
     if (plazaError || !plaza) {
