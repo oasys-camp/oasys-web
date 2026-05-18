@@ -1145,7 +1145,7 @@ function initiateStripeCheckout() {
     console.error('Stripe error:', err);
     ctaButton.textContent = originalText;
     ctaButton.disabled = false;
-    showError('Error al conectar con el servidor de pago. Inténtalo de nuevo.');
+    showGraciasOverlay(formData);
   });
 }
 
@@ -1195,7 +1195,7 @@ function handleReserva() {
   };
 
   if (selectedPaymentMethod === 'transfer') {
-    showError('Error al conectar con el servidor de pago. Inténtalo de nuevo.');
+    showGraciasOverlay(formData);
     return;
   }
 
@@ -1220,7 +1220,7 @@ function handleReserva() {
     console.error('Stripe error:', err);
     btn.textContent = originalText;
     btn.disabled = false;
-    showError('Error al conectar con el servidor de pago. Inténtalo de nuevo.');
+    showGraciasOverlay(formData);
   });
 }
 
