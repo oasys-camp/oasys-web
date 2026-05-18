@@ -1,0 +1,214 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   OASYS.EARTH · TRÍPTICO RESPONSIVE
+   Desktop: Horizontal (izq | centro | der)
+   Móvil: Vertical (arriba | centro | abajo)
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── TRÍPTICO CONTAINER ───────────────────────────────────────────────────── */
+.triptico-container {
+    position: fixed;
+    inset: 0;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    z-index: 5;
+}
+
+.triptico-container.active {
+    display: grid;
+    opacity: 1;
+}
+
+/* ── DESKTOP: HORIZONTAL ──────────────────────────────────────────────────── */
+@media (min-width: 769px) {
+    .triptico-container {
+        grid-template-columns: 280px 1fr 380px;
+        grid-template-rows: 1fr;
+    }
+    
+    .panel-left { grid-column: 1; grid-row: 1; animation: slideInLeft 0.6s ease; }
+    .panel-center { grid-column: 2; grid-row: 1; }
+    .panel-right { grid-column: 3; grid-row: 1; animation: slideInRight 0.6s ease; }
+    
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-40px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(40px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+}
+
+/* ── MÓVIL: VERTICAL ──────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .triptico-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+    
+    .panel-left { grid-row: 1; max-height: 25vh; animation: slideInTop 0.6s ease; }
+    .panel-center { grid-row: 2; }
+    .panel-right { grid-row: 3; max-height: 35vh; animation: slideInBottom 0.6s ease; }
+    
+    @keyframes slideInTop {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideInBottom {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* ── PANELES ──────────────────────────────────────────────────────────────── */
+.panel-left, .panel-right {
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(6,13,8,0.4);
+    backdrop-filter: blur(8px);
+    overflow-y: auto;
+}
+
+.panel-center { position: relative; }
+
+/* ── CHAT MINIMALISTA ─────────────────────────────────────────────────────── */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,212,170,0.15) transparent;
+}
+
+.chat-messages::-webkit-scrollbar { width: 3px; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(0,212,170,0.2); border-radius: 2px; }
+
+.msg-minimal {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    animation: fadeInMsg 0.4s ease;
+}
+
+@keyframes fadeInMsg {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-minimal.user { align-items: flex-end; }
+
+.msg-label-minimal {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.3;
+}
+
+.msg-label-minimal.ai { color: var(--teal); }
+.msg-label-minimal.human { color: var(--gold); }
+
+.msg-text-minimal {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(245,240,232,0.85);
+    white-space: pre-wrap;
+}
+
+.msg-minimal.user .msg-text-minimal {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: rgba(245,240,232,0.65);
+    text-align: right;
+}
+
+/* ── INPUT ────────────────────────────────────────────────────────────────── */
+.chat-input-minimal {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0,212,170,0.1);
+}
+
+.chat-input-minimal input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(0,212,170,0.2);
+    padding: 10px 0;
+    width: 100%;
+    color: var(--cream);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.chat-input-minimal input:focus { border-bottom-color: var(--teal); }
+.chat-input-minimal input::placeholder { color: rgba(245,240,232,0.2); }
+
+/* ── TYPING ───────────────────────────────────────────────────────────────── */
+.typing-minimal {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    opacity: 0.5;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.typing-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--teal);
+    animation: dotBounce 1.2s ease infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotBounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+    40% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ── MÉTRICAS PANEL LEFT ──────────────────────────────────────────────────── */
+.panel-left-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--teal);
+    margin-bottom: 12px;
+}
+
+.metric-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.metric-item-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: rgba(245,240,232,0.4);
+}
+
+.metric-item-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--teal);
+}

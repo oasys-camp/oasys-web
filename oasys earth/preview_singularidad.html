@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OASYS Singularidad · Preview</title>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; overflow: hidden; width: 100vw; height: 100vh; }
+        #cesiumContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: -1;
+        }
+        .cesium-viewer-bottom, .cesium-viewer-toolbar, .cesium-viewer-animationContainer,
+        .cesium-viewer-timelineContainer, .cesium-viewer-fullscreenButton, .cesium-viewer-vrButton,
+        .cesium-viewer-geocoderContainer, .cesium-viewer-homeButton, .cesium-viewer-sceneModePicker,
+        .cesium-viewer-navigationHelpButton, .cesium-viewer-infoBox, .cesium-viewer-selectionIndicator {
+            display: none !important;
+        }
+        #content {
+            position: relative;
+            z-index: 1;
+            background: transparent;
+            padding: 40px;
+            color: white;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div id="cesiumContainer"></div>
+    <div id="content">
+        <h1 style="font-size: 24px; margin-bottom: 10px;">OASYS SINGULARIDAD</h1>
+        <p style="font-size: 14px; opacity: 0.8;">El Bosque Sagrado · LAT 40°N</p>
+    </div>
+    <script>
+        try {
+            // Crear viewer sin token de Cesium Ion
+            const viewer = new Cesium.Viewer('cesiumContainer', {
+                terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+                baseLayer: false,
+                baseLayerPicker: false,
+                geocoder: false,
+                homeButton: false,
+                sceneModePicker: false,
+                navigationHelpButton: false,
+                animation: false,
+                timeline: false,
+                fullscreenButton: false,
+                vrButton: false,
+                infoBox: false,
+                selectionIndicator: false
+            });
+
+            // Configurar apariencia High Agro Tech
+            viewer.scene.globe.baseColor = Cesium.Color.BLACK;
+            viewer.scene.globe.saturation = 0.6;
+            viewer.scene.fog.enabled = true;
+            viewer.scene.fog.density = 0.0002;
+
+            // Añadir capa de imágenes CartoDB (gratuito para desarrollo)
+            viewer.imageryLayers.addImageryProvider(
+                new Cesium.UrlTemplateImageryProvider({
+                    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                    subdomains: ['a', 'b', 'c', 'd'],
+                    credit: 'Map tiles by CartoDB, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+                })
+            );
+
+            // Posición inicial - Tierra llena 90% del viewport
+            viewer.camera.setView({
+                destination: Cesium.Cartesian3.fromDegrees(-3.8, 40.0, 800000),
+                orientation: {
+                    heading: 0,
+                    pitch: Cesium.Math.toRadians(-50),
+                    roll: 0
+                }
+            });
+
+            // Rotación constante - sistema vivo
+            viewer.scene.postRender.addEventListener(() => {
+                const currentPos = viewer.camera.positionCartographic;
+                const newLongitude = Cesium.Math.toDegrees(currentPos.longitude) + 0.01;
+                viewer.camera.setView({
+                    destination: Cesium.Cartesian3.fromDegrees(
+                        newLongitude,
+                        Cesium.Math.toDegrees(currentPos.latitude),
+                        Cesium.Math.toDegrees(currentPos.height)
+                    ),
+                    orientation: viewer.camera.orientation
+                });
+            });
+
+            // Marcador principal en El Bosque Sagrado
+            const bosqueMarker = viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(-3.8, 40.0, 0),
+                point: {
+                    pixelSize: 15,
+                    color: Cesium.Color.CYAN,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 3,
+                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                },
+                ellipse: {
+                    semiMinorAxis: 10000.0,
+                    semiMajorAxis: 10000.0,
+                    height: 0,
+                    material: Cesium.Color.CYAN.withAlpha(0.2),
+                    outline: true,
+                    outlineColor: Cesium.Color.CYAN.withAlpha(0.4),
+                    outlineWidth: 2
+                }
+            });
+
+            // Pulsar el marcador
+            let pulseTime = 0;
+            viewer.clock.onTick.addEventListener(() => {
+                pulseTime += 0.02;
+
+                // Pulsar tamaño del punto
+                const baseSize = 15;
+                const pulseSize = baseSize + Math.sin(pulseTime) * 3;
+                bosqueMarker.point.pixelSize = pulseSize;
+
+                // Pulsar opacidad
+                const baseAlpha = 0.8;
+                const pulseAlpha = baseAlpha + Math.sin(pulseTime * 0.5) * 0.2;
+                bosqueMarker.point.color = Cesium.Color.CYAN.withAlpha(pulseAlpha);
+
+                // Pulsar elipse
+                const baseRadius = 10000;
+                const pulseRadius = baseRadius + Math.sin(pulseTime * 0.3) * 1000;
+                bosqueMarker.ellipse.semiMinorAxis = pulseRadius;
+                bosqueMarker.ellipse.semiMajorAxis = pulseRadius;
+            });
+
+            console.log('🌍 OASYS SINGULARIDAD cargado correctamente');
+            console.log('📍 El Bosque Sagrado: -3.8°W, 40°N');
+
+            // Debugging
+            window.SINGULARIDAD_DEBUG = {
+                viewer: viewer,
+                bosqueMarker: bosqueMarker,
+                flyToBosque: () => {
+                    viewer.camera.flyTo({
+                        destination: Cesium.Cartesian3.fromDegrees(-3.8, 40.0, 100000),
+                        orientation: { heading: 0, pitch: Cesium.Math.toRadians(-45), roll: 0 },
+                        duration: 3
+                    });
+                },
+                flyToSpace: () => {
+                    viewer.camera.flyTo({
+                        destination: Cesium.Cartesian3.fromDegrees(-3.8, 40.0, 10000000),
+                        orientation: { heading: 0, pitch: Cesium.Math.toRadians(-90), roll: 0 },
+                        duration: 5
+                    });
+                }
+            };
+
+        } catch (error) {
+            console.error('Error:', error);
+            document.body.innerHTML = '<div style="color:white; padding:20px; font-family:monospace;">Error: ' + error.message + '</div>';
+        }
+    </script>
+</body>
+</html>

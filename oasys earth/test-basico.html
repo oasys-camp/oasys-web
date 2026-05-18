@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Básico</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        #test {
+            padding: 20px;
+        }
+        #globe-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="test">
+        <h1>Test Básico de Globe.gl</h1>
+        <p>Si ves este texto, el HTML se cargó.</p>
+        <p id="script-status">⏳ Esperando script...</p>
+        <p id="globe-status">⏳ Esperando Globe...</p>
+    </div>
+    <div id="globe-container"></div>
+
+    <script>
+        document.getElementById('script-status').textContent = '✅ Script principal cargado';
+        console.log('Script principal cargado');
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
+
+    <script>
+        document.getElementById('globe-status').textContent = '✅ Script Globe.gl cargado';
+        console.log('Script Globe.gl cargado');
+
+        if (typeof Globe !== 'undefined') {
+            console.log('Globe está disponible:', Globe);
+
+            try {
+                const myGlobe = new Globe(document.getElementById('globe-container'))
+                    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+                    .backgroundColor('#000000');
+
+                myGlobe.controls().autoRotate = true;
+                myGlobe.pointOfView({ lat: 40.0, lng: -3.5, altitude: 2.5 });
+
+                console.log('✅ Globo creado exitosamente');
+                document.getElementById('globe-status').textContent = '✅ Globo creado exitosamente';
+
+            } catch (error) {
+                console.error('❌ Error creando globo:', error);
+                document.getElementById('globe-status').textContent = '❌ Error: ' + error.message;
+            }
+        } else {
+            console.error('❌ Globe no está definido');
+            document.getElementById('globe-status').textContent = '❌ Globe no está definido';
+        }
+    </script>
+</body>
+</html>

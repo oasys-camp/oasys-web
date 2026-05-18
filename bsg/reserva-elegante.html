@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva tu Plaza | El Bosque Sagrado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        :root {
+            --primary: #1a472a;
+            --secondary: #d4a574;
+            --accent: #c9a84c;
+            --dark: #0a1f14;
+            --light: #f5f0e8;
+            --success: #00D4AA;
+            --error: #e74c3c;
+            --ink: #111111;
+            --ink2: rgba(17,17,17,0.7);
+            --muted: rgba(17,17,17,0.5);
+            --border: rgba(17,17,17,0.1);
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8e0d5 50%, #f5f0e8 100%);
+            color: var(--ink);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .header-brand {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: clamp(42px, 6vw, 72px);
+            font-weight: 300;
+            margin-bottom: 16px;
+            line-height: 1.1;
+            color: var(--ink);
+        }
+
+        .header h1 em {
+            font-style: italic;
+            color: var(--primary);
+        }
+
+        .header p {
+            font-size: 18px;
+            color: var(--ink2);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: start;
+        }
+
+        /* Left Column - Info */
+        .info-column {
+            animation: fadeInLeft 1s ease;
+        }
+
+        .info-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 40px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-card h3 {
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        .info-card p {
+            font-size: 16px;
+            color: var(--ink2);
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .info-card ul {
+            list-style: none;
+            margin-top: 24px;
+        }
+
+        .info-card li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            color: var(--ink2);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .info-card li:before {
+            content: "— ";
+            color: var(--accent);
+            margin-right: 8px;
+        }
+
+        /* Right Column - Form */
+        .form-column {
+            animation: fadeInRight 1s ease;
+        }
+
+        .form-container {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 48px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 32px;
+        }
+
+        .form-header h2 {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 12px;
+            color: var(--ink);
+        }
+
+        .form-header p {
+            font-size: 15px;
+            color: var(--muted);
+            font-weight: 300;
+        }
+
+        .price-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 8px 24px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            margin-top: 20px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0;
+            color: var(--ink);
+            font-size: 16px;
+            font-family: 'Cormorant Garamond', serif;
+            transition: all 0.3s ease;
+            font-weight: 300;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fafafa;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .form-group select {
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Photo Upload */
+        .photo-upload {
+            border: 1px dashed var(--border);
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .photo-upload:hover {
+            border-color: var(--accent);
+            background: #f5f0e8;
+        }
+
+        .photo-upload.dragover {
+            border-color: var(--success);
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .photo-upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .photo-upload-text {
+            font-size: 15px;
+            color: var(--ink2);
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+
+        .photo-upload-subtext {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+        }
+
+        .photo-preview {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            max-height: 250px;
+            overflow: hidden;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview.active {
+            display: block;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 20px 40px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'IBM Plex Mono', monospace;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-top: 32px;
+        }
+
+        .submit-btn:hover {
+            background: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .btn-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .submit-btn .btn-loader {
+            display: none;
+        }
+
+        .submit-btn.loading .btn-text {
+            visibility: hidden;
+        }
+
+        .submit-btn.loading .btn-loader {
+            display: block;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 60px 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 32px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        .success-message h2 {
+            font-size: 36px;
+            font-weight: 300;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+
+        .success-message p {
+            font-size: 16px;
+            color: var(--ink2);
+            margin-bottom: 24px;
+            font-weight: 300;
+        }
+
+        .success-details {
+            background: #f5f0e8;
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .success-details h3 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            color: var(--muted);
+        }
+
+        .success-details p {
+            font-size: 15px;
+            margin: 12px 0;
+            color: var(--ink2);
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .success-details strong {
+            color: var(--primary);
+            font-weight: 400;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .form-container {
+                padding: 32px;
+            }
+
+            .info-card {
+                padding: 32px;
+            }
+        }
+
+        /* Instagram Badge */
+        .instagram-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            padding: 12px 24px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            margin-top: 24px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .instagram-badge:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);
+        }
+
+        /* Error Message */
+        .error-message {
+            display: none;
+            background: rgba(231, 76, 60, 0.05);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            color: var(--error);
+            font-size: 14px;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        /* Stats Counter */
+        .stats-counter {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 300;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-brand">OASYS BASECAMP LAT 40°N</div>
+            <h1>Reserva tu Plaza<br><em>en el Bosque Sagrado</em></h1>
+            <p>Únete a los 50 fundadores que transformarán el duelo en un pulmón verde para Toledo</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Column - Info -->
+            <div class="info-column">
+                <div class="info-card">
+                    <h3>🌳 Tu Árbol, Tu Historia</h3>
+                    <p>Cada plaza fundadora incluye un árbol único (encina, olivo o almendro) que llevará el nombre de tu mascota. Su historia vivirá para siempre en nuestro bosque.</p>
+                    <ul>
+                        <li>Árbol personalizado con placa identificativa</li>
+                        <li>Coordenadas GPS exclusivas</li>
+                        <li>Documentación blockchain de seguimiento</li>
+                        <li>Actualizaciones periódicas con fotos</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>🐾 Tu Compañero, Siempre Presente</h3>
+                    <p>El proceso de biotransformación aerobia CE 1069/2009 integra a tu mascota en el ciclo de vida del bosque. No es cremación, es transformación.</p>
+                    <ul>
+                        <li>Proceso 100% natural y respetuoso</li>
+                        <li>Cumple normativa europea CE 1069/2009</li>
+                        <li>Certificado de transformación biológica</li>
+                        <li>Memorial vivo en la naturaleza</li>
+                    </ul>
+                </div>
+
+                <div class="info-card" style="background: linear-gradient(135deg, #1a472a 0%, #0a1f14 100%); color: white; border: none;">
+                    <h3 style="color: #c9a84c;">🌟 Bombón & Peluche</h3>
+                    <p style="color: rgba(255,255,255,0.8);">Nuestros embajadores fundadores. Desde su consciencia animal nos invitan a hacer las cosas bien.</p>
+                    <ul style="color: rgba(255,255,255,0.7);">
+                        <li>Plaza Semilla Nº 1 & 2 · Almendro</li>
+                        <li>Portavoces del Bosque Sagrado</li>
+                        <li>Guías espirituales del proyecto</li>
+                        <li>Inspiración para cada fundador</li>
+                    </ul>
+                    <a href="bombon-peluche.html" style="display: inline-block; margin-top: 16px; padding: 8px 16px; background: rgba(201,168,76,0.2); color: #c9a84c; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; border: 1px solid rgba(201,168,76,0.3);">Conocer a nuestros embajadores →</a>
+                </div>
+
+                <div class="info-card">
+                    <h3>📸 Hall of Fame de Instagram</h3>
+                    <p>Tu mascota formará parte del <em>hall of fame</em> de @elbosque_sagrado en Instagram. Compartiremos su historia con nuestra comunidad, como Lolo, fundador plaza 13.</p>
+                    <ul>
+                        <li>Publicación dedicada en nuestro perfil</li>
+                        <li>Etiqueta permanente con nombre de tu mascota</li>
+                        <li>Comunidad de fundadores conectados</li>
+                        <li>Actualizaciones del crecimiento de tu árbol</li>
+                    </ul>
+                    <a href="https://instagram.com/elbosque_sagrado" target="_blank" class="instagram-badge">
+                        <span>📷</span> @elbosque_sagrado
+                    </a>
+                </div>
+
+                <div class="info-card">
+                    <h3>💎 Pack Fundador Completo</h3>
+                    <p>Por solo 450€ (precio exclusivo inicio de actividad), recibes:</p>
+                    <ul>
+                        <li>Plaza fundadora #1-50</li>
+                        <li>Árbol + animal de compañía</li>
+                        <li>Documentación completa</li>
+                        <li>Certificado blockchain</li>
+                        <li>Acceso a visitas reguladas</li>
+                        <li>Actualizaciones de por vida</li>
+                    </ul>
+                    <div class="stats-counter">
+                        <div class="stat-item">
+                            <div class="stat-number">13</div>
+                            <div class="stat-label">Fundadores</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">37</div>
+                            <div class="stat-label">Disponibles</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">50</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Form -->
+            <div class="form-column">
+                <div class="form-container" id="form-container">
+                    <div class="form-header">
+                        <h2>Completa tu Reserva</h2>
+                        <p>Unos minutos y tu lugar en el bosque estará asegurado</p>
+                        <div class="price-tag">450€ · Plaza Fundador</div>
+                    </div>
+
+                    <div class="error-message" id="error-message"></div>
+
+                    <form id="reservation-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre">Nombre completo *</label>
+                                <input type="text" id="nombre" name="nombre" placeholder="Francisco García Yuste" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" name="email" placeholder="francisco@ejemplo.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="telefono">Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" placeholder="+34 600 000 000" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nif">NIF/DNI *</label>
+                                <input type="text" id="nif" name="nif" placeholder="03833458W" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tipo_arbol">Tipo de Árbol *</label>
+                                <select id="tipo_arbol" name="tipo_arbol" required>
+                                    <option value="">Selecciona...</option>
+                                    <option value="encina">Encina</option>
+                                    <option value="olivo">Olivo</option>
+                                    <option value="almendro">Almendro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tipo_animal">Tipo de Animal *</label>
+                                <select id="tipo_animal" name="tipo_animal" required>
+                                    <option value="">Selecciona...</option>
+                                    <option value="perro">Perro</option>
+                                    <option value="gato">Gato</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nombre_mascota">Nombre de tu mascota *</label>
+                            <input type="text" id="nombre_mascota" name="nombre_mascota" placeholder="Lolo" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mensaje">Cuéntanos sobre tu mascota (opcional)</label>
+                            <textarea id="mensaje" name="mensaje" rows="3" placeholder="Comparte su historia, lo que más te gustaba de él/ella..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>📷 Foto para el Hall of Fame (opcional)</label>
+                            <div class="photo-upload" id="photo-upload">
+                                <div class="photo-upload-icon">📸</div>
+                                <div class="photo-upload-text">Arrastra una foto aquí o haz clic para seleccionar</div>
+                                <div class="photo-upload-subtext">Tu mascota aparecerá en @elbosque_sagrado</div>
+                                <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
+                            </div>
+                            <div class="photo-preview" id="photo-preview">
+                                <img id="photo-preview-img" src="" alt="Preview">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submit-btn">
+                            <span class="btn-text">Confirmar Reserva · 450€</span>
+                            <span class="btn-loader">Procesando...</span>
+                        </button>
+
+                        <p style="text-align: center; margin-top: 24px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.1em;">
+                            🔒 Pago seguro con Stripe · Tus datos están protegidos
+                        </p>
+                    </form>
+                </div>
+
+                <!-- Success Message -->
+                <div class="success-message" id="success-message">
+                    <div class="success-icon">🌳</div>
+                    <h2>¡Reserva Confirmada!</h2>
+                    <p>Gracias por unirte al Bosque Sagrado. Tu plaza está asegurada.</p>
+
+                    <div class="success-details">
+                        <h3>Ficha de Reserva</h3>
+                        <p><strong>Plaza:</strong> <span id="success-plaza">--</span></p>
+                        <p><strong>Árbol:</strong> <span id="success-arbol">--</span></p>
+                        <p><strong>Animal:</strong> <span id="success-animal">--</span></p>
+                        <p><strong>Mascota:</strong> <span id="success-mascota">--</span></p>
+                        <p><strong>Pagado:</strong> <span>450€</span></p>
+                    </div>
+
+                    <p style="font-size: 15px; color: var(--ink2); font-weight: 300;">
+                        Recibirás un email de confirmación en breve con toda la documentación y las coordenadas GPS de tu árbol.
+                    </p>
+
+                    <div style="margin-top: 32px;">
+                        <a href="https://instagram.com/elbosque_sagrado" target="_blank" class="instagram-badge">
+                            <span>📷</span> Ver tu mascota en @elbosque_sagrado
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Stripe
+        const stripe = Stripe('pk_test_your_publishable_key_here');
+        let selectedFile = null;
+
+        // Photo upload handling
+        const photoUpload = document.getElementById('photo-upload');
+        const photoInput = document.getElementById('photo');
+        const photoPreview = document.getElementById('photo-preview');
+        const photoPreviewImg = document.getElementById('photo-preview-img');
+
+        photoUpload.addEventListener('click', () => photoInput.click());
+
+        photoUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            photoUpload.classList.add('dragover');
+        });
+
+        photoUpload.addEventListener('dragleave', () => {
+            photoUpload.classList.remove('dragover');
+        });
+
+        photoUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            photoUpload.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        photoInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Por favor, selecciona una imagen válida');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                showError('La imagen no puede superar los 5MB');
+                return;
+            }
+
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                photoPreviewImg.src = e.target.result;
+                photoPreview.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Form submission
+        const form = document.getElementById('reservation-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorMessage = document.getElementById('error-message');
+        const formContainer = document.getElementById('form-container');
+        const successMessage = document.getElementById('success-message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Validate form
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+            const telefono = document.getElementById('telefono').value;
+            const nif = document.getElementById('nif').value;
+            const tipoArbol = document.getElementById('tipo_arbol').value;
+            const tipoAnimal = document.getElementById('tipo_animal').value;
+            const nombreMascota = document.getElementById('nombre_mascota').value;
+            const mensaje = document.getElementById('mensaje').value;
+
+            if (!nombre || !email || !telefono || !nif || !tipoArbol || !tipoAnimal || !nombreMascota) {
+                showError('Por favor, completa todos los campos obligatorios');
+                return;
+            }
+
+            // Validate NIF format
+            if (!isValidNIF(nif)) {
+                showError('El formato del NIF/DNI no es válido');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            try {
+                // Create checkout session
+                const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        plazaNumber: await getNextPlazaNumber(),
+                        nif: nif,
+                        fullName: nombre,
+                        email: email,
+                        treeType: tipoArbol,
+                        animalType: tipoAnimal,
+                        petName: nombreMascota,
+                        message: mensaje,
+                        phone: telefono
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(data.error);
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                // Redirect to Stripe Checkout
+                const { error } = await stripe.redirectToCheckout({
+                    sessionId: data.sessionId
+                });
+
+                if (error) {
+                    showError(error.message);
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Hubo un error al procesar tu reserva. Por favor, inténtalo de nuevo.');
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('active');
+            setTimeout(() => {
+                errorMessage.classList.remove('active');
+            }, 5000);
+        }
+
+        function isValidNIF(nif) {
+            const cleanNIF = nif.replace(/[\s-]/g, '').toUpperCase();
+            const nifRegex = /^[0-9]{8}[A-Z]$/;
+            return nifRegex.test(cleanNIF);
+        }
+
+        async function getNextPlazaNumber() {
+            try {
+                const response = await fetch('/api/next-plaza');
+                const data = await response.json();
+                return data.plazaNumber || 14; // Default to 14 if API fails
+            } catch (error) {
+                console.error('Error getting next plaza number:', error);
+                return 14;
+            }
+        }
+
+        // Check for successful payment from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+
+        if (sessionId) {
+            // Verify session and show success message
+            verifySession(sessionId);
+        }
+
+        async function verifySession(sessionId) {
+            try {
+                const response = await fetch('/api/verify-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show success message
+                    formContainer.style.display = 'none';
+                    successMessage.classList.add('active');
+
+                    // Update success details
+                    document.getElementById('success-plaza').textContent = `#${data.plaza_number}`;
+                    document.getElementById('success-arbol').textContent = data.tree_type;
+                    document.getElementById('success-animal').textContent = data.animal_type;
+                    document.getElementById('success-mascota').textContent = data.full_name;
+
+                    // Track conversion
+                    if (window.gtag) {
+                        gtag('event', 'purchase', {
+                            transaction_id: sessionId,
+                            value: 450,
+                            currency: 'EUR',
+                            items: [{
+                                item_id: data.plaza_number,
+                                item_name: `Plaza BSG #${data.plaza_number}`,
+                                price: 450,
+                                quantity: 1
+                            }]
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Bienvenido al Bosque Sagrado! | OASYS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark: #060d08;
+            --teal: #00D4AA;
+            --gold: #C9A84C;
+            --cream: #F5F0E8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--dark);
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--cream);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: pulse 2s ease infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            color: var(--teal);
+            margin-bottom: 20px;
+            letter-spacing: 0.1em;
+        }
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            color: var(--gold);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        .message {
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(245,240,232,0.8);
+            margin-bottom: 40px;
+        }
+        .plaza-info {
+            background: rgba(0,212,170,0.1);
+            border: 1px solid rgba(0,212,170,0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .plaza-info h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: var(--teal);
+            margin-bottom: 15px;
+        }
+        .plaza-info p {
+            font-size: 12px;
+            margin: 8px 0;
+            color: rgba(245,240,232,0.7);
+        }
+        .plaza-info strong {
+            color: var(--gold);
+        }
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            border: 1px solid var(--teal);
+            background: transparent;
+            color: var(--teal);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .btn:hover {
+            background: var(--teal);
+            color: var(--dark);
+        }
+        .btn.primary {
+            background: var(--teal);
+            color: var(--dark);
+        }
+        .btn.primary:hover {
+            background: rgba(0,212,170,0.8);
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0,212,170,0.3);
+            border-top-color: var(--teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">🌳</div>
+        <h1>¡BIENVENIDO AL BOSQUE SAGRADO!</h1>
+        <p class="subtitle">Tu plaza está reservada</p>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <span>Preparando tu documentación...</span>
+        </div>
+
+        <div class="plaza-info" id="plaza-info" style="display: none;">
+            <h3>DETALLES DE TU PLAZA</h3>
+            <p><strong>Plaza:</strong> <span id="plaza-number">--</span></p>
+            <p><strong>Árbol:</strong> <span id="tree-type">--</span></p>
+            <p><strong>Animal:</strong> <span id="animal-type">--</span></p>
+            <p><strong>Fecha:</strong> <span id="payment-date">--</span></p>
+        </div>
+
+        <p class="message" id="message">
+            Gracias por unirte a la comunidad fundadora del Bosque Sagrado.
+            Estamos generando tu documentación oficial y te la enviaremos por email en breve.
+        </p>
+
+        <div class="error" id="error" style="display: none;"></div>
+
+        <div class="actions" id="actions" style="display: none;">
+            <a href="/" class="btn primary">VOLVER A OASYS.EARTH</a>
+            <a href="https://oasysbasecamp.com" target="_blank" class="btn">OASYSBASECAMP</a>
+        </div>
+    </div>
+
+    <script>
+        // Get session ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+
+        if (sessionId) {
+            // Verify session and get details
+            fetch('/api/verify-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: sessionId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+
+                if (data.success) {
+                    document.getElementById('plaza-info').style.display = 'block';
+                    document.getElementById('plaza-number').textContent = data.plaza_number;
+                    document.getElementById('tree-type').textContent = data.tree_type;
+                    document.getElementById('animal-type').textContent = data.animal_type;
+                    document.getElementById('payment-date').textContent = new Date(data.payment_date).toLocaleDateString('es-ES');
+                    document.getElementById('actions').style.display = 'flex';
+
+                    // Track successful conversion
+                    if (window.gtag) {
+                        gtag('event', 'purchase', {
+                            transaction_id: sessionId,
+                            value: data.amount,
+                            currency: 'EUR',
+                            items: [{
+                                item_id: data.plaza_number,
+                                item_name: `Plaza BSG #${data.plaza_number}`,
+                                price: data.amount,
+                                quantity: 1
+                            }]
+                        });
+                    }
+                } else {
+                    document.getElementById('error').textContent = data.error || 'Error al verificar tu sesión';
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('actions').style.display = 'flex';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').textContent = 'Error de conexión. Por favor, contacta con soporte.';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('actions').style.display = 'flex';
+            });
+        } else {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').textContent = 'No se encontró sesión de pago';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('actions').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

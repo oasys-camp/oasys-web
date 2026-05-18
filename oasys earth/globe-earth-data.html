@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OASYS · Earth with Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #globe-container {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="globe-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
+    <script>
+        // Datos de ubicaciones de OASYS
+        const oasysLocations = [
+            { lat: 40.0, lng: -3.5, name: 'Yunclillos', value: 100, color: '#00ff88' },
+            { lat: 40.1, lng: -3.6, name: 'Madrid', value: 45, color: '#00aaff' },
+            { lat: 41.39, lng: 2.16, name: 'Barcelona', value: 30, color: '#ffaa00' },
+            { lat: 37.39, lng: -5.98, name: 'Sevilla', value: 25, color: '#ff6600' },
+            { lat: 43.36, lng: -5.84, name: 'Oviedo', value: 15, color: '#aa00ff' }
+        ];
+
+        // Inicializar el globo con datos
+        const myGlobe = new Globe(document.getElementById('globe-container'))
+            .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+            .backgroundColor('#000000')
+            .showAtmosphere(true)
+            .atmosphereColor('#3a8cff')
+            .atmosphereAltitude(0.15)
+            .pointsData(oasysLocations)
+            .pointAltitude(0.02)
+            .pointRadius('value')
+            .pointColor('color')
+            .pointLabel('name')
+            .pointLabelSize(12)
+            .pointResolution(12);
+
+        // Configurar rotación automática
+        myGlobe.controls().autoRotate = true;
+        myGlobe.controls().autoRotateSpeed = 0.5;
+
+        // Ajustar cámara para ver España
+        myGlobe.pointOfView({ lat: 40.0, lng: -3.5, altitude: 2.5 });
+
+        console.log('🌍 OASYS Earth with data points using Globe.gl + Three.js');
+    </script>
+</body>
+</html>

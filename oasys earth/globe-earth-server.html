@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OASYS · Earth Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #000;
+            color: white;
+            padding: 20px;
+        }
+
+        #globe-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        #info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .server-info {
+            background: rgba(0, 255, 0, 0.2);
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>🌍 OASYS Earth</h3>
+        <p>Para ver la tierra correctamente, necesitas ejecutar un servidor local.</p>
+        <div class="server-info">
+            <strong>Opción 1 - Python:</strong><br>
+            python -m http.server 8000
+        </div>
+        <div class="server-info">
+            <strong>Opción 2 - Node.js:</strong><br>
+            npx http-server
+        </div>
+        <div class="server-info">
+            <strong>Opción 3 - VS Code:</strong><br>
+            Live Server extension
+        </div>
+        <p style="margin-top: 10px;">Luego abre: http://localhost:8000/globe-earth-server.html</p>
+    </div>
+
+    <div id="globe-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
+    <script>
+        console.log('Iniciando...');
+
+        window.addEventListener('load', function() {
+            console.log('Página cargada');
+
+            // Detectar si estamos en servidor local
+            const isLocalServer = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+
+            if (!isLocalServer) {
+                console.warn('⚠️ No estás en un servidor local. La imagen puede no cargar por CORS.');
+                document.getElementById('info').innerHTML += '<p style="color: #ff6600; margin-top: 10px;">⚠️ Modo file:// detectado - Usa un servidor local</p>';
+            }
+
+            setTimeout(function() {
+                try {
+                    const container = document.getElementById('globe-container');
+                    console.log('Contenedor:', container);
+
+                    // Usar imagen que permite CORS
+                    const myGlobe = new Globe(container)
+                        .globeImageUrl('https://raw.githubusercontent.com/mwwebber/three-globe/master/example/img/earth-blue-marble.jpg')
+                        .backgroundColor('#000000')
+                        .showAtmosphere(true)
+                        .atmosphereColor('#3a8cff')
+                        .atmosphereAltitude(0.15);
+
+                    // Configurar rotación
+                    myGlobe.controls().autoRotate = true;
+                    myGlobe.controls().autoRotateSpeed = 0.5;
+                    myGlobe.pointOfView({ lat: 40.0, lng: -3.5, altitude: 2.5 });
+
+                    console.log('✅ Globo creado');
+                } catch (error) {
+                    console.error('❌ Error:', error);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

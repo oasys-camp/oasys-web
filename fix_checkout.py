@@ -1,4 +1,4 @@
-// netlify/functions/create-checkout.js
+new_content = '''// netlify/functions/create-checkout.js
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
 
@@ -56,8 +56,8 @@ exports.handler = async (event, context) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.SITE_URL}/cancel.html`,
+      success_url: `${process.env.SITE_URL}/bsg/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.SITE_URL}/#reserva`,
       customer_email: data.email,
       metadata: {
         plaza_number: String(plazaNumber),
@@ -106,3 +106,9 @@ exports.handler = async (event, context) => {
     };
   }
 };
+'''
+
+with open('bsg/netlify/functions/create-checkout.js', 'w', encoding='utf-8') as f:
+    f.write(new_content)
+
+print("create-checkout.js actualizado OK")

@@ -5,3 +5,6 @@ node_modules/
 .claude/
 .mcp.json
 bsg/run_migration.mjs
+
+# Local Netlify folder
+.netlify

@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OASYS BRAIN · oasys.earth</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+    <!-- CesiumJS -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+
     <style>
         :root {
             --dark: #060d08;
@@ -26,10 +31,21 @@
             width: 100vw;
         }
 
-        #canvas-container {
+        #cesiumContainer {
             position: fixed;
             inset: 0;
             z-index: 0;
+        }
+
+        /* Ocultar controles por defecto de Cesium */
+        .cesium-viewer-bottom,
+        .cesium-viewer-toolbar,
+        .cesium-viewer-animationContainer,
+        .cesium-viewer-timelineContainer,
+        .cesium-viewer-fullscreenButton,
+        .cesium-viewer-vrButton,
+        .cesium-viewer-geocoderContainer {
+            display: none !important;
         }
 
         /* ── Header ── */
@@ -42,6 +58,11 @@
             justify-content: space-between;
             z-index: 10;
             background: linear-gradient(to bottom, rgba(6,13,8,0.9) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        #header > * {
+            pointer-events: auto;
         }
 
         .logo {
@@ -228,6 +249,11 @@
             justify-content: space-between;
             z-index: 10;
             background: linear-gradient(to top, rgba(6,13,8,0.8) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        #footer > * {
+            pointer-events: auto;
         }
 
         .footer-mantra {
@@ -304,11 +330,68 @@
             0%   { transform: translate(-50%,-50%) scale(0.8); opacity: 0.4; }
             100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
         }
+
+        /* ── Loading overlay ── */
+        #loading {
+            position: fixed;
+            inset: 0;
+            background: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 1s ease;
+        }
+
+        #loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.3em;
+            color: var(--teal);
+            margin-top: 20px;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 2px;
+            background: rgba(0, 212, 170, 0.2);
+            margin-top: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--teal);
+            animation: loading 2s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="canvas-container"></div>
+    <!-- Loading overlay -->
+    <div id="loading">
+        <div class="loading-text">INICIALIZANDO OASYS BRAIN</div>
+        <div class="loading-bar"></div>
+    </div>
+
+    <!-- Cesium Container -->
+    <div id="cesiumContainer"></div>
 
     <!-- Pulse rings decorativos -->
     <div class="pulse-ring" style="width:300px;height:300px;left:50%;top:50%;animation-delay:0s;"></div>
@@ -330,27 +413,27 @@
 
     <!-- Nodos -->
     <nav id="nodes-panel">
-        <button class="node-btn active" data-shape="lat40n" onclick="selectNode(this, 'lat40n')">
+        <button class="node-btn active" data-node="lat40n" onclick="flyToNode('lat40n')">
             <div class="node-dot"></div>
             <span class="node-label">LAT 40°N</span>
             <span class="node-sub">3.47 ha</span>
         </button>
-        <button class="node-btn" data-shape="bsg" onclick="selectNode(this, 'bsg')">
+        <button class="node-btn" data-node="bsg" onclick="flyToNode('bsg')">
             <div class="node-dot"></div>
             <span class="node-label">El Bosque Sagrado</span>
             <span class="node-sub">BSG</span>
         </button>
-        <button class="node-btn" data-shape="semilla" onclick="selectNode(this, 'semilla')">
+        <button class="node-btn" data-node="semilla" onclick="flyToNode('semilla')">
             <div class="node-dot"></div>
             <span class="node-label">Proyecto SEMILLA</span>
             <span class="node-sub">CE 1069</span>
         </button>
-        <button class="node-btn" data-shape="earth" onclick="selectNode(this, 'earth')">
+        <button class="node-btn" data-node="earth" onclick="flyToNode('earth')">
             <div class="node-dot"></div>
             <span class="node-label">Earth Mission</span>
             <span class="node-sub">RED</span>
         </button>
-        <button class="node-btn" data-shape="nodo" onclick="selectNode(this, 'nodo')">
+        <button class="node-btn" data-node="nodo" onclick="flyToNode('nodo')">
             <div class="node-dot"></div>
             <span class="node-label">NODO</span>
             <span class="node-sub">INF</span>
@@ -368,12 +451,12 @@
     <!-- Controles -->
     <div id="controls">
         <div>
-            <div class="ctrl-label">Densidad</div>
-            <input type="range" class="ctrl-slider" id="density" min="0.2" max="1.5" step="0.05" value="1">
+            <div class="ctrl-label">Rotación Auto</div>
+            <input type="range" class="ctrl-slider" id="rotationSpeed" min="0" max="100" step="1" value="20">
         </div>
         <div>
-            <div class="ctrl-label">Velocidad</div>
-            <input type="range" class="ctrl-slider" id="speed" min="0.1" max="3" step="0.1" value="1">
+            <div class="ctrl-label">Inercia</div>
+            <input type="range" class="ctrl-slider" id="inertia" min="0" max="100" step="1" value="50">
         </div>
     </div>
 
@@ -383,254 +466,1762 @@
         <div class="footer-meta">OASYS BASE CAMP · creativityanddreams.com</div>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        // ── CONFIGURACIÓN OASYS BRAIN ────────────────────────────────────────
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        // Coordenadas de El Bosque Sagrado (Yunclillos, Toledo)
+        const BOSQUE_SAGRADO = {
+            longitude: -3.8,  // 3.8°W
+            latitude: 40.0,   // 40°N
+            height: 0
+        };
 
-        camera.position.z = 55;
-
-        const COUNT = 18000;
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(COUNT * 3);
-        const targets   = new Float32Array(COUNT * 3);
-        const colors    = new Float32Array(COUNT * 3);
-
-        // Colores OASYS
-        const C_TEAL = new THREE.Color('#00D4AA');
-        const C_GOLD = new THREE.Color('#C9A84C');
-        const C_CREAM = new THREE.Color('#F5F0E8');
-
-        // ── Shapes ──────────────────────────────────────────
-        function shapeLAT40N(i) {
-            // Esfera de la tierra — el proyecto físico
-            const phi = Math.acos(-1 + (2 * i) / COUNT);
-            const theta = Math.sqrt(COUNT * Math.PI) * phi;
-            const r = 22;
-            return {
-                x: r * Math.cos(theta) * Math.sin(phi),
-                y: r * Math.sin(theta) * Math.sin(phi),
-                z: r * Math.cos(phi)
-            };
-        }
-
-        function shapeBSG(i) {
-            // Árbol fractal — El Bosque Sagrado
-            const t = (i / COUNT) * Math.PI * 20;
-            const layer = Math.floor(i / (COUNT / 5));
-            const r = 3 + layer * 4.5;
-            const spread = layer * 0.8;
-            return {
-                x: Math.cos(t * (1 + layer * 0.3)) * r + (Math.random() - 0.5) * spread,
-                y: -14 + layer * 7.5 + (Math.random() - 0.5) * spread,
-                z: Math.sin(t * (1 + layer * 0.3)) * r + (Math.random() - 0.5) * spread
-            };
-        }
-
-        function shapeSEMILLA(i) {
-            // Espiral — semilla / ADN / biotransformación
-            const t = (i / COUNT) * Math.PI * 40;
-            const progress = i / COUNT;
-            const r = 2 + progress * 14;
-            const strand = i % 2 === 0 ? 1 : -1;
-            return {
-                x: Math.cos(t) * r * strand,
-                y: -20 + progress * 40,
-                z: Math.sin(t) * r
-            };
-        }
-
-        function shapeEarth(i) {
-            // Constelación dispersa — red global Earth Mission
-            const phi = Math.random() * Math.PI * 2;
-            const theta = Math.random() * Math.PI;
-            const r = 15 + Math.random() * 20;
-            const cluster = Math.floor(Math.random() * 7);
-            const cx = Math.cos(cluster * Math.PI * 2 / 7) * 15;
-            const cz = Math.sin(cluster * Math.PI * 2 / 7) * 15;
-            return {
-                x: Math.sin(theta) * Math.cos(phi) * r * 0.5 + cx,
-                y: Math.cos(theta) * r * 0.4,
-                z: Math.sin(theta) * Math.sin(phi) * r * 0.5 + cz
-            };
-        }
-
-        function shapeNODO(i) {
-            // Estructura cúbica modular
-            const face = Math.floor(i / (COUNT / 6));
-            const u = (Math.random() - 0.5) * 34;
-            const v = (Math.random() - 0.5) * 34;
-            const d = 17;
-            const noise = (Math.random() - 0.5) * 0.6;
-            switch(face) {
-                case 0: return { x: d + noise, y: u, z: v };
-                case 1: return { x: -d + noise, y: u, z: v };
-                case 2: return { x: u, y: d + noise, z: v };
-                case 3: return { x: u, y: -d + noise, z: v };
-                case 4: return { x: u, y: v, z: d + noise };
-                default: return { x: u, y: v, z: -d + noise };
+        // Configuración de nodos OASYS
+        const OASYS_NODES = {
+            lat40n: {
+                tag: 'Nodo piloto · Toledo',
+                title: 'LAT 40°N',
+                desc: 'Yunclillos, Toledo. El primer nodo piloto de la red OASYS. 3.47 hectáreas de agroforestería regenerativa en el corazón de La Sagra toledana, a 45 minutos de Madrid.',
+                position: {
+                    longitude: -3.8,
+                    latitude: 40.0,
+                    height: 50000  // 50km de altura para vista regional
+                },
+                orientation: {
+                    heading: 0,
+                    pitch: -45,
+                    roll: 0
+                }
+            },
+            bsg: {
+                tag: 'Comunidad fundadora',
+                title: 'El Bosque Sagrado',
+                desc: 'Biotransformación aerobia CE 1069/2009 integrada en agricultura regenerativa con memorial vivo. 50 plazas fundadoras, 13 activas. Donde los árboles llevan historias.',
+                position: {
+                    longitude: -3.8,
+                    latitude: 40.0,
+                    height: 2000  // 2km para vista cercana
+                },
+                orientation: {
+                    heading: 0,
+                    pitch: -30,
+                    roll: 0
+                }
+            },
+            semilla: {
+                tag: 'Proceso · CE 1069/2009',
+                title: 'Proyecto SEMILLA',
+                desc: 'El sistema de biotransformación que define la identidad de OASYS. Ciclo completo: tierra, vida, regreso a la tierra. Un servicio agrícola de nueva generación.',
+                position: {
+                    longitude: -3.8,
+                    latitude: 40.0,
+                    height: 10000  // 10km para vista de proceso
+                },
+                orientation: {
+                    heading: 45,
+                    pitch: -60,
+                    roll: 0
+                }
+            },
+            earth: {
+                tag: 'Red global · Expansión',
+                title: 'Earth Mission',
+                desc: 'La visión más allá del piloto. OASYS como red de nodos regenerativos coordinados, cada uno con su identidad local y arquitectura compartida.',
+                position: {
+                    longitude: 0,
+                    latitude: 0,
+                    height: 20000000  // 20,000km para vista global
+                },
+                orientation: {
+                    heading: 0,
+                    pitch: -90,
+                    roll: 0
+                }
+            },
+            nodo: {
+                tag: 'Infraestructura modular',
+                title: 'NODO',
+                desc: 'Sistema de instalación modular desmontable. La columna vertebral física de cada nodo OASYS. Escalable, replicable, adaptado al territorio.',
+                position: {
+                    longitude: -3.8,
+                    latitude: 40.0,
+                    height: 500  // 500m para vista de infraestructura
+                },
+                orientation: {
+                    heading: 90,
+                    pitch: -20,
+                    roll: 0
+                }
             }
-        }
-
-        const shapeMap = {
-            lat40n: shapeLAT40N,
-            bsg:    shapeBSG,
-            semilla: shapeSEMILLA,
-            earth:  shapeEarth,
-            nodo:   shapeNODO
         };
 
-        const nodeData = {
-            lat40n:  { tag: 'Nodo piloto · Toledo',   title: 'LAT 40°N',           desc: 'Yunclillos, Toledo. El primer nodo piloto de la red OASYS. 3.47 hectáreas de agroforestería regenerativa en el corazón de La Sagra toledana, a 45 minutos de Madrid.' },
-            bsg:     { tag: 'Comunidad fundadora',     title: 'El Bosque Sagrado',  desc: 'Biotransformación aerobia CE 1069/2009 integrada en agricultura regenerativa con memorial vivo. 50 plazas fundadoras, 13 activas. Donde los árboles llevan historias.' },
-            semilla: { tag: 'Proceso · CE 1069/2009',  title: 'Proyecto SEMILLA',   desc: 'El sistema de biotransformación que define la identidad de OASYS. Ciclo completo: tierra, vida, regreso a la tierra. Un servicio agrícola de nueva generación.' },
-            earth:   { tag: 'Red global · Expansión',  title: 'Earth Mission',       desc: 'La visión más allá del piloto. OASYS como red de nodos regenerativos coordinados, cada uno con su identidad local y arquitectura compartida.' },
-            nodo:    { tag: 'Infraestructura modular', title: 'NODO',                desc: 'Sistema de instalación modular desmontable. La columna vertebral física de cada nodo OASYS. Escalable, replicable, adaptado al territorio.' }
-        };
+        // ── INICIALIZACIÓN DE CESIUM ───────────────────────────────────────────
 
-        // ── Color por nodo ──
-        const colorMap = {
-            lat40n:  [C_TEAL, C_TEAL, C_CREAM],
-            bsg:     [C_TEAL, C_GOLD, C_TEAL],
-            semilla: [C_GOLD, C_TEAL, C_GOLD],
-            earth:   [C_CREAM, C_TEAL, C_GOLD],
-            nodo:    [C_GOLD, C_GOLD, C_CREAM]
-        };
+        // Configurar token de Cesium (reemplazar con tu token real)
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYWE1OWUxNy1mMWZiLTQzYjYtYTQ0OS1kMWFjYmFkNjc5YzciLCJpZCI6NTc2MzMsImlhdCI6MTYyMDY0NTc4NX0.XcKpgANiY19MC4bdFUXMVEBToBmqS8kuYpUlxJHYZxk';
 
-        let currentShape = 'lat40n';
-        let morphProgress = 0;
-        let morphing = false;
-        let oldPositions = new Float32Array(COUNT * 3);
+        // Crear viewer de Cesium
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            terrainProvider: Cesium.createWorldTerrain(),
+            baseLayerPicker: false,
+            geocoder: false,
+            homeButton: false,
+            sceneModePicker: false,
+            navigationHelpButton: false,
+            animation: false,
+            timeline: false,
+            fullscreenButton: false,
+            vrButton: false,
+            infoBox: false,
+            selectionIndicator: false,
+            shadows: true,
+            shouldAnimate: true
+        });
 
-        function setTargets(shapeName) {
-            const fn = shapeMap[shapeName];
-            const palette = colorMap[shapeName];
-            for (let i = 0; i < COUNT; i++) {
-                const p = fn(i);
-                targets[i * 3]     = p.x;
-                targets[i * 3 + 1] = p.y;
-                targets[i * 3 + 2] = p.z;
-                const c = palette[Math.floor(Math.random() * palette.length)];
-                colors[i * 3]     = c.r;
-                colors[i * 3 + 1] = c.g;
-                colors[i * 3 + 2] = c.b;
+        // Configurar iluminación realista
+        viewer.scene.globe.enableLighting = true;
+
+        // Configurar atmósfera
+        viewer.scene.skyBox = new Cesium.SkyBox({
+            sources: {
+                positiveX: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_px.jpg',
+                negativeX: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_mx.jpg',
+                positiveY: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_py.jpg',
+                negativeY: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_my.jpg',
+                positiveZ: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_pz.jpg',
+                negativeZ: 'https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Assets/Textures/SkyBox/tycho2t3_80_mz.jpg'
             }
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors.slice(), 3));
+        });
+
+        // Configurar el globo terráqueo con estilo OASYS
+        viewer.scene.globe.baseColor = Cesium.Color.BLACK;
+        viewer.scene.globe.tileCacheSize = 1000;
+        viewer.scene.fog.enabled = true;
+        viewer.scene.fog.density = 0.0001;
+
+        // ── COMPORTAMIENTOS AVANZADOS ─────────────────────────────────────────
+
+        // Variables de control
+        let autoRotationEnabled = true;
+        let autoRotationSpeed = 0.00002; // Velocidad muy lenta para calma
+        let userInteractionActive = false;
+        let inactivityTimer = null;
+        let inertiaEnabled = true;
+        let inertiaFactor = 0.95; // Factor de desaceleración
+
+        // Configurar ScreenSpaceCameraController con inercia kinética
+        const sscc = viewer.scene.screenSpaceCameraController;
+        sscc.enableInputs = true;
+        sscc.inertiaSpin = 0.9;   // Inercia en rotación
+        sscc.inertiaTranslate = 0.9;  // Inercia en traslación
+        sscc.inertiaZoom = 0.8;   // Inercia en zoom
+
+        // Detectar interacción del usuario
+        viewer.scene.canvas.addEventListener('mousedown', () => {
+            userInteractionActive = true;
+            pauseAutoRotation();
+            resetInactivityTimer();
+        });
+
+        viewer.scene.canvas.addEventListener('mouseup', () => {
+            resetInactivityTimer();
+        });
+
+        viewer.scene.canvas.addEventListener('wheel', () => {
+            userInteractionActive = true;
+            pauseAutoRotation();
+            resetInactivityTimer();
+        });
+
+        viewer.scene.canvas.addEventListener('touchstart', () => {
+            userInteractionActive = true;
+            pauseAutoRotation();
+            resetInactivityTimer();
+        });
+
+        // Funciones de control de auto-rotación
+        function pauseAutoRotation() {
+            autoRotationEnabled = false;
         }
 
-        // Init
-        setTargets('lat40n');
-        for (let i = 0; i < COUNT * 3; i++) positions[i] = targets[i];
-        oldPositions.set(positions);
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        function resumeAutoRotation() {
+            autoRotationEnabled = true;
+            userInteractionActive = false;
+        }
 
-        const material = new THREE.PointsMaterial({
-            size: 0.28,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.85,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false
+        function resetInactivityTimer() {
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+            }
+
+            inactivityTimer = setTimeout(() => {
+                if (userInteractionActive) {
+                    resumeAutoRotation();
+                }
+            }, 10000); // 10 segundos de inactividad
+        }
+
+        // Controles de UI
+        document.getElementById('rotationSpeed').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            autoRotationSpeed = (value / 100) * 0.0001; // Escalar velocidad
         });
 
-        const particleSystem = new THREE.Points(geometry, material);
-        scene.add(particleSystem);
-
-        // ── Mouse ──
-        const mouse = { x: 0, y: 0 };
-        window.addEventListener('mousemove', e => {
-            mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
-            mouse.y = -(e.clientY / window.innerHeight - 0.5) * 2;
+        document.getElementById('inertia').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            inertiaFactor = 0.8 + (value / 100) * 0.19; // 0.8 a 0.99
+            sscc.inertiaSpin = inertiaFactor;
+            sscc.inertiaTranslate = inertiaFactor;
+            sscc.inertiaZoom = inertiaFactor * 0.9;
         });
 
-        // ── Controles ──
-        let speedMult = 1;
-        let densityScale = 1;
+        // ── DYNAMIC FLY-IN ─────────────────────────────────────────────────────
 
-        document.getElementById('speed').addEventListener('input', e => {
-            speedMult = parseFloat(e.target.value);
-        });
-        document.getElementById('density').addEventListener('input', e => {
-            densityScale = parseFloat(e.target.value);
-            particleSystem.scale.set(densityScale, densityScale, densityScale);
-        });
+        function performDynamicFlyIn() {
+            // Empezar desde El Bosque Sagrado a nivel del suelo
+            const startPosition = {
+                longitude: BOSQUE_SAGRADO.longitude,
+                latitude: BOSQUE_SAGRADO.latitude,
+                height: 100  // 100m sobre el terreno
+            };
 
-        // ── Node select ──
-        function selectNode(btn, shape) {
-            document.querySelectorAll('.node-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            // Posición final: vista orbital con rotación pasiva
+            const endPosition = {
+                longitude: BOSQUE_SAGRADO.longitude,
+                latitude: BOSQUE_SAGRADO.latitude,
+                height: 5000000  // 5,000km para vista orbital
+            };
 
-            oldPositions.set(positions);
-            setTargets(shape);
-            currentShape = shape;
-            morphProgress = 0;
-            morphing = true;
+            // Configurar cámara inicial
+            viewer.camera.setView({
+                destination: Cesium.Cartesian3.fromDegrees(
+                    startPosition.longitude,
+                    startPosition.latitude,
+                    startPosition.height
+                ),
+                orientation: {
+                    heading: Cesium.Math.toRadians(0),
+                    pitch: Cesium.Math.toRadians(-10),
+                    roll: 0.0
+                }
+            });
 
-            const d = nodeData[shape];
-            document.getElementById('info-tag').textContent = d.tag;
-            document.getElementById('info-title').textContent = d.title;
-            document.getElementById('info-desc').textContent = d.desc;
+            // Animación de fly-in hacia el espacio
+            viewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(
+                    endPosition.longitude,
+                    endPosition.latitude,
+                    endPosition.height
+                ),
+                orientation: {
+                    heading: Cesium.Math.toRadians(0),
+                    pitch: Cesium.Math.toRadians(-90), // Mirando hacia abajo
+                    roll: 0.0
+                },
+                duration: 8.0, // 8 segundos de animación
+                easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT
+            });
+        }
+
+        // ── SISTEMA DE NODOS ───────────────────────────────────────────────────
+
+        function flyToNode(nodeId) {
+            const node = OASYS_NODES[nodeId];
+            if (!node) return;
+
+            // Actualizar UI
+            document.querySelectorAll('.node-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.node === nodeId) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Actualizar info panel
+            document.getElementById('info-tag').textContent = node.tag;
+            document.getElementById('info-title').textContent = node.title;
+            document.getElementById('info-desc').textContent = node.desc;
             document.getElementById('node-info').classList.add('visible');
+
+            // Volar al nodo
+            viewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(
+                    node.position.longitude,
+                    node.position.latitude,
+                    node.position.height
+                ),
+                orientation: {
+                    heading: Cesium.Math.toRadians(node.orientation.heading),
+                    pitch: Cesium.Math.toRadians(node.orientation.pitch),
+                    roll: Cesium.Math.toRadians(node.orientation.roll)
+                },
+                duration: 3.0,
+                easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT
+            });
+
+            // Pausar auto-rotación temporalmente
+            pauseAutoRotation();
+            resetInactivityTimer();
         }
+
+        // ── CAPAS GEOJSON AVANZADAS ───────────────────────────────────────────────
+
+        function loadGeoJSONLayer(url, name) {
+            return viewer.dataSources.add(Cesium.GeoJsonDataSource.load(url, {
+                stroke: Cesium.Color.CYAN,
+                fill: Cesium.Color.CYAN.withAlpha(0.15),
+                strokeWidth: 2
+            })).then((dataSource) => {
+                dataSource.name = name;
+
+                // Personalizar entidades según su tipo
+                dataSource.entities.values.forEach((entity) => {
+                    const properties = entity.properties;
+                    const nodeType = properties?.type?.getValue() || 'default';
+
+                    // Configurar estilo según tipo
+                    switch(nodeType) {
+                        case 'pilot':
+                            // Nodo piloto - punto grande con halo
+                            if (entity.point) {
+                                entity.point.pixelSize = 12;
+                                entity.point.color = Cesium.Color.CYAN.withAlpha(0.9);
+                                entity.point.outlineColor = Cesium.Color.WHITE;
+                                entity.point.outlineWidth = 3;
+                            }
+                            break;
+
+                        case 'memorial':
+                            // Bosque Sagrado - polígono con borde dorado
+                            if (entity.polygon) {
+                                entity.polygon.material = Cesium.Color.CYAN.withAlpha(0.2);
+                                entity.polygon.outline = true;
+                                entity.polygon.outlineColor = Cesium.Color.GOLD;
+                                entity.polygon.outlineWidth = 3;
+                            }
+                            break;
+
+                        case 'biotransformation':
+                            // SEMILLA - punto con pulso
+                            if (entity.point) {
+                                entity.point.pixelSize = 10;
+                                entity.point.color = Cesium.Color.GOLD.withAlpha(0.8);
+                                entity.point.outlineColor = Cesium.Color.CYAN;
+                                entity.point.outlineWidth = 2;
+                            }
+                            break;
+
+                        case 'network':
+                            // Earth Mission - puntos dispersos
+                            if (entity.point) {
+                                entity.point.pixelSize = 6;
+                                entity.point.color = Cesium.Color.CYAN.withAlpha(0.6);
+                                entity.point.outlineColor = Cesium.Color.WHITE;
+                                entity.point.outlineWidth = 1;
+                            }
+                            break;
+
+                        case 'infrastructure':
+                            // Conexiones - línea con gradiente
+                            if (entity.polyline) {
+                                entity.polyline.width = 4;
+                                entity.polyline.material = new Cesium.PolylineGlowMaterialProperty({
+                                    glowPower: 0.2,
+                                    color: Cesium.Color.CYAN
+                                });
+                            }
+                            break;
+
+                        case 'modular':
+                            // NODO - punto cuadrado
+                            if (entity.point) {
+                                entity.point.pixelSize = 8;
+                                entity.point.color = Cesium.Color.GOLD.withAlpha(0.7);
+                                entity.point.outlineColor = Cesium.Color.WHITE;
+                                entity.point.outlineWidth = 2;
+                            }
+                            break;
+                    }
+
+                    // Añadir label con nombre
+                    if (properties?.name?.getValue()) {
+                        entity.label = {
+                            text: properties.name.getValue(),
+                            font: '12px Orbitron',
+                            fillColor: Cesium.Color.WHITE,
+                            outlineColor: Cesium.Color.BLACK,
+                            outlineWidth: 2,
+                            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                            horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+                            pixelOffset: new Cesium.Cartesian2(0, -20),
+                            show: false, // Oculto por defecto
+                            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 5000000) // Solo visible cerca
+                        };
+                    }
+                });
+
+                // Configurar interactividad
+                setupEntityInteractivity(dataSource);
+
+                return dataSource;
+            });
+        }
+
+        // Configurar interactividad de entidades
+        function setupEntityInteractivity(dataSource) {
+            // Hover effect
+            let hoveredEntity = null;
+
+            viewer.screenSpaceEventHandler.setInputAction((movement) => {
+                const pickedObject = viewer.scene.pick(movement.endPosition);
+
+                // Resetear entidad anterior
+                if (hoveredEntity && (!pickedObject || pickedObject.id !== hoveredEntity)) {
+                    resetEntityStyle(hoveredEntity);
+                    hoveredEntity = null;
+                    document.body.style.cursor = 'crosshair';
+                }
+
+                // Aplicar hover a nueva entidad
+                if (Cesium.defined(pickedObject) && pickedObject.id instanceof Cesium.Entity) {
+                    const entity = pickedObject.id;
+                    if (entity !== hoveredEntity) {
+                        hoveredEntity = entity;
+                        applyHoverStyle(entity);
+                        document.body.style.cursor = 'pointer';
+
+                        // Mostrar label al hacer hover
+                        if (entity.label) {
+                            entity.label.show = true;
+                        }
+                    }
+                }
+            }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+            // Click handler
+            viewer.screenSpaceEventHandler.setInputAction((click) => {
+                const pickedObject = viewer.scene.pick(click.position);
+
+                if (Cesium.defined(pickedObject) && pickedObject.id instanceof Cesium.Entity) {
+                    const entity = pickedObject.id;
+                    showEntityInfo(entity);
+
+                    // Volar a la entidad
+                    viewer.flyTo(entity, {
+                        duration: 2.0,
+                        offset: new Cesium.HeadingPitchRange(0, -45, 10000)
+                    });
+
+                    // Pausar auto-rotación
+                    pauseAutoRotation();
+                    resetInactivityTimer();
+                }
+            }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        }
+
+        // Aplicar estilo hover
+        function applyHoverStyle(entity) {
+            const originalColor = entity._originalColor;
+
+            if (entity.point && !originalColor) {
+                entity._originalColor = entity.point.color.getValue(Cesium.JulianDate.now());
+                entity.point.color = Cesium.Color.WHITE;
+                entity.point.pixelSize = (entity.point.pixelSize.getValue() || 8) * 1.5;
+            }
+
+            if (entity.polygon && !originalColor) {
+                entity._originalColor = entity.polygon.material.getValue(Cesium.JulianDate.now());
+                entity.polygon.material = Cesium.Color.WHITE.withAlpha(0.4);
+            }
+
+            if (entity.polyline && !originalColor) {
+                entity._originalColor = entity.polyline.material;
+                entity.polyline.material = Cesium.Color.WHITE;
+            }
+        }
+
+        // Resetear estilo original
+        function resetEntityStyle(entity) {
+            if (entity._originalColor) {
+                if (entity.point) {
+                    entity.point.color = entity._originalColor;
+                    entity.point.pixelSize = entity._originalPixelSize || entity.point.pixelSize.getValue();
+                }
+                if (entity.polygon) {
+                    entity.polygon.material = entity._originalColor;
+                }
+                if (entity.polyline) {
+                    entity.polyline.material = entity._originalColor;
+                }
+
+                // Ocultar label
+                if (entity.label) {
+                    entity.label.show = false;
+                }
+
+                delete entity._originalColor;
+                delete entity._originalPixelSize;
+            }
+        }
+
+        // Mostrar información de entidad
+        function showEntityInfo(entity) {
+            const properties = entity.properties;
+            if (!properties) return;
+
+            const name = properties.name?.getValue() || 'Sin nombre';
+            const type = properties.type?.getValue() || 'Desconocido';
+            const status = properties.status?.getValue() || 'N/A';
+
+            // Actualizar panel de info
+            document.getElementById('info-tag').textContent = type.toUpperCase();
+            document.getElementById('info-title').textContent = name;
+            document.getElementById('info-desc').textContent = generateEntityDescription(properties);
+            document.getElementById('node-info').classList.add('visible');
+
+            // Actualizar botones de nodos
+            document.querySelectorAll('.node-btn').forEach(btn => {
+                btn.classList.remove('active');
+                const btnNodeId = btn.dataset.node;
+                const entityNodeId = properties.node_id?.getValue();
+
+                if (btnNodeId === entityNodeId) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Generar descripción de entidad
+        function generateEntityDescription(properties) {
+            const parts = [];
+
+            if (properties.area_ha) {
+                parts.push(`${properties.area_ha.getValue()} hectáreas`);
+            }
+            if (properties.tree_count) {
+                parts.push(`${properties.tree_count.getValue()} árboles`);
+            }
+            if (properties.biomass_tons) {
+                parts.push(`${properties.biomass_tons.getValue()} toneladas de biomasa`);
+            }
+            if (properties.biodiversity_index) {
+                parts.push(`Índice biodiversidad: ${(properties.biodiversity_index.getValue() * 100).toFixed(0)}%`);
+            }
+            if (properties.carbon_sequestration_tons) {
+                parts.push(`${properties.carbon_sequestration_tons.getValue()} toneladas CO₂ secuestrado`);
+            }
+            if (properties.founder_count) {
+                parts.push(`${properties.founder_count.getValue()} fundadores activos`);
+            }
+            if (properties.available_plazas) {
+                parts.push(`${properties.available_plazas.getValue()} plazas disponibles`);
+            }
+
+            return parts.length > 0
+                ? parts.join(' · ') + '.'
+                : 'Datos biométricos disponibles en el sistema OASYS.';
+        }
+
+        // Cargar datos biométricos de OASYS
+        loadGeoJSONLayer('./data/oasys-biometricos.geojson', 'OASYS Biométricos').then((dataSource) => {
+            // Registrar animaciones automáticas para entidades importantes
+            dataSource.entities.values.forEach((entity) => {
+                const properties = entity.properties;
+                const nodeType = properties?.type?.getValue();
+                const nodeId = properties?.node_id?.getValue();
+
+                // Animaciones según tipo de nodo
+                switch(nodeType) {
+                    case 'pilot':
+                        // LAT 40°N - pulso lento y constante
+                        if (entity.point) {
+                            const baseSize = entity.point.pixelSize.getValue();
+                            createPulseAnimation(entity.id, baseSize, 3, 2.0);
+
+                            // Efecto de brillo periódico
+                            setInterval(() => {
+                                if (entity.position) {
+                                    const pos = entity.position.getValue(Cesium.JulianDate.now());
+                                    const carto = Cesium.Cartographic.fromCartesian(pos);
+                                    createGlowEffect(
+                                        Cesium.Math.toDegrees(carto.longitude),
+                                        Cesium.Math.toDegrees(carto.latitude),
+                                        10000,
+                                        Cesium.Color.CYAN,
+                                        3000
+                                    );
+                                }
+                            }, 8000);
+                        }
+                        break;
+
+                    case 'memorial':
+                        // El Bosque Sagrado - brillo dorado pulsante
+                        if (entity.polygon) {
+                            createGlowAnimation(entity.id, 0.2, 0.15, 1.5);
+
+                            // Partículas de energía constantes
+                            setInterval(() => {
+                                const center = getPolygonCenter(entity);
+                                if (center) {
+                                    for (let i = 0; i < 3; i++) {
+                                        setTimeout(() => {
+                                            const angle = Math.random() * Math.PI * 2;
+                                            const radius = 0.005; // ~500m
+                                            spawnParticle(
+                                                center.longitude + Math.cos(angle) * radius,
+                                                center.latitude + Math.sin(angle) * radius,
+                                                100 + Math.random() * 200,
+                                                'energy'
+                                            );
+                                        }, i * 200);
+                                    }
+                                }
+                            }, 2000);
+                        }
+                        break;
+
+                    case 'biotransformation':
+                        // Proyecto SEMILLA - pulso rápido dorado
+                        if (entity.point) {
+                            const baseSize = entity.point.pixelSize.getValue();
+                            createPulseAnimation(entity.id, baseSize, 4, 3.0);
+
+                            // Partículas de datos
+                            setInterval(() => {
+                                const pos = entity.position.getValue(Cesium.JulianDate.now());
+                                const carto = Cesium.Cartographic.fromCartesian(pos);
+                                spawnParticle(
+                                    Cesium.Math.toDegrees(carto.longitude),
+                                    Cesium.Math.toDegrees(carto.latitude),
+                                    300,
+                                    'data'
+                                );
+                            }, 1500);
+                        }
+                        break;
+
+                    case 'network':
+                        // Earth Mission - puntos dispersos con micro-pulsos
+                        if (entity.point) {
+                            const baseSize = entity.point.pixelSize.getValue();
+                            createPulseAnimation(entity.id, baseSize, 2, 1.0);
+                        }
+                        break;
+
+                    case 'modular':
+                        // NODO - pulso constante
+                        if (entity.point) {
+                            const baseSize = entity.point.pixelSize.getValue();
+                            createPulseAnimation(entity.id, baseSize, 2, 2.5);
+                        }
+                        break;
+                }
+            });
+
+            console.log('🎨 Animaciones automáticas registradas para', dataSource.entities.values.length, 'entidades');
+        });
+
+        // Función auxiliar para obtener centro de polígono
+        function getPolygonCenter(entity) {
+            if (!entity.polygon) return null;
+
+            const positions = entity.polygon.hierarchy.getValue(Cesium.JulianDate.now()).positions;
+            if (!positions || positions.length === 0) return null;
+
+            let totalLon = 0;
+            let totalLat = 0;
+
+            positions.forEach((pos) => {
+                const carto = Cesium.Cartographic.fromCartesian(pos);
+                totalLon += carto.longitude;
+                totalLat += carto.latitude;
+            });
+
+            return {
+                longitude: Cesium.Math.toDegrees(totalLon / positions.length),
+                latitude: Cesium.Math.toDegrees(totalLat / positions.length)
+            };
+        }
+
+        // ── BUCLE DE ANIMACIÓN PRINCIPAL ───────────────────────────────────────
+
+        function updateAutoRotation() {
+            if (autoRotationEnabled && !userInteractionActive) {
+                // Rotación sobre eje Z (day-night cycle)
+                const currentHeading = viewer.camera.heading;
+                viewer.camera.heading = currentHeading + autoRotationSpeed;
+            }
+        }
+
+        // ── SISTEMA DE PARTÍCULAS Y EFECTOS VISUALES ───────────────────────────────
+
+        let particleSystem = null;
+        let particleTime = 0;
+
+        // Crear sistema de partículas para efectos visuales
+        function createParticleSystem() {
+            // Crear colección de entidades para partículas
+            particleSystem = {
+                particles: [],
+                maxParticles: 100,
+                spawnRate: 0.5, // Partículas por segundo
+                lastSpawn: 0
+            };
+        }
+
+        // Generar partícula en posición específica
+        function spawnParticle(longitude, latitude, height, type = 'default') {
+            if (particleSystem.particles.length >= particleSystem.maxParticles) {
+                return; // Límite de partículas
+            }
+
+            const particle = viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(longitude, latitude, height),
+                point: {
+                    pixelSize: 2 + Math.random() * 3,
+                    color: getParticleColor(type),
+                    outlineWidth: 0,
+                    heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
+                },
+                properties: {
+                    type: type,
+                    life: 1.0, // Vida de la partícula (0-1)
+                    velocity: {
+                        x: (Math.random() - 0.5) * 0.0001,
+                        y: (Math.random() - 0.5) * 0.0001,
+                        z: Math.random() * 0.0005
+                    }
+                }
+            });
+
+            particleSystem.particles.push(particle);
+            return particle;
+        }
+
+        // Obtener color según tipo de partícula
+        function getParticleColor(type) {
+            switch(type) {
+                case 'life':
+                    return Cesium.Color.CYAN.withAlpha(0.6 + Math.random() * 0.4);
+                case 'energy':
+                    return Cesium.Color.GOLD.withAlpha(0.6 + Math.random() * 0.4);
+                case 'data':
+                    return Cesium.Color.WHITE.withAlpha(0.4 + Math.random() * 0.3);
+                default:
+                    return Cesium.Color.CYAN.withAlpha(0.5);
+            }
+        }
+
+        // Actualizar partículas
+        function updateParticles(deltaTime) {
+            const toRemove = [];
+
+            particleSystem.particles.forEach((particle, index) => {
+                const properties = particle.properties;
+                const life = properties.life.getValue() - deltaTime * 0.3; // Decaimiento
+
+                if (life <= 0) {
+                    toRemove.push(index);
+                    return;
+                }
+
+                // Actualizar vida
+                properties.life = life;
+
+                // Actualizar posición
+                const position = particle.position.getValue(Cesium.JulianDate.now());
+                const carto = Cesium.Cartographic.fromCartesian(position);
+
+                carto.longitude += properties.velocity.x.getValue();
+                carto.latitude += properties.velocity.y.getValue();
+                carto.height += properties.velocity.z.getValue();
+
+                particle.position = Cesium.Cartesian3.fromRadians(
+                    carto.longitude,
+                    carto.latitude,
+                    carto.height
+                );
+
+                // Actualizar opacidad según vida
+                const alpha = life * 0.6;
+                particle.point.color = particle.point.color.getValue().withAlpha(alpha);
+                particle.point.pixelSize = (2 + Math.random() * 3) * life;
+            });
+
+            // Eliminar partículas muertas (en orden inverso)
+            toRemove.reverse().forEach(index => {
+                const particle = particleSystem.particles[index];
+                viewer.entities.remove(particle);
+                particleSystem.particles.splice(index, 1);
+            });
+        }
+
+        // Generar partículas en nodos activos
+        function spawnNodeParticles() {
+            const now = Date.now();
+
+            // LAT 40°N - partículas de vida
+            if (now - particleSystem.lastSpawn > 2000) {
+                spawnParticle(-3.8, 40.0, 100, 'life');
+                particleSystem.lastSpawn = now;
+            }
+
+            // El Bosque Sagrado - partículas de energía
+            if (now - particleSystem.lastSpawn > 1500) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 0.01; // ~1km
+                spawnParticle(
+                    -3.8 + Math.cos(angle) * radius,
+                    40.0 + Math.sin(angle) * radius,
+                    50,
+                    'energy'
+                );
+            }
+
+            // Proyecto SEMILLA - partículas de datos
+            if (now - particleSystem.lastSpawn > 3000) {
+                spawnParticle(-3.795, 40.005, 200, 'data');
+            }
+        }
+
+        // ── ANIMACIONES DE ENTIDADES ─────────────────────────────────────────────
+
+        let entityAnimations = new Map();
+
+        // Registrar animación para entidad
+        function registerEntityAnimation(entityId, animationFn) {
+            entityAnimations.set(entityId, animationFn);
+        }
+
+        // Actualizar animaciones de entidades
+        function updateEntityAnimations(time) {
+            entityAnimations.forEach((animationFn, entityId) => {
+                const entity = viewer.entities.getById(entityId);
+                if (entity) {
+                    animationFn(entity, time);
+                }
+            });
+        }
+
+        // Animación de pulso para puntos importantes
+        function createPulseAnimation(entityId, baseSize, pulseAmplitude, pulseSpeed) {
+            registerEntityAnimation(entityId, (entity, time) => {
+                if (entity.point) {
+                    const pulse = Math.sin(time * pulseSpeed) * pulseAmplitude;
+                    entity.point.pixelSize = baseSize + pulse;
+                }
+            });
+        }
+
+        // Animación de brillo para polígonos
+        function createGlowAnimation(entityId, baseAlpha, glowAmplitude, glowSpeed) {
+            registerEntityAnimation(entityId, (entity, time) => {
+                if (entity.polygon) {
+                    const glow = Math.sin(time * glowSpeed) * glowAmplitude;
+                    const currentMaterial = entity.polygon.material.getValue();
+                    if (currentMaterial instanceof Cesium.Color) {
+                        entity.polygon.material = currentMaterial.withAlpha(baseAlpha + glow);
+                    }
+                }
+            });
+        }
+
+        // ── EFECTOS DE TRANSICIÓN ─────────────────────────────────────────────────
+
+        let transitionEffects = [];
+
+        // Crear efecto de transición
+        function createTransitionEffect(fromPosition, toPosition, duration, callback) {
+            const effect = {
+                startTime: Date.now(),
+                duration: duration,
+                fromPosition: fromPosition,
+                toPosition: toPosition,
+                callback: callback,
+                progress: 0
+            };
+
+            transitionEffects.push(effect);
+            return effect;
+        }
+
+        // Actualizar efectos de transición
+        function updateTransitions() {
+            const now = Date.now();
+            const toRemove = [];
+
+            transitionEffects.forEach((effect, index) => {
+                const elapsed = now - effect.startTime;
+                effect.progress = Math.min(elapsed / effect.duration, 1);
+
+                if (effect.progress >= 1) {
+                    if (effect.callback) {
+                        effect.callback();
+                    }
+                    toRemove.push(index);
+                }
+            });
+
+            // Eliminar efectos completados
+            toRemove.reverse().forEach(index => {
+                transitionEffects.splice(index, 1);
+            });
+        }
+
+        // ── EFECTOS DE BRILLO (GLOW) ─────────────────────────────────────────────
+
+        // Crear efecto de brillo alrededor de posición
+        function createGlowEffect(longitude, latitude, radius, color, duration = 5000) {
+            const glowEntity = viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(longitude, latitude, 0),
+                ellipse: {
+                    semiMinorAxis: radius,
+                    semiMajorAxis: radius,
+                    material: color.withAlpha(0.1),
+                    outline: true,
+                    outlineColor: color.withAlpha(0.3),
+                    outlineWidth: 2,
+                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                },
+                properties: {
+                    glowEffect: true,
+                    startTime: Date.now(),
+                    duration: duration,
+                    maxRadius: radius,
+                    baseAlpha: 0.1
+                }
+            });
+
+            // Animar el efecto
+            const animateGlow = () => {
+                const elapsed = Date.now() - glowEntity.properties.startTime.getValue();
+                const progress = elapsed / duration;
+
+                if (progress >= 1) {
+                    viewer.entities.remove(glowEntity);
+                    return;
+                }
+
+                // Efecto de expansión y desvanecimiento
+                const currentRadius = glowEntity.properties.maxRadius.getValue() * (1 + progress * 0.5);
+                const currentAlpha = glowEntity.properties.baseAlpha.getValue() * (1 - progress);
+
+                glowEntity.ellipse.semiMinorAxis = currentRadius;
+                glowEntity.ellipse.semiMajorAxis = currentRadius;
+                glowEntity.ellipse.material = color.withAlpha(currentAlpha);
+                glowEntity.ellipse.outlineColor = color.withAlpha(currentAlpha * 3);
+
+                requestAnimationFrame(animateGlow);
+            };
+
+            animateGlow();
+            return glowEntity;
+        }
+
+        // ── INTEGRACIÓN EN BUCLE PRINCIPAL ─────────────────────────────────────────
+
+        let lastFrameTime = Date.now();
+
+        viewer.clock.onTick.addEventListener(() => {
+            const now = Date.now();
+            const deltaTime = (now - lastFrameTime) / 1000; // Segundos
+            lastFrameTime = now;
+
+            // Actualizar auto-rotación
+            updateAutoRotation();
+
+            // Actualizar partículas
+            if (particleSystem) {
+                updateParticles(deltaTime);
+                spawnNodeParticles();
+            }
+
+            // Actualizar animaciones de entidades
+            particleTime += deltaTime;
+            updateEntityAnimations(particleTime);
+
+            // Actualizar transiciones
+            updateTransitions();
+        });
+
+        // ── INICIALIZACIÓN DE SISTEMA VISUAL ─────────────────────────────────────
+
+        // Inicializar sistema de partículas
+        createParticleSystem();
+
+        // Registrar animaciones para nodos importantes
+        // (Se registrarán automáticamente cuando se carguen los datos GeoJSON)
+
+        // ── INICIALIZACIÓN ───────────────────────────────────────────────────────
+
+        // Ocultar loading cuando Cesium esté listo
+        viewer.scene.globe.tileLoadProgressEvent.addEventListener((remaining) => {
+            if (remaining === 0) {
+                setTimeout(() => {
+                    document.getElementById('loading').classList.add('hidden');
+                    performDynamicFlyIn();
+                }, 1000);
+            }
+        });
 
         // Mostrar info inicial
         document.getElementById('node-info').classList.add('visible');
 
-        // ── Animación ──
-        let time = 0;
-        const posAttr = geometry.getAttribute('position');
+        // ── SISTEMA DE AUDIO AMBIENTAL ─────────────────────────────────────────────
 
-        function easeInOut(t) {
-            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        let audioContext = null;
+        let ambientOscillator = null;
+        let ambientGain = null;
+        let audioEnabled = false;
+
+        // Inicializar sistema de audio
+        function initAudioSystem() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                ambientGain = audioContext.createGain();
+                ambientGain.gain.value = 0; // Empezar en silencio
+                ambientGain.connect(audioContext.destination);
+                audioEnabled = true;
+                console.log('🔊 Sistema de audio inicializado');
+            } catch (error) {
+                console.warn('⚠️ Audio no disponible:', error);
+            }
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            time += 0.008 * speedMult;
+        // Crear sonido ambiental
+        function createAmbientSound() {
+            if (!audioEnabled || !audioContext) return;
 
-            // Morphing
-            if (morphing) {
-                morphProgress = Math.min(morphProgress + 0.012, 1);
-                const ease = easeInOut(morphProgress);
-                for (let i = 0; i < COUNT; i++) {
-                    const ix = i * 3, iy = ix + 1, iz = ix + 2;
-                    positions[ix] = oldPositions[ix] + (targets[ix] - oldPositions[ix]) * ease;
-                    positions[iy] = oldPositions[iy] + (targets[iy] - oldPositions[iy]) * ease;
-                    positions[iz] = oldPositions[iz] + (targets[iz] - oldPositions[iz]) * ease;
-                }
-                if (morphProgress >= 1) morphing = false;
-                posAttr.needsUpdate = true;
-            } else {
-                // Respiración orgánica
-                for (let i = 0; i < COUNT; i++) {
-                    const ix = i * 3, iy = ix + 1, iz = ix + 2;
-                    const wave = Math.sin(time + i * 0.003) * 0.06;
-                    positions[ix] = targets[ix] * (1 + wave);
-                    positions[iy] = targets[iy] * (1 + wave * 0.7);
-                    positions[iz] = targets[iz] * (1 + wave * 0.5);
-                }
-                posAttr.needsUpdate = true;
+            // Oscilador base para drone ambiental
+            ambientOscillator = audioContext.createOscillator();
+            ambientOscillator.type = 'sine';
+            ambientOscillator.frequency.value = 80; // Frecuencia baja
+
+            // Añadir modulación para movimiento orgánico
+            const lfo = audioContext.createOscillator();
+            lfo.type = 'sine';
+            lfo.frequency.value = 0.1; // Muy lento
+
+            const lfoGain = audioContext.createGain();
+            lfoGain.gain.value = 10;
+
+            lfo.connect(lfoGain);
+            lfoGain.connect(ambientOscillator.frequency);
+
+            // Filtro para suavizar
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 200;
+
+            ambientOscillator.connect(filter);
+            filter.connect(ambientGain);
+
+            // Iniciar osciladores
+            ambientOscillator.start();
+            lfo.start();
+        }
+
+        // Activar audio ambiental
+        function enableAmbientAudio() {
+            if (!audioEnabled) {
+                initAudioSystem();
             }
 
-            // Rotación con influencia del ratón
-            particleSystem.rotation.y += 0.0015 * speedMult + mouse.x * 0.0008;
-            particleSystem.rotation.x += 0.0008 * speedMult + mouse.y * 0.0005;
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
 
-            renderer.render(scene, camera);
+            if (!ambientOscillator) {
+                createAmbientSound();
+            }
+
+            // Fade in suave
+            if (ambientGain) {
+                ambientGain.gain.cancelScheduledValues(audioContext.currentTime);
+                ambientGain.gain.setValueAtTime(ambientGain.gain.value, audioContext.currentTime);
+                ambientGain.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 2);
+            }
         }
 
-        animate();
+        // Desactivar audio ambiental
+        function disableAmbientAudio() {
+            if (ambientGain) {
+                ambientGain.gain.cancelScheduledValues(audioContext.currentTime);
+                ambientGain.gain.setValueAtTime(ambientGain.gain.value, audioContext.currentTime);
+                ambientGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
+            }
+        }
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        // Efecto de sonido al interactuar
+        function playInteractionSound(type = 'hover') {
+            if (!audioEnabled || !audioContext) return;
+
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            switch(type) {
+                case 'hover':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = 440;
+                    gainNode.gain.value = 0.05;
+                    break;
+                case 'click':
+                    oscillator.type = 'triangle';
+                    oscillator.frequency.value = 660;
+                    gainNode.gain.value = 0.1;
+                    break;
+                case 'flyto':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = 220;
+                    gainNode.gain.value = 0.08;
+                    break;
+            }
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // ── SISTEMA DE FEEDBACK VISUAL ───────────────────────────────────────────
+
+        // Crear indicador de estado del sistema
+        function createSystemStatusIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'system-status';
+            indicator.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 9px;
+                color: rgba(0, 212, 170, 0.6);
+                letter-spacing: 0.15em;
+                z-index: 100;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+            document.body.appendChild(indicator);
+            return indicator;
+        }
+
+        const systemStatusIndicator = createSystemStatusIndicator();
+
+        // Actualizar indicador de estado
+        function updateSystemStatus(status) {
+            systemStatusIndicator.textContent = status;
+            systemStatusIndicator.style.opacity = '1';
+
+            setTimeout(() => {
+                systemStatusIndicator.style.opacity = '0';
+            }, 3000);
+        }
+
+        // Crear efecto de ripple al hacer click
+        function createClickEffect(x, y) {
+            const ripple = document.createElement('div');
+            ripple.style.cssText = `
+                position: fixed;
+                left: ${x}px;
+                top: ${y}px;
+                width: 20px;
+                height: 20px;
+                border: 2px solid rgba(0, 212, 170, 0.5);
+                border-radius: 50%;
+                transform: translate(-50%, -50%) scale(0);
+                animation: rippleEffect 0.6s ease-out forwards;
+                pointer-events: none;
+                z-index: 1000;
+            `;
+
+            document.body.appendChild(ripple);
+
+            setTimeout(() => {
+                document.body.removeChild(ripple);
+            }, 600);
+        }
+
+        // Añadir animación de ripple
+        const rippleStyle = document.createElement('style');
+        rippleStyle.textContent = `
+            @keyframes rippleEffect {
+                0% {
+                    transform: translate(-50%, -50%) scale(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate(-50%, -50%) scale(3);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(rippleStyle);
+
+        // ── INTEGRACIÓN DE AUDIO Y FEEDBACK ───────────────────────────────────────
+
+        // Activar audio con primera interacción
+        let firstInteraction = true;
+        document.addEventListener('click', (e) => {
+            if (firstInteraction) {
+                enableAmbientAudio();
+                firstInteraction = false;
+                updateSystemStatus('AUDIO ACTIVADO');
+            }
+
+            // Efecto de ripple
+            createClickEffect(e.clientX, e.clientY);
         });
+
+        // Actualizar interactividad con audio
+        const originalApplyHoverStyle = applyHoverStyle;
+        applyHoverStyle = function(entity) {
+            originalApplyHoverStyle(entity);
+            playInteractionSound('hover');
+        };
+
+        const originalShowEntityInfo = showEntityInfo;
+        showEntityInfo = function(entity) {
+            originalShowEntityInfo(entity);
+            playInteractionSound('click');
+            updateSystemStatus('ENTIDAD SELECCIONADA');
+        };
+
+        // Actualizar flyToNode con audio
+        const originalFlyToNode = flyToNode;
+        flyToNode = function(nodeId) {
+            originalFlyToNode(nodeId);
+            playInteractionSound('flyto');
+            updateSystemStatus('NAVEGANDO A: ' + nodeId.toUpperCase());
+        };
+
+        // ── MANEJO DE RESIZE ─────────────────────────────────────────────────────
+
+        // Manejar resize
+        window.addEventListener('resize', () => {
+            viewer.resize();
+        });
+
+        // ── SISTEMA DE NOTIFICACIONES ─────────────────────────────────────────────
+
+        let notificationSystem = {
+            container: null,
+            notifications: [],
+            maxNotifications: 5
+        };
+
+        // Crear contenedor de notificaciones
+        function createNotificationContainer() {
+            const container = document.createElement('div');
+            container.id = 'notification-container';
+            container.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                z-index: 1000;
+                pointer-events: none;
+            `;
+            document.body.appendChild(container);
+            notificationSystem.container = container;
+            return container;
+        }
+
+        // Crear notificación
+        function showNotification(message, type = 'info', duration = 4000) {
+            if (!notificationSystem.container) {
+                createNotificationContainer();
+            }
+
+            // Limitar número de notificaciones
+            if (notificationSystem.notifications.length >= notificationSystem.maxNotifications) {
+                const oldest = notificationSystem.notifications.shift();
+                removeNotification(oldest.element);
+            }
+
+            const notification = document.createElement('div');
+            const colors = {
+                info: { bg: 'rgba(0, 212, 170, 0.1)', border: 'rgba(0, 212, 170, 0.3)', text: '#00D4AA' },
+                success: { bg: 'rgba(0, 212, 170, 0.15)', border: 'rgba(0, 212, 170, 0.5)', text: '#00D4AA' },
+                warning: { bg: 'rgba(201, 168, 76, 0.1)', border: 'rgba(201, 168, 76, 0.3)', text: '#C9A84C' },
+                error: { bg: 'rgba(255, 100, 100, 0.1)', border: 'rgba(255, 100, 100, 0.3)', text: '#ff6464' }
+            };
+
+            const color = colors[type] || colors.info;
+
+            notification.style.cssText = `
+                background: ${color.bg};
+                border: 1px solid ${color.border};
+                color: ${color.text};
+                padding: 12px 16px;
+                border-radius: 4px;
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 10px;
+                letter-spacing: 0.1em;
+                backdrop-filter: blur(8px);
+                opacity: 0;
+                transform: translateX(20px);
+                transition: all 0.3s ease;
+                pointer-events: auto;
+                max-width: 300px;
+            `;
+
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 12px;">${getNotificationIcon(type)}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+
+            notificationSystem.container.appendChild(notification);
+
+            // Animación de entrada
+            requestAnimationFrame(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            });
+
+            // Sonido de notificación
+            if (audioEnabled) {
+                playNotificationSound(type);
+            }
+
+            const notificationObj = {
+                element: notification,
+                type: type,
+                timestamp: Date.now()
+            };
+
+            notificationSystem.notifications.push(notificationObj);
+
+            // Auto-eliminar después de duración
+            setTimeout(() => {
+                removeNotification(notification);
+            }, duration);
+
+            return notificationObj;
+        }
+
+        // Obtener icono según tipo
+        function getNotificationIcon(type) {
+            const icons = {
+                info: 'ℹ️',
+                success: '✓',
+                warning: '⚠️',
+                error: '✕'
+            };
+            return icons[type] || icons.info;
+        }
+
+        // Eliminar notificación
+        function removeNotification(notification) {
+            if (!notification || !notification.parentNode) return;
+
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(20px)';
+
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+
+            // Remover del array
+            const index = notificationSystem.notifications.findIndex(n => n.element === notification);
+            if (index > -1) {
+                notificationSystem.notifications.splice(index, 1);
+            }
+        }
+
+        // Sonido de notificación
+        function playNotificationSound(type) {
+            if (!audioEnabled || !audioContext) return;
+
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            switch(type) {
+                case 'success':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = 523.25; // C5
+                    gainNode.gain.value = 0.08;
+                    break;
+                case 'warning':
+                    oscillator.type = 'triangle';
+                    oscillator.frequency.value = 440; // A4
+                    gainNode.gain.value = 0.06;
+                    break;
+                case 'error':
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.value = 330; // E4
+                    gainNode.gain.value = 0.05;
+                    break;
+                default:
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = 440;
+                    gainNode.gain.value = 0.04;
+            }
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+            oscillator.stop(audioContext.currentTime + 0.2);
+        }
+
+        // ── SISTEMA DE ALERTAS DE ESTADO ─────────────────────────────────────────
+
+        let systemAlerts = [];
+
+        // Crear alerta de estado
+        function createSystemAlert(message, severity = 'info') {
+            const alert = document.createElement('div');
+            const colors = {
+                info: { bg: 'rgba(0, 212, 170, 0.05)', border: 'rgba(0, 212, 170, 0.2)' },
+                warning: { bg: 'rgba(201, 168, 76, 0.05)', border: 'rgba(201, 168, 76, 0.2)' },
+                critical: { bg: 'rgba(255, 100, 100, 0.05)', border: 'rgba(255, 100, 100, 0.2)' }
+            };
+
+            const color = colors[severity] || colors.info;
+
+            alert.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%) translateY(20px);
+                background: ${color.bg};
+                border: 1px solid ${color.border};
+                color: rgba(245, 240, 232, 0.8);
+                padding: 16px 24px;
+                border-radius: 4px;
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 11px;
+                letter-spacing: 0.1em;
+                backdrop-filter: blur(8px);
+                opacity: 0;
+                transition: all 0.3s ease;
+                z-index: 1000;
+                text-align: center;
+            `;
+
+            alert.textContent = message;
+            document.body.appendChild(alert);
+
+            // Animación de entrada
+            requestAnimationFrame(() => {
+                alert.style.opacity = '1';
+                alert.style.transform = 'translateX(-50%) translateY(0)';
+            });
+
+            const alertObj = {
+                element: alert,
+                severity: severity,
+                timestamp: Date.now()
+            };
+
+            systemAlerts.push(alertObj);
+
+            // Auto-eliminar después de 8 segundos
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateX(-50%) translateY(20px)';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 300);
+            }, 8000);
+
+            return alertObj;
+        }
+
+        // ── INDICADORES DE PROGRESO ───────────────────────────────────────────────
+
+        let progressIndicators = {};
+
+        // Crear indicador de progreso
+        function createProgressIndicator(id, message, total = 100) {
+            const container = document.createElement('div');
+            container.id = `progress-${id}`;
+            container.style.cssText = `
+                position: fixed;
+                bottom: 120px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(6, 13, 8, 0.9);
+                border: 1px solid rgba(0, 212, 170, 0.2);
+                padding: 16px 24px;
+                border-radius: 4px;
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 10px;
+                color: rgba(245, 240, 232, 0.8);
+                z-index: 1000;
+                min-width: 300px;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+
+            container.innerHTML = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>${message}</span>
+                    <span id="progress-percent-${id}">0%</span>
+                </div>
+                <div style="width: 100%; height: 2px; background: rgba(0, 212, 170, 0.1); border-radius: 1px;">
+                    <div id="progress-bar-${id}" style="width: 0%; height: 100%; background: #00D4AA; border-radius: 1px; transition: width 0.3s ease;"></div>
+                </div>
+            `;
+
+            document.body.appendChild(container);
+
+            // Animación de entrada
+            requestAnimationFrame(() => {
+                container.style.opacity = '1';
+            });
+
+            const indicator = {
+                element: container,
+                current: 0,
+                total: total,
+                message: message
+            };
+
+            progressIndicators[id] = indicator;
+            return indicator;
+        }
+
+        // Actualizar progreso
+        function updateProgress(id, current) {
+            const indicator = progressIndicators[id];
+            if (!indicator) return;
+
+            indicator.current = Math.min(current, indicator.total);
+            const percent = Math.round((indicator.current / indicator.total) * 100);
+
+            const percentEl = document.getElementById(`progress-percent-${id}`);
+            const barEl = document.getElementById(`progress-bar-${id}`);
+
+            if (percentEl) percentEl.textContent = `${percent}%`;
+            if (barEl) barEl.style.width = `${percent}%`;
+
+            // Completado
+            if (indicator.current >= indicator.total) {
+                setTimeout(() => {
+                    removeProgressIndicator(id);
+                }, 1000);
+            }
+        }
+
+        // Eliminar indicador de progreso
+        function removeProgressIndicator(id) {
+            const indicator = progressIndicators[id];
+            if (!indicator) return;
+
+            indicator.element.style.opacity = '0';
+            setTimeout(() => {
+                if (indicator.element.parentNode) {
+                    indicator.element.parentNode.removeChild(indicator.element);
+                }
+            }, 300);
+
+            delete progressIndicators[id];
+        }
+
+        // ── SISTEMA DE LOGGING VISUAL ────────────────────────────────────────────
+
+        let visualLog = {
+            container: null,
+            entries: [],
+            maxEntries: 50
+        };
+
+        // Crear contenedor de log visual
+        function createVisualLogContainer() {
+            const container = document.createElement('div');
+            container.id = 'visual-log';
+            container.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                width: 300px;
+                max-height: 200px;
+                overflow-y: auto;
+                background: rgba(6, 13, 8, 0.8);
+                border: 1px solid rgba(0, 212, 170, 0.1);
+                padding: 12px;
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 8px;
+                color: rgba(245, 240, 232, 0.5);
+                z-index: 100;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            `;
+
+            // Scrollbar personalizado
+            container.style.scrollbarWidth = 'thin';
+            container.style.scrollbarColor = 'rgba(0, 212, 170, 0.3) transparent';
+
+            document.body.appendChild(container);
+            visualLog.container = container;
+            return container;
+        }
+
+        // Añadir entrada al log visual
+        function logToVisual(message, type = 'info') {
+            if (!visualLog.container) {
+                createVisualLogContainer();
+            }
+
+            const timestamp = new Date().toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            const entry = document.createElement('div');
+            const colors = {
+                info: 'rgba(0, 212, 170, 0.6)',
+                success: 'rgba(0, 212, 170, 0.8)',
+                warning: 'rgba(201, 168, 76, 0.8)',
+                error: 'rgba(255, 100, 100, 0.8)'
+            };
+
+            entry.style.cssText = `
+                margin-bottom: 4px;
+                color: ${colors[type] || colors.info};
+                opacity: 0;
+                transition: opacity 0.2s ease;
+            `;
+
+            entry.innerHTML = `<span style="opacity: 0.5;">[${timestamp}]</span> ${message}`;
+
+            visualLog.container.appendChild(entry);
+
+            // Animación de entrada
+            requestAnimationFrame(() => {
+                entry.style.opacity = '1';
+            });
+
+            // Limitar entradas
+            if (visualLog.entries.length >= visualLog.maxEntries) {
+                const oldest = visualLog.entries.shift();
+                if (oldest.element && oldest.element.parentNode) {
+                    oldest.element.parentNode.removeChild(oldest.element);
+                }
+            }
+
+            visualLog.entries.push({
+                element: entry,
+                type: type,
+                timestamp: Date.now()
+            });
+
+            // Auto-scroll al final
+            visualLog.container.scrollTop = visualLog.container.scrollHeight;
+
+            // Mostrar contenedor si está oculto
+            if (visualLog.container.style.opacity === '0') {
+                visualLog.container.style.opacity = '1';
+            }
+        }
+
+        // ── INTEGRACIÓN CON SISTEMA EXISTENTE ───────────────────────────────────
+
+        // Actualizar updateSystemStatus para usar notificaciones
+        const originalUpdateSystemStatus = updateSystemStatus;
+        updateSystemStatus = function(status) {
+            originalUpdateSystemStatus(status);
+            logToVisual(status, 'info');
+        };
+
+        // Mostrar notificaciones de eventos importantes
+        viewer.scene.globe.tileLoadProgressEvent.addEventListener((remaining) => {
+            if (remaining === 0) {
+                showNotification('Sistema OASYS BRAIN completamente cargado', 'success');
+                logToVisual('Carga de terreno completada', 'success');
+            }
+        });
+
+        // Notificar errores de carga
+        viewer.dataSources.dataSourceAdded.addEventListener((dataSource) => {
+            showNotification(`Capa cargada: ${dataSource.name}`, 'info');
+            logToVisual(`DataSource añadido: ${dataSource.name}`, 'info');
+        });
+
+        // ── DEBUGGING Y DESARROLLO ───────────────────────────────────────────────
+
+        // Exponer funciones para debugging
+        window.OASYS_DEBUG = {
+            viewer: viewer,
+            nodes: OASYS_NODES,
+            flyToNode: flyToNode,
+            pauseAutoRotation: pauseAutoRotation,
+            resumeAutoRotation: resumeAutoRotation,
+            loadGeoJSONLayer: loadGeoJSONLayer,
+            getCurrentPosition: () => {
+                const carto = Cesium.Cartographic.fromCartesian(viewer.camera.position);
+                return {
+                    longitude: Cesium.Math.toDegrees(carto.longitude),
+                    latitude: Cesium.Math.toDegrees(carto.latitude),
+                    height: carto.height
+                };
+            },
+            // Nuevas funciones de debugging
+            notifications: {
+                show: showNotification,
+                clear: () => {
+                    notificationSystem.notifications.forEach(n => removeNotification(n.element));
+                    notificationSystem.notifications = [];
+                }
+            },
+            alerts: {
+                create: createSystemAlert,
+                clear: () => {
+                    systemAlerts.forEach(a => {
+                        if (a.element.parentNode) {
+                            a.element.parentNode.removeChild(a.element);
+                        }
+                    });
+                    systemAlerts = [];
+                }
+            },
+            progress: {
+                create: createProgressIndicator,
+                update: updateProgress,
+                remove: removeProgressIndicator
+            },
+            log: {
+                add: logToVisual,
+                clear: () => {
+                    if (visualLog.container) {
+                        visualLog.container.innerHTML = '';
+                        visualLog.entries = [];
+                    }
+                }
+            },
+            audio: {
+                enable: enableAmbientAudio,
+                disable: disableAmbientAudio,
+                play: playInteractionSound
+            },
+            particles: {
+                system: particleSystem,
+                spawn: spawnParticle,
+                count: () => particleSystem.particles.length
+            }
+        };
+
+        console.log('🌍 OASYS BRAIN inicializado');
+        console.log('🔧 Debug functions disponibles en window.OASYS_DEBUG');
+        console.log('📊 Sistema de notificaciones activo');
+        console.log('🔊 Sistema de audio listo (activar con click)');
     </script>
 </body>
 </html>

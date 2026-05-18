@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OASYS · Earth Base64</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #globe-container {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="globe-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
+    <script>
+        console.log('Iniciando con imagen base64...');
+
+        window.addEventListener('load', function() {
+            console.log('Página cargada');
+
+            setTimeout(function() {
+                try {
+                    const container = document.getElementById('globe-container');
+                    console.log('Contenedor:', container);
+
+                    // Crear globo con imagen base64 (simple blue marble)
+                    const myGlobe = new Globe(container)
+                        .globeImageUrl('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=')
+                        .backgroundColor('#000000')
+                        .showAtmosphere(true)
+                        .atmosphereColor('#3a8cff')
+                        .atmosphereAltitude(0.15);
+
+                    // Configurar rotación
+                    myGlobe.controls().autoRotate = true;
+                    myGlobe.controls().autoRotateSpeed = 0.5;
+                    myGlobe.pointOfView({ lat: 40.0, lng: -3.5, altitude: 2.5 });
+
+                    console.log('✅ Globo creado con imagen base64');
+                } catch (error) {
+                    console.error('❌ Error:', error);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

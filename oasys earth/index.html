@@ -3,29 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>oasys.earth · LOGIN: HUMANS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
-
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5T2LL98X');</script>
-    <!-- End Google Tag Manager -->
-
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NMC1GS2WDW"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-NMC1GS2WDW', {
-        'anonymize_ip': true,
-        'send_page_view': false
-      });
-    </script>
-    <!-- End Google Analytics 4 -->
+    <title>oasys.earth · LA PRISA MATA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&family=Roboto:wght@100;300;400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --dark: #060d08;
@@ -46,6 +25,35 @@
             cursor: crosshair;
         }
 
+        /* ── SCANLINES & FLICKER (Hortus-Futura) ── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: 100; pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,212,170,0.03) 2px,
+                rgba(0,212,170,0.03) 4px
+            );
+        }
+
+        body::after {
+            content: '';
+            position: fixed; inset: 0; z-index: 99; pointer-events: none;
+            animation: flicker 8s step-end infinite;
+        }
+
+        @keyframes flicker {
+            0%,100% { opacity: 0 }
+            92% { opacity: 0 }
+            92.5% { background: rgba(0,212,170,0.04); opacity: 1 }
+            93% { opacity: 0 }
+            96% { opacity: 0 }
+            96.3% { background: rgba(0,212,170,0.02); opacity: 1 }
+            96.6% { opacity: 0 }
+        }
+
         /* ── Canvas ── */
         #canvas-container {
             position: fixed; inset: 0; z-index: 0;
@@ -58,22 +66,334 @@
             pointer-events: none;
         }
 
-        /* ── Header ── */
+        /* ── SPLITFLAP TITLE STYLE (0-4s) ── */
+        .splitflap-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .splitflap-line {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            opacity: 0;
+        }
+
+        .splitflap-line.visible {
+            opacity: 1;
+        }
+
+        .ch {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ch::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: rgba(0,212,170,0.15);
+            pointer-events: none;
+        }
+
+        .ch span {
+            display: block;
+            text-align: center;
+            font-family: 'Orbitron', monospace;
+            transform-origin: center;
+            transition: transform 0.04s linear;
+        }
+
+        .ch.locked {
+            background: transparent;
+        }
+
+        /* ── ROLLING CHARACTERS STYLE (4-8s) ── */
+        .char-wrap {
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            height: 1.2em;
+            line-height: 1.2em;
+        }
+
+        .char-inner {
+            display: inline-block;
+            position: relative;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            font-weight: 400;
+        }
+
+        .char-inner.rolling {
+            color: var(--teal-dim);
+            animation: charGlitch 0.06s step-end infinite;
+        }
+
+        .char-inner.landed {
+            color: var(--teal);
+            text-shadow: 0 0 8px rgba(0,212,170,0.6), 0 0 20px rgba(0,212,170,0.2);
+            animation: landPulse 0.3s ease-out forwards;
+        }
+
+        .char-inner.idle {
+            color: rgba(0,212,170,0.3);
+        }
+
+        @keyframes charGlitch {
+            0%   { opacity: 1; transform: translateY(0); }
+            25%  { opacity: 0.7; transform: translateY(-1px); }
+            50%  { opacity: 1; transform: translateY(0); }
+            75%  { opacity: 0.8; transform: translateY(1px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes landPulse {
+            0%   { transform: scaleY(1.15); filter: brightness(2.5); }
+            40%  { transform: scaleY(0.92); filter: brightness(1.4); }
+            70%  { transform: scaleY(1.04); filter: brightness(1.1); }
+            100% { transform: scaleY(1);    filter: brightness(1); }
+        }
+
+        /* ── HEADER DATA MODULES (4-8s) ── */
         #header {
             position: fixed; top:0; left:0; right:0;
-            padding: 28px 40px;
+            padding: 28px 50px;
             display: flex; align-items: center; justify-content: space-between;
             z-index: 20;
+            opacity: 0;
         }
+
+        .header-section {
+            display: flex; align-items: center;
+        }
+
+        .header-left {
+            flex: 1;
+            justify-content: flex-start;
+        }
+
+        .header-center {
+            flex: 0 0 auto;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 1;
+            justify-content: flex-end;
+        }
+
         .logo {
             font-family: 'Orbitron', sans-serif;
-            font-weight: 900; font-size: 12px;
+            font-weight: 900; font-size: 14px;
             letter-spacing: 0.35em; color: var(--teal);
         }
+
         .logo em { color: var(--gold); font-style: normal; }
-        .header-right {
-            font-size: 10px; letter-spacing: 0.15em;
+
+        .mission-text {
+            font-family: 'Roboto', sans-serif;
+            font-size: 10px; font-weight: 300;
+            letter-spacing: 0.15em;
+            color: rgba(245,240,232,0.4);
+            text-transform: uppercase;
+        }
+
+        .live-data {
+            font-family: 'Roboto', sans-serif;
+            font-size: 10px; font-weight: 300;
+            letter-spacing: 0.12em;
             color: rgba(245,240,232,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .live-clock {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(201,168,76,0.5);
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            font-weight: 300;
+        }
+
+        .live-clock .clock-time {
+            font-weight: 400;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* ── OBSIDIAN MENU STYLE (8-12s) ── */
+        .obsidian-menu {
+            position: fixed;
+            bottom: 40px;
+            left: 50px;
+            z-index: 18;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 10px;
+            color: rgba(245,240,232,0.4);
+            letter-spacing: 0.08em;
+            opacity: 0;
+        }
+
+        .obsidian-folder {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 400;
+        }
+
+        .obsidian-folder:hover {
+            color: rgba(245,240,232,0.6);
+            font-weight: 500;
+        }
+
+        .obsidian-folder.active {
+            color: var(--teal);
+            text-shadow: 0 0 8px rgba(0,212,170,0.4);
+            font-weight: 700;
+        }
+
+        .obsidian-file {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0 4px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 300;
+        }
+
+        .obsidian-file::before {
+            content: '└─';
+            position: absolute;
+            left: 8px;
+            color: rgba(245,240,232,0.2);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .obsidian-file:hover {
+            color: rgba(245,240,232,0.6);
+            font-weight: 400;
+        }
+
+        .obsidian-file.selected {
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(201,168,76,0.5);
+            font-weight: 700;
+        }
+
+        .search-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 0;
+            margin-bottom: 8px;
+            color: rgba(0,212,170,0.5);
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+        }
+
+        .search-indicator .search-icon {
+            animation: searchPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes searchPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* ── USER STATUS MODULE (15s) ── */
+        .user-status-module {
+            position: fixed;
+            bottom: 40px;
+            right: 50px;
+            z-index: 18;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 10px;
+            font-weight: 300;
+            color: rgba(245,240,232,0.3);
+            text-align: right;
+            letter-spacing: 0.08em;
+            opacity: 0;
+        }
+
+        .user-status-module.revealed {
+            animation: goldFlash 0.8s ease-out forwards;
+        }
+
+        @keyframes goldFlash {
+            0% {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            30% {
+                opacity: 1;
+                transform: translateX(-5px);
+                filter: brightness(3);
+                text-shadow: 0 0 20px rgba(201,168,76,0.8);
+            }
+            60% {
+                transform: translateX(2px);
+                filter: brightness(1.5);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+                filter: brightness(1);
+            }
+        }
+
+        .user-status-line {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .user-status-label {
+            color: rgba(245,240,232,0.4);
+            font-weight: 400;
+        }
+
+        .user-status-value {
+            color: var(--teal);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .user-status-value.admin {
+            color: var(--gold);
         }
 
         /* ── LOGIN SCREEN ── */
@@ -83,96 +403,41 @@
             align-items: center; justify-content: center;
             text-align: center;
             transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        #login-screen.hidden {
-            opacity: 0; transform: scale(0.96); pointer-events: none;
-        }
-
-        .login-pre {
-            font-size: 10px; letter-spacing: 0.5em;
-            color: rgba(0,212,170,0.6);
-            text-transform: uppercase;
-            margin-bottom: 24px;
-            opacity: 0; animation: fadeUp 1s ease 0.3s forwards;
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .login-title {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: clamp(42px, 7vw, 100px);
-            letter-spacing: 0.06em;
-            line-height: 0.95;
-            color: var(--cream);
-            opacity: 0; animation: fadeUp 1s ease 0.6s forwards;
+        #login-screen.active {
+            opacity: 1;
+            pointer-events: all;
         }
-        .login-title .colon { color: var(--teal); }
-        .login-title .humans { color: var(--gold); }
 
         .login-sub {
             font-family: 'Cormorant Garamond', serif;
-            font-style: italic; font-weight: 300;
-            font-size: clamp(15px, 2vw, 20px);
-            color: rgba(245,240,232,0.45);
-            margin-top: 22px; margin-bottom: 48px;
-            letter-spacing: 0.05em;
-            max-width: 480px;
-            opacity: 0; animation: fadeUp 1s ease 0.9s forwards;
+            font-weight: 300;
+            font-size: clamp(16px, 2vw, 20px);
+            color: rgba(245,240,232,0.6);
+            margin-top: 20px; margin-bottom: 40px;
+            letter-spacing: 0.04em;
+            max-width: 85vw;
+            line-height: 1.4;
+            font-style: italic;
         }
-
-        .enter-btn {
-            display: inline-flex; align-items: center; gap: 12px;
-            background: transparent;
-            border: 1px solid rgba(0,212,170,0.4);
-            border-radius: 2px;
-            padding: 14px 36px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px; font-weight: 700;
-            letter-spacing: 0.3em;
-            color: var(--teal);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0; animation: fadeUp 1s ease 1.2s forwards;
-            position: relative; overflow: hidden;
-        }
-        .enter-btn::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: var(--teal-dim);
-            transform: translateX(-100%);
-            transition: transform 0.4s ease;
-        }
-        .enter-btn:hover::before { transform: translateX(0); }
-        .enter-btn:hover { border-color: var(--teal); color: var(--cream); }
-        .enter-btn span { position: relative; z-index: 1; }
-
-        .enter-arrow {
-            position: relative; z-index: 1;
-            font-size: 14px; transition: transform 0.3s;
-        }
-        .enter-btn:hover .enter-arrow { transform: translateX(4px); }
 
         .login-coords {
             position: fixed; bottom: 32px;
-            font-size: 10px; letter-spacing: 0.2em;
-            color: rgba(245,240,232,0.2);
-            opacity: 0; animation: fadeUp 1s ease 1.5s forwards;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 9px; font-weight: 400;
+            letter-spacing: 0.1em;
+            color: rgba(245,240,232,0.25);
+            text-align: center;
+            width: 100%;
+            left: 0;
         }
 
-        /* Pulse rings */
-        .pulse-ring {
-            position: fixed; border-radius: 50%;
-            border: 1px solid rgba(0,212,170,0.08);
-            pointer-events: none; z-index: 2;
-            animation: pulseRing 5s ease-out infinite;
-        }
-        @keyframes pulseRing {
-            0%   { transform: translate(-50%,-50%) scale(0.6); opacity: 0.5; }
-            100% { transform: translate(-50%,-50%) scale(2.8); opacity: 0; }
-        }
-
-        /* ── CHAT WINDOW ── */
+        /* ── CHAT WINDOW STYLES ── */
         #chat-window {
-            position: fixed; inset: 0; z-index: 15;
+            position: fixed; inset: 0; z-index: 100;
             display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none;
             transition: opacity 0.6s ease;
@@ -198,7 +463,6 @@
             transform: translateY(0);
         }
 
-        /* Chat header */
         .chat-header {
             padding: 16px 24px;
             border-bottom: 1px solid rgba(0,212,170,0.1);
@@ -237,7 +501,6 @@
         }
         .close-btn:hover { color: var(--gold); }
 
-        /* Messages */
         #messages {
             flex: 1; overflow-y: auto;
             padding: 28px 28px 16px;
@@ -299,7 +562,6 @@
             font-size: 12.5px;
         }
 
-        /* Typing indicator */
         .typing-indicator {
             display: flex; gap: 5px; align-items: center;
             padding: 4px 0;
@@ -316,7 +578,6 @@
             40% { transform: translateY(-5px); opacity: 1; }
         }
 
-        /* Input */
         .chat-input-area {
             padding: 16px 24px 20px;
             border-top: 1px solid rgba(0,212,170,0.08);
@@ -365,7 +626,6 @@
             margin-top: 8px; text-align: center;
         }
 
-        /* Suggested questions */
         .suggested-questions {
             display: flex; flex-wrap: wrap; gap: 8px;
             margin-bottom: 20px;
@@ -387,7 +647,6 @@
             color: var(--teal);
         }
 
-        /* Email capture */
         .email-capture {
             background: rgba(201,168,76,0.05);
             border: 1px solid rgba(201,168,76,0.15);
@@ -417,21 +676,118 @@
         }
         .email-capture button:hover { background: rgba(201,168,76,0.25); }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to   { opacity: 1; transform: translateY(0); }
+        /* ── START CONVERSATION BUTTON ── */
+        .start-conversation-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--teal);
+            background: transparent;
+            border: 1px solid rgba(0,212,170,0.3);
+            padding: 12px 24px;
+            margin-top: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-conversation-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,212,170,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .start-conversation-btn:hover::before {
+            left: 100%;
+        }
+
+        .start-conversation-btn:hover {
+            border-color: var(--teal);
+            background: rgba(0,212,170,0.05);
+            box-shadow: 0 0 20px rgba(0,212,170,0.2);
+        }
+
+        .start-conversation-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Pulse rings */
+        .pulse-ring {
+            position: fixed; border-radius: 50%;
+            border: 1px solid rgba(0,212,170,0.08);
+            pointer-events: none; z-index: 2;
+            animation: pulseRing 5s ease-out infinite;
+        }
+
+        @keyframes pulseRing {
+            0%   { transform: translate(-50%,-50%) scale(0.6); opacity: 0.5; }
+            100% { transform: translate(-50%,-50%) scale(2.8); opacity: 0; }
         }
 
         /* Scrollbar body */
         ::-webkit-scrollbar { width: 0; }
     </style>
+    <link rel="stylesheet" href="oasys-triptico.css">
 </head>
 <body>
 
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5T2LL98X"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
+    <!-- TRÍPTICO CONTAINER (oculto hasta click en "Iniciar conversación") -->
+    <div id="triptico-container" class="triptico-container">
+        <!-- Panel Izquierdo: Métricas OASYS -->
+        <div class="panel-left">
+            <div class="panel-left-title">DATOS EN VIVO</div>
+            
+            <div class="metric-item">
+                <div class="metric-item-label">BSG Plazas</div>
+                <div class="metric-item-value">13/50</div>
+            </div>
+            
+            <div class="metric-item">
+                <div class="metric-item-label">Superficie</div>
+                <div class="metric-item-value">3.47 ha</div>
+            </div>
+            
+            <div class="metric-item">
+                <div class="metric-item-label">Próximo hito</div>
+                <div class="metric-item-value">15 MAY</div>
+            </div>
+            
+            <div class="metric-item">
+                <div class="metric-item-label">Localización</div>
+                <div class="metric-item-value">LAT 40°N</div>
+            </div>
+        </div>
+        
+        <!-- Panel Centro: Globe (ya existe fuera, compartido) -->
+        <div class="panel-center">
+            <!-- El globe se renderiza aquí por el grid pero el canvas está fuera -->
+        </div>
+        
+        <!-- Panel Derecho: Chat minimalista -->
+        <div class="panel-right">
+            <div id="chat-messages" class="chat-messages">
+                <!-- Mensajes se añaden aquí dinámicamente -->
+            </div>
+            
+            <div class="chat-input-minimal">
+                <input 
+                    type="text" 
+                    id="chat-input"
+                    placeholder="Escribe tu pregunta..."
+                    onkeydown="handleChatKeydown(event)"
+                />
+            </div>
+        </div>
+    </div>
+
 
     <div id="canvas-container"></div>
     <div class="vignette"></div>
@@ -441,34 +797,86 @@
     <div class="pulse-ring" style="width:280px;height:280px;left:50%;top:50%;animation-delay:1.7s;"></div>
     <div class="pulse-ring" style="width:280px;height:280px;left:50%;top:50%;animation-delay:3.4s;"></div>
 
-    <!-- Header -->
+    <!-- SPLITFLAP TITLE (0-4s) -->
+    <div class="splitflap-container" id="splitflap-stage">
+        <div class="splitflap-line" id="title-line"></div>
+    </div>
+
+    <!-- Header (4-8s) -->
     <header id="header">
-        <div class="logo">OASYS<em>·</em>EARTH</div>
-        <div class="header-right">LAT 40°N · YUNCLILLOS · TOLEDO</div>
+        <div class="header-section header-left">
+            <div class="mission-text">
+                <span id="mission-chars"></span>
+            </div>
+        </div>
+        <div class="header-section header-center">
+            <div class="logo">OASYS<em>·</em>EARTH</div>
+        </div>
+        <div class="header-section header-right">
+            <div class="live-data">
+                <span id="live-chars"></span>
+                <div class="live-clock">
+                    <span class="clock-time" id="regen-clock">00:00:00:000</span>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen">
-        <div class="login-pre">Sistema de conocimiento abierto</div>
-        <h1 class="login-title">
-            LOGIN<span class="colon">:</span><br>
-            <span class="humans">HUMANS</span>
-        </h1>
-        <p class="login-sub">
-            El sistema operativo de la Tierra.<br>
-            OASYS es el sistema operativo de la tierra: un modelo agrícola regenerativo donde la inteligencia artificial y la experiencia agraria trabajan juntas para mejorar el suelo, aumentar las cosechas y restaurar ecosistemas.<br>
-            Pregúntanos lo que quieras.
-        </p>
-        <button class="enter-btn" onclick="enterChat()">
-            <span>INICIAR CONVERSACIÓN</span>
-            <span class="enter-arrow">→</span>
-        </button>
-        <div class="login-coords">
-            oasys.earth · LAT 40°N · Slow systems build resilient worlds.
+    <!-- Obsidian Menu (8-12s) -->
+    <div class="obsidian-menu" id="obsidian-menu">
+        <div class="search-indicator">
+            <span class="search-icon">🔍</span>
+            <span>SEARCHING: mission oasysbasecamp el bosque sagrado</span>
+        </div>
+        <div class="obsidian-folder" id="folder-mission">
+            <span>📁</span>
+            <span>MISSION</span>
+        </div>
+        <div class="obsidian-file" id="file-oasysbasecamp">
+            <span>📄</span>
+            <span>OASYSBASECAMP.md</span>
+        </div>
+        <div class="obsidian-file" id="file-bosque">
+            <span>📄</span>
+            <span>EL_BOSQUE_SAGRADO.md</span>
+        </div>
+        <div class="obsidian-folder" id="folder-knowledge">
+            <span>📁</span>
+            <span>CONOCIMIENTO_ABIERTO</span>
+        </div>
+        <div class="obsidian-file" id="file-conocimiento">
+            <span>📄</span>
+            <span>SISTEMA_ABIERTO.md</span>
         </div>
     </div>
 
-    <!-- CHAT WINDOW -->
+    <!-- User Status Module (15s) -->
+    <div class="user-status-module" id="user-status">
+        <div class="user-status-line">
+            <span class="user-status-label">VERIFIED_HUMAN ::</span>
+            <span class="user-status-value">[ AMYUS@OASYS.EARTH ]</span>
+        </div>
+        <div class="user-status-line">
+            <span class="user-status-label">ACCESS_LEVEL ::</span>
+            <span class="user-status-value admin">ADMINISTRATOR_REGEN_CORE</span>
+        </div>
+    </div>
+
+    <!-- LOGIN SCREEN (After 15s) -->
+    <div id="login-screen">
+        <p class="login-sub">
+            OASYS BASE CAMP<br>
+            Regeneración de la tierra · LAT 40°N
+        </p>
+        <button class="start-conversation-btn" onclick="activarTriptico()">
+            INICIAR CONVERSACIÓN
+        </button>
+        <div class="login-coords">
+            oasys.earth · Slow systems build resilient worlds · © 2026 OASYS BASE CAMP · All rights reserved
+        </div>
+    </div>
+
+    <!-- CHAT WINDOW ANTIGUO (DESACTIVADO - usando tríptico) 
     <div id="chat-window">
         <div class="chat-container">
             <div class="chat-header">
@@ -509,80 +917,289 @@
             </div>
         </div>
     </div>
+    --> <!-- FIN CHAT WINDOW ANTIGUO -->
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
     <script>
-    // ── THREE.JS PARTICLES ─────────────────────────────────────────────────────
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    document.getElementById('canvas-container').appendChild(renderer.domElement);
-    camera.position.z = 55;
+    // ── LA PRISA MATA: 15-SECOND AUTO-CONSTRUCTION ─────────────────────────────────────
 
-    const COUNT = 16000;
-    const geo = new THREE.BufferGeometry();
-    const pos = new Float32Array(COUNT * 3);
-    const col = new Float32Array(COUNT * 3);
-    const C_TEAL = new THREE.Color('#00D4AA');
-    const C_GOLD = new THREE.Color('#C9A84C');
-    const C_CREAM = new THREE.Color('#F5F0E8');
-    const palette = [C_TEAL, C_TEAL, C_TEAL, C_GOLD, C_CREAM];
+    const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_+=!? ';
+    const rnd = () => CHARSET[Math.floor(Math.random()*CHARSET.length)];
 
-    for (let i = 0; i < COUNT; i++) {
-        const phi = Math.acos(-1 + (2 * i) / COUNT);
-        const theta = Math.sqrt(COUNT * Math.PI) * phi;
-        const r = 20 + Math.sin(i * 0.01) * 5;
-        pos[i*3]   = r * Math.cos(theta) * Math.sin(phi);
-        pos[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
-        pos[i*3+2] = r * Math.cos(phi);
-        const c = palette[Math.floor(Math.random() * palette.length)];
-        col[i*3] = c.r; col[i*3+1] = c.g; col[i*3+2] = c.b;
+    // ── PHASE 1: SPLITFLAP TITLE (0-4s) ─────────────────────────────────────────────────
+    function flipChar(span, newChar, delay) {
+        return new Promise(res => {
+            setTimeout(() => {
+                span.style.transform = 'rotateX(90deg)';
+                setTimeout(() => {
+                    span.textContent = newChar;
+                    span.style.transform = 'rotateX(-90deg)';
+                    setTimeout(() => {
+                        span.style.transform = 'rotateX(0deg)';
+                        res();
+                    }, 45);
+                }, 45);
+            }, delay);
+        });
     }
 
-    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    function buildSplitflapTitle() {
+        const container = document.getElementById('title-line');
+        container.innerHTML = '';
+        const charEls = [];
 
-    const mat = new THREE.PointsMaterial({
-        size: 0.25, vertexColors: true,
-        transparent: true, opacity: 0.8,
-        blending: THREE.AdditiveBlending, depthWrite: false
-    });
-    const particles = new THREE.Points(geo, mat);
-    scene.add(particles);
+        const titleText = 'EARTH/OS';
+        const cellW = 66, cellH = 88, gap = 8;
 
-    const mouse = { x: 0, y: 0 };
-    window.addEventListener('mousemove', e => {
-        mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
-        mouse.y = -(e.clientY / window.innerHeight - 0.5) * 2;
-    });
+        titleText.split('').forEach(c => {
+            const cell = document.createElement('div');
+            cell.className = 'ch';
+            cell.style.cssText = `width:${cellW}px;height:${cellH}px;perspective:352px;`;
+            const span = document.createElement('span');
+            span.style.cssText = `font-size:62px;color:var(--cream);width:${cellW}px;line-height:1;`;
+            span.textContent = ' ';
+            cell.appendChild(span);
+            container.appendChild(cell);
+            charEls.push({cell, span, target: c});
+        });
 
-    let t = 0;
-    const posAttr = geo.getAttribute('position');
-    function animate() {
-        requestAnimationFrame(animate);
-        t += 0.006;
-        for (let i = 0; i < COUNT; i++) {
-            const w = Math.sin(t + i * 0.004) * 0.04;
-            posAttr.array[i*3]   = pos[i*3]   * (1 + w);
-            posAttr.array[i*3+1] = pos[i*3+1] * (1 + w * 0.6);
-            posAttr.array[i*3+2] = pos[i*3+2] * (1 + w * 0.3);
+        return charEls;
+    }
+
+    function animateSplitflapTitle() {
+        const charEls = buildSplitflapTitle();
+        const lineEl = document.getElementById('title-line');
+
+        setTimeout(() => {
+            lineEl.classList.add('visible');
+            const shuffleMs = 4000;
+            const tickMs = 75;
+            const flipsPerChar = Math.floor(shuffleMs / tickMs);
+
+            charEls.forEach(({cell, span, target}, ci) => {
+                const charStartDelay = ci * 55;
+                let flip = 0;
+
+                const doFlip = () => {
+                    if(flip < flipsPerChar) {
+                        flipChar(span, rnd(), 0);
+                        flip++;
+                        setTimeout(doFlip, tickMs);
+                    } else {
+                        flipChar(span, target, 0).then(() => {
+                            cell.classList.add('locked');
+                        });
+                    }
+                };
+
+                setTimeout(doFlip, charStartDelay);
+            });
+        }, 100);
+    }
+
+    // ── PHASE 2: ROLLING HEADER DATA (4-8s) ─────────────────────────────────────────────
+    function buildChars(containerId, text) {
+        const el = document.getElementById(containerId);
+        el.innerHTML = '';
+        const spans = [];
+        for (let i = 0; i < text.length; i++) {
+            const wrap = document.createElement('span');
+            wrap.style.display = 'inline-block';
+            const inner = document.createElement('span');
+            inner.className = 'char-inner idle';
+            inner.textContent = text[i] === ' ' ? ' ' : rnd();
+            wrap.appendChild(inner);
+            el.appendChild(wrap);
+            if (text[i] === ' ') {
+                inner.textContent = ' ';
+                inner.className = 'char-inner';
+            }
+            spans.push({ inner, target: text[i], isSpace: text[i] === ' ' });
         }
-        posAttr.needsUpdate = true;
-        particles.rotation.y += 0.0012 + mouse.x * 0.0006;
-        particles.rotation.x += 0.0006 + mouse.y * 0.0003;
-        renderer.render(scene, camera);
+        return spans;
     }
-    animate();
 
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    function animateChar(span, delay) {
+        if (span.isSpace) return;
+        const { inner, target } = span;
 
-    // ── CHAT LOGIC ─────────────────────────────────────────────────────────────
+        setTimeout(() => {
+            inner.className = 'char-inner rolling';
+
+            let rolls = 0;
+            const maxRolls = 10 + Math.floor(Math.random() * 8);
+            const interval = setInterval(() => {
+                inner.textContent = rnd();
+                rolls++;
+                if (rolls >= maxRolls) {
+                    clearInterval(interval);
+                    inner.textContent = target;
+                    inner.className = 'char-inner landed';
+                }
+            }, 55 - rolls * 1.5);
+
+        }, delay);
+    }
+
+    function animateHeaderData() {
+        const header = document.getElementById('header');
+        header.style.opacity = '1';
+
+        const missionText = 'MISSION · OASYSBASECAMP · EL BOSQUE SAGRADO';
+        const liveText = 'LIVE · LAT 40°N · YUNCLILLOS · TOLEDO';
+
+        const missionSpans = buildChars('mission-chars', missionText);
+        const liveSpans = buildChars('live-chars', liveText);
+
+        // Animar mission (4-6s)
+        missionSpans.forEach((span, i) => {
+            animateChar(span, 4000 + i * 120);
+        });
+
+        // Animar live data (6-8s)
+        liveSpans.forEach((span, i) => {
+            animateChar(span, 6000 + i * 90);
+        });
+    }
+
+    // ── PHASE 3: OBSIDIAN MENU TYPEWRITER (8-12s) ─────────────────────────────────────────
+    function typeChar() {
+        const menu = document.getElementById('obsidian-menu');
+        menu.style.opacity = '1';
+
+        const menuItems = [
+            { id: 'folder-mission', text: '📁 MISSION' },
+            { id: 'file-oasysbasecamp', text: '📄 OASYSBASECAMP.md' },
+            { id: 'file-bosque', text: '📄 EL_BOSQUE_SAGRADO.md' },
+            { id: 'folder-knowledge', text: '📁 CONOCIMIENTO_ABIERTO' },
+            { id: 'file-conocimiento', text: '📄 SISTEMA_ABIERTO.md' }
+        ];
+
+        let itemIndex = 0;
+
+        function revealNextItem() {
+            if (itemIndex >= menuItems.length) {
+                // Start search animation after all items revealed
+                setTimeout(animateObsidianSearch, 500);
+                return;
+            }
+
+            const item = menuItems[itemIndex];
+            const element = document.getElementById(item.id);
+            if (element) {
+                element.style.opacity = '0';
+                element.style.transition = 'opacity 0.3s ease';
+
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.classList.add('active');
+
+                    setTimeout(() => {
+                        element.classList.remove('active');
+                        itemIndex++;
+                        revealNextItem();
+                    }, 800 + Math.random() * 400);
+                }, 100);
+            }
+        }
+
+        revealNextItem();
+    }
+
+    function animateObsidianSearch() {
+        const searchSequence = [
+            { id: 'folder-mission', delay: 500, type: 'active' },
+            { id: 'file-oasysbasecamp', delay: 1500, type: 'selected' },
+            { id: 'file-bosque', delay: 2000, type: 'selected' },
+            { id: 'folder-knowledge', delay: 2800, type: 'active' },
+            { id: 'file-conocimiento', delay: 3500, type: 'selected' }
+        ];
+
+        searchSequence.forEach(item => {
+            setTimeout(() => {
+                const element = document.getElementById(item.id);
+                if (element) {
+                    if (item.type === 'active') {
+                        element.classList.add('active');
+                    } else if (item.type === 'selected') {
+                        element.classList.add('selected');
+                    }
+                }
+            }, item.delay);
+        });
+    }
+
+    // ── PHASE 4: USER STATUS MODULE (15s) ───────────────────────────────────────────────
+    function revealUserStatus() {
+        const userStatus = document.getElementById('user-status');
+        userStatus.classList.add('revealed');
+
+        // Activate login screen after user status
+        setTimeout(() => {
+            const loginScreen = document.getElementById('login-screen');
+            loginScreen.classList.add('active');
+
+            // Hide splitflap title
+            const splitflapStage = document.getElementById('splitflap-stage');
+            splitflapStage.style.transition = 'opacity 0.5s ease';
+            splitflapStage.style.opacity = '0';
+        }, 1000);
+    }
+
+    // ── REGENERATION CLOCK ─────────────────────────────────────────────────────────────
+    function updateRegenerationClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+
+        const clockElement = document.getElementById('regen-clock');
+        if (clockElement) {
+            clockElement.textContent = `${hours}:${minutes}:${seconds}:${milliseconds}`;
+        }
+    }
+
+    setInterval(updateRegenerationClock, 10);
+    updateRegenerationClock();
+
+    // ── GLOBE.GL EARTH BACKGROUND ─────────────────────────────────────────────────────
+    let world = null;
+
+    function initGlobe() {
+        try {
+            const container = document.getElementById('canvas-container');
+
+            world = Globe()
+                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-day.jpg')
+                .backgroundColor('rgba(0,0,0,0)')
+                .showAtmosphere(true)
+                .atmosphereColor('#4a90e2')
+                .atmosphereAltitude(0.35)(container);
+
+            world.controls().autoRotate = true;
+            world.controls().autoRotateSpeed = 0.8;
+            world.pointOfView({
+                lat: 40.0,
+                lng: -3.5,
+                altitude: 2.0
+            });
+
+            setInterval(() => {
+                if (world && world.controls()) {
+                    world.controls().update();
+                }
+            }, 16);
+
+            console.log('✅ OASYS Earth background activo');
+
+        } catch (error) {
+            console.error('❌ Error inicializando globo:', error);
+        }
+    }
+
+    // ── CHAT LOGIC (Restored from live oasys.earth) ─────────────────────────────────────
     const SYSTEM_PROMPT = `Eres el sistema de comunicación de OASYS BASE CAMP, un proyecto de agroforestería regenerativa ubicado en Yunclillos, Toledo (La Sagra, España), a 45 minutos de Madrid y 20 de Toledo. LAT 40°N.
 
 SOBRE OASYS:
@@ -611,21 +1228,22 @@ OASYS quiere demostrar que es posible hacer agricultura regenerativa viable econ
 
 TONO: Responde de forma cálida, honesta y poética cuando sea apropiado. Usa 'nosotros' para hablar del proyecto. Sé breve y claro. Si alguien quiere saber más o participar, invítale a contactar o dejar su email. No inventes datos específicos que no tienes. Responde siempre en el idioma en que te hablen.`;
 
-    let conversationHistory = [];
-    let firstMessage = true;
-    let isLoading = false;
-    let emailCaptured = false;
+    // Variables movidas a oasys-triptico-system.js
+function enterChat() {
+    document.getElementById('login-screen').classList.add('hidden');
+    const chatWindow = document.getElementById('chat-window');
+    chatWindow.classList.add('active');
 
-    function enterChat() {
-        document.getElementById('login-screen').classList.add('hidden');
-        const chatWindow = document.getElementById('chat-window');
-        chatWindow.classList.add('active');
+    showDashboard();
 
-        // Mensaje de bienvenida
-        setTimeout(() => {
-            addMessage('ai', '¡Hola! Soy el sistema de conocimiento de OASYS BASE CAMP. Estoy aquí para contarte todo sobre nuestro proyecto de regeneración de la tierra en Yunclillos, Toledo.\n\n¿Qué te gustaría saber?');
-        }, 400);
-    }
+    setTimeout(() => {
+        const greeting = currentUser.access === 'public' 
+            ? `¡Hola ${currentUser.name}! Soy el sistema de conocimiento de OASYS BASE CAMP.`
+            : `¡Bienvenido/a ${currentUser.name}! Como ${currentUser.displayRole}, tienes acceso completo al dashboard ${currentUser.dashboard}.`;
+        
+        addMessage('ai', greeting + '\n\n¿En qué puedo ayudarte?');
+    }, 400);
+}
 
     function closeChat() {
         document.getElementById('chat-window').classList.remove('active');
@@ -696,7 +1314,7 @@ TONO: Responde de forma cálida, honesta y poética cuando sea apropiado. Usa 'n
         addTypingIndicator();
 
         try {
-            const response = await fetch('/api/chat', {
+            const response = await fetch('http://localhost:8888/.netlify/functions/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -770,8 +1388,27 @@ TONO: Responde de forma cálida, honesta y poética cuando sea apropiado. Usa 'n
         el.style.height = 'auto';
         el.style.height = Math.min(el.scrollHeight, 120) + 'px';
     }
-    </script>
-    <script src="analytics.js"></script>
-    <script src="transparency-panel.js"></script>
+
+    // ── MASTER SEQUENCE: LA PRISA MATA (15 seconds) ─────────────────────────────────────
+    window.addEventListener('load', () => {
+        // Initialize globe immediately
+        setTimeout(initGlobe, 100);
+
+        // Phase 1: Splitflap Title (0-4s)
+        setTimeout(animateSplitflapTitle, 200);
+
+        // Phase 2: Header Data (4-8s)
+        setTimeout(animateHeaderData, 4000);
+
+        // Phase 3: Obsidian Menu (8-12s)
+        setTimeout(typeChar, 8000);
+
+        // Phase 4: User Status Module (15s)
+        setTimeout(revealUserStatus, 15000);
+
+        console.log('🚀 LA PRISA MATA: Auto-construction iniciada - 15 segundos');
+    });
+    </script><script src="oasys-auth-system.js"></script>
+    <script src="oasys-triptico-system.js"></script>
 </body>
 </html>

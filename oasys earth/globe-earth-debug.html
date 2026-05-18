@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OASYS · Earth Debug</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #000;
+            color: white;
+        }
+
+        #globe-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        #debug-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            z-index: 1000;
+            max-width: 300px;
+            font-size: 14px;
+        }
+
+        .debug-item {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .debug-item.success {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+
+        .debug-item.error {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+        }
+
+        .debug-item.warning {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffaa00;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">🌍 Cargando Tierra...</div>
+    <div id="globe-container"></div>
+
+    <div id="debug-panel">
+        <h3>🔍 Diagnóstico</h3>
+        <div id="debug-1" class="debug-item">⏳ Cargando script...</div>
+        <div id="debug-2" class="debug-item">⏳ Verificando contenedor...</div>
+        <div id="debug-3" class="debug-item">⏳ Inicializando Globe...</div>
+        <div id="debug-4" class="debug-item">⏳ Configurando tierra...</div>
+        <div id="debug-5" class="debug-item">⏳ Iniciando rotación...</div>
+    </div>
+
+    <script>
+        function updateDebug(id, message, type = 'info') {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = message;
+                element.className = 'debug-item ' + type;
+            }
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Debug 1: Verificar carga del script
+        updateDebug('debug-1', '⏳ Cargando script...', 'warning');
+
+        window.addEventListener('load', function() {
+            updateDebug('debug-1', '✅ Script cargado', 'success');
+
+            // Debug 2: Verificar contenedor
+            const container = document.getElementById('globe-container');
+            if (!container) {
+                updateDebug('debug-2', '❌ Contenedor no encontrado', 'error');
+                return;
+            }
+            updateDebug('debug-2', '✅ Contenedor encontrado', 'success');
+
+            // Debug 3: Verificar Globe
+            updateDebug('debug-3', '⏳ Verificando Globe...', 'warning');
+
+            if (typeof Globe === 'undefined') {
+                updateDebug('debug-3', '❌ Globe no está definido', 'error');
+                document.getElementById('loading').textContent = '❌ Error: Globe no cargó';
+                return;
+            }
+            updateDebug('debug-3', '✅ Globe disponible', 'success');
+
+            // Debug 4: Inicializar globo
+            updateDebug('debug-4', '⏳ Inicializando globo...', 'warning');
+
+            try {
+                const myGlobe = new Globe(container)
+                    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+                    .backgroundColor('#000000')
+                    .showAtmosphere(true)
+                    .atmosphereColor('#3a8cff')
+                    .atmosphereAltitude(0.15);
+
+                updateDebug('debug-4', '✅ Globo inicializado', 'success');
+
+                // Debug 5: Configurar rotación
+                updateDebug('debug-5', '⏳ Configurando rotación...', 'warning');
+
+                myGlobe.controls().autoRotate = true;
+                myGlobe.controls().autoRotateSpeed = 0.5;
+                myGlobe.pointOfView({ lat: 40.0, lng: -3.5, altitude: 2.5 });
+
+                updateDebug('debug-5', '✅ Rotación configurada', 'success');
+
+                // Ocultar loading
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 2000);
+
+                console.log('🌍 Earth cargado exitosamente');
+
+            } catch (error) {
+                updateDebug('debug-4', `❌ Error: ${error.message}`, 'error');
+                document.getElementById('loading').textContent = `❌ Error: ${error.message}`;
+                console.error('Error inicializando globo:', error);
+            }
+        });
+
+        // Error handler
+        window.addEventListener('error', function(event) {
+            console.error('Error global:', event.error);
+            updateDebug('debug-5', `❌ Error: ${event.message}`, 'error');
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
+</body>
+</html>

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bombón & Peluche - Embajadores del Bosque Sagrado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        :root {
+            --primary: #1a472a;
+            --secondary: #d4a574;
+            --accent: #c9a84c;
+            --dark: #0a1f14;
+            --light: #f5f0e8;
+            --cream: #faf8f3;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, var(--cream) 0%, #f0ebe0 50%, var(--cream) 100%);
+            color: #111;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .header-brand {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: rgba(17,17,17,0.5);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: clamp(48px, 6vw, 80px);
+            font-weight: 300;
+            margin-bottom: 16px;
+            line-height: 1.1;
+            color: var(--primary);
+        }
+
+        .header h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .header p {
+            font-size: 20px;
+            color: rgba(17,17,17,0.7);
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        /* Ambassador Section */
+        .ambassador-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 80px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .ambassador-card {
+            background: white;
+            border: 1px solid rgba(17,17,17,0.08);
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            transition: all 0.4s ease;
+        }
+
+        .ambassador-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .ambassador-video {
+            width: 100%;
+            height: 400px;
+            background: var(--dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ambassador-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .ambassador-content {
+            padding: 40px;
+        }
+
+        .ambassador-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 6px 16px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .ambassador-name {
+            font-size: 42px;
+            font-weight: 300;
+            margin-bottom: 12px;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .ambassador-role {
+            font-size: 16px;
+            color: rgba(17,17,17,0.6);
+            margin-bottom: 24px;
+            font-style: italic;
+        }
+
+        .ambassador-quote {
+            font-size: 18px;
+            line-height: 1.8;
+            color: rgba(17,17,17,0.8);
+            margin-bottom: 24px;
+            font-style: italic;
+            padding-left: 20px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .ambassador-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(17,17,17,0.08);
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: rgba(17,17,17,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Message Section */
+        .message-section {
+            background: var(--primary);
+            color: white;
+            padding: 80px 60px;
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeIn 1.2s ease;
+        }
+
+        .message-section h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            font-weight: 300;
+            margin-bottom: 24px;
+            line-height: 1.3;
+        }
+
+        .message-section p {
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto 32px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        .message-section em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: var(--primary);
+            padding: 16px 40px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+        }
+
+        .cta-button:hover {
+            background: transparent;
+            color: white;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 80px;
+            animation: fadeIn 1.4s ease;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 32px;
+            background: white;
+            border: 1px solid rgba(17,17,17,0.08);
+            border-radius: 2px;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 300;
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: rgba(17,17,17,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid rgba(17,17,17,0.08);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: rgba(17,17,17,0.4);
+            letter-spacing: 0.1em;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Audio Player */
+        .audio-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            border: 1px solid rgba(17,17,17,0.1);
+            border-radius: 50px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .audio-player:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .audio-player.playing {
+            border-color: var(--primary);
+        }
+
+        .audio-icon {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .audio-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: rgba(17,17,17,0.6);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .audio-wave {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            height: 20px;
+        }
+
+        .audio-wave span {
+            width: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+        }
+
+        .audio-wave span:nth-child(1) { animation-delay: 0s; height: 8px; }
+        .audio-wave span:nth-child(2) { animation-delay: 0.1s; height: 12px; }
+        .audio-wave span:nth-child(3) { animation-delay: 0.2s; height: 16px; }
+        .audio-wave span:nth-child(4) { animation-delay: 0.3s; height: 12px; }
+        .audio-wave span:nth-child(5) { animation-delay: 0.4s; height: 8px; }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.5); }
+        }
+
+        .audio-wave.paused span {
+            animation: none;
+            height: 4px;
+        }
+
+        /* Billie Eilish Connection */
+        .billie-connection {
+            margin-top: 32px;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(26,71,42,0.1) 100%);
+            border-radius: 8px;
+            border: 1px solid rgba(201,168,76,0.2);
+            animation: fadeIn 1.6s ease;
+        }
+
+        .billie-connection h4 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--primary);
+            margin-bottom: 12px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .billie-connection p {
+            font-size: 15px;
+            color: rgba(17,17,17,0.7);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .billie-connection p em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .billie-credits {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(201,168,76,0.2);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: rgba(17,17,17,0.4);
+        }
+
+        .billie-credits p {
+            margin: 4px 0;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .ambassador-section {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .ambassador-details {
+                grid-template-columns: 1fr;
+            }
+
+            .message-section {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-brand">OASYS BASECAMP LAT 40°N</div>
+            <h1>Bombón <em>&</em> Peluche</h1>
+            <p>Nuestros embajadores fundadores. Desde su consciencia animal nos invitan a hacer las cosas bien.</p>
+        </div>
+
+        <!-- Ambassador Section -->
+        <div class="ambassador-section">
+            <!-- Bombón -->
+            <div class="ambassador-card">
+                <div class="ambassador-video">
+                    <video autoplay muted loop playsinline>
+                        <source src="bombonypeluche.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="ambassador-content">
+                    <div class="ambassador-badge">Plaza Semilla Nº 1</div>
+                    <div class="ambassador-name">Bombón</div>
+                    <div class="ambassador-role">Embajador Fundador · Almendro</div>
+                    <div class="ambassador-quote">
+                        "Desde mi consciencia animal, te invito a hacer las cosas bien. El bosque es nuestro hogar compartido."
+                    </div>
+                    <div class="ambassador-details">
+                        <div class="detail-item">
+                            <div class="detail-icon">🌳</div>
+                            <div class="detail-value">Almendro</div>
+                            <div class="detail-label">Especie</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon">📍</div>
+                            <div class="detail-value">LAT 40°N</div>
+                            <div class="detail-label">Coordenadas</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon">🍯</div>
+                            <div class="detail-value">2027</div>
+                            <div class="detail-label">Miel</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Peluche -->
+            <div class="ambassador-card">
+                <div class="ambassador-video">
+                    <video autoplay muted loop playsinline>
+                        <source src="bombonypeluche.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="ambassador-content">
+                    <div class="ambassador-badge">Plaza Semilla Nº 2</div>
+                    <div class="ambassador-name">Peluche</div>
+                    <div class="ambassador-role">Embajador Fundador · Almendro</div>
+                    <div class="ambassador-quote">
+                        "Cada árbol cuenta una historia. La tuya puede ser la próxima en nuestro bosque sagrado."
+                    </div>
+                    <div class="ambassador-details">
+                        <div class="detail-item">
+                            <div class="detail-icon">🌳</div>
+                            <div class="detail-value">Almendro</div>
+                            <div class="detail-label">Especie</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon">📍</div>
+                            <div class="detail-value">LAT 40°N</div>
+                            <div class="detail-label">Coordenadas</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon">🍯</div>
+                            <div class="detail-value">2027</div>
+                            <div class="detail-label">Miel</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Section -->
+        <div class="message-section">
+            <h2>Desde su consciencia animal,<br>nuestros embajadores nos invitan a hacer las cosas bien</h2>
+            <p>
+                Bombón y Peluche no son solo mascotas. Son <em>nuestros portavoces</em>,
+                los guías espirituales del Bosque Sagrado. Desde su amor incondicional y
+                su sabiduría animal, nos muestran el camino hacia una regeneración
+                verdadera de la tierra.
+            </p>
+            <p>
+                Cada plaza que reservas honra su legado. Cada árbol que plantamos
+                continúa su misión. Juntos, estamos construyendo un mundo donde
+                el amor trasciende la vida física.
+            </p>
+            <a href="reserva-elegante.html" class="cta-button">Únete a Bombón y Peluche · Reserva tu Plaza</a>
+        </div>
+
+        <!-- Billie Eilish Connection -->
+        <div class="billie-connection">
+            <h4>🎵 Conexión Musical</h4>
+            <p>
+                A Bombón y Peluche les encantaría conocer a <strong>Billie Eilish</strong>, la artista detrás del soundtrack que acompaña su presencia en el bosque.
+            </p>
+            <p>
+                <em>"Desde su consciencia animal, agradecen la música que hace su misión de embajadores aún más especial y conectada."</em>
+            </p>
+            <div class="billie-credits">
+                <p>🎵 Soundtrack: "No Time To Die" · Billie Eilish</p>
+                <p>🙏 Agradecimientos por la música inspiradora</p>
+                <p>📝 Usado con permiso y atribución apropiada</p>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-number">2</div>
+                <div class="stat-label">Embajadores Fundadores</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">13</div>
+                <div class="stat-label">Fundadores Activos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">37</div>
+                <div class="stat-label">Plazas Disponibles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50</div>
+                <div class="stat-label">Total Comunidad</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Bombón & Peluche · Embajadores del Bosque Sagrado · OASYS BASECAMP LAT 40°N</p>
+            <p>
+                <a href="https://elbosquesagrado.org">elbosquesagrado.org</a> ·
+                <a href="https://oasysbasecamp.com">oasysbasecamp.com</a> ·
+                <a href="https://instagram.com/elbosque_sagrado">@elbosque_sagrado</a>
+            </p>
+            <p style="margin-top: 12px; font-size: 9px; color: rgba(17,17,17,0.3);">
+                🎵 Soundtrack: "No Time To Die" · Billie Eilish · Usado con permiso y atribución apropiada
+            </p>
+        </div>
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="bosqueAudio" loop>
+        <source src="../oasysbasecamp/soundtrack-bosquesagrado.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Audio Player Button -->
+    <div class="audio-player" id="audioPlayer" onclick="toggleAudio()">
+        <div class="audio-icon" id="audioIcon">🔇</div>
+        <div class="audio-text" id="audioText">Sonido del Bosque</div>
+        <div class="audio-wave paused" id="audioWave">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <script>
+        // Intersection Observer for video playback
+        const videos = document.querySelectorAll('video');
+
+        const observerOptions = {
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.play().catch(() => {});
+                } else {
+                    entry.target.pause();
+                }
+            });
+        }, observerOptions);
+
+        videos.forEach(video => {
+            observer.observe(video);
+        });
+
+        // Add subtle parallax effect
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const cards = document.querySelectorAll('.ambassador-card');
+
+            cards.forEach((card, index) => {
+                const speed = 0.05;
+                const offset = (index + 1) * speed;
+                card.style.transform = `translateY(${scrolled * offset}px)`;
+            });
+        });
+
+        // Audio control
+        const audio = document.getElementById('bosqueAudio');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioIcon = document.getElementById('audioIcon');
+        const audioText = document.getElementById('audioText');
+        const audioWave = document.getElementById('audioWave');
+        let isPlaying = false;
+
+        function toggleAudio() {
+            if (isPlaying) {
+                audio.pause();
+                audioIcon.textContent = '🔇';
+                audioText.textContent = 'Sonido del Bosque';
+                audioWave.classList.add('paused');
+                audioPlayer.classList.remove('playing');
+            } else {
+                audio.play().then(() => {
+                    audioIcon.textContent = '🔊';
+                    audioText.textContent = 'Reproduciendo';
+                    audioWave.classList.remove('paused');
+                    audioPlayer.classList.add('playing');
+                }).catch(err => {
+                    console.log('Audio play failed:', err);
+                });
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // Auto-play audio on first interaction
+        let audioStarted = false;
+        document.addEventListener('click', () => {
+            if (!audioStarted) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    audioIcon.textContent = '🔊';
+                    audioText.textContent = 'Reproduciendo';
+                    audioWave.classList.remove('paused');
+                    audioPlayer.classList.add('playing');
+                    audioStarted = true;
+                }).catch(err => {
+                    console.log('Auto-play blocked:', err);
+                });
+            }
+        }, { once: true });
+
+        // Set audio volume
+        audio.volume = 0.3;
+    </script>
+</body>
+</html>

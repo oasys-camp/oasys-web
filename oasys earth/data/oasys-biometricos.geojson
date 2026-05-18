@@ -1,0 +1,139 @@
+{
+  "description": "Datos biométricos de los nodos de la red OASYS",
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [-3.8, 40],
+        "type": "Point"
+      },
+      "properties": {
+        "area_ha": 3.47,
+        "biodiversity_index": 0.85,
+        "biomass_tons": 1250.5,
+        "carbon_sequestration_tons": 450.2,
+        "established_date": "2024-01-15",
+        "name": "LAT 40°N",
+        "node_id": "lat40n",
+        "soil_health_score": 0.92,
+        "status": "active",
+        "tree_count": 2450,
+        "type": "pilot",
+        "water_retention_m3": 8500
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [-3.81, 39.99],
+          [-3.79, 39.99],
+          [-3.79, 40.01],
+          [-3.81, 40.01],
+          [-3.81, 39.99]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "area_ha": 1.5,
+        "available_plazas": 37,
+        "avg_tree_age_years": 3,
+        "community_engagement": 0.78,
+        "founder_count": 13,
+        "memorial_stories": 13,
+        "name": "El Bosque Sagrado",
+        "node_id": "bsg",
+        "species_diversity": 8,
+        "status": "active",
+        "tree_count": 50,
+        "type": "memorial"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [-3.795, 40.005],
+        "type": "Point"
+      },
+      "properties": {
+        "capacity_tons_per_year": 50,
+        "certification_date": "2024-03-01",
+        "compliance_ce1069": true,
+        "environmental_impact": 0.91,
+        "name": "Proyecto SEMILLA",
+        "node_id": "semilla",
+        "processing_efficiency": 0.94,
+        "safety_score": 0.98,
+        "status": "operational",
+        "type": "biotransformation"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [-3.8, 40],
+          [-3.5, 41],
+          [-4, 39.5],
+          [-3.2, 40.5],
+          [-4.2, 40.2]
+        ],
+        "type": "MultiPoint"
+      },
+      "properties": {
+        "coverage_km2": 2500,
+        "expansion_phase": 2,
+        "interconnectivity": 0.65,
+        "name": "Earth Mission Network",
+        "node_id": "earth",
+        "planned_nodes": 15,
+        "status": "expanding",
+        "target_year": 2030,
+        "total_nodes": 5,
+        "type": "network"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [-3.8, 40],
+          [-3.795, 40.005]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "capacity_m3_per_day": 2.5,
+        "connection_type": "pipeline",
+        "distance_m": 550,
+        "installation_date": "2024-02-20",
+        "maintenance_interval_days": 90,
+        "name": "Conexión LAT40N-SEMILLA",
+        "node_id": "connection_1",
+        "status": "active",
+        "type": "infrastructure"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [-3.802, 39.998],
+        "type": "Point"
+      },
+      "properties": {
+        "expansion_capability": 8,
+        "installation_date": "2024-01-20",
+        "modular_type": "NODO-Standard",
+        "modules_count": 4,
+        "name": "NODO Infraestructura",
+        "node_id": "nodo",
+        "power_consumption_kw": 15,
+        "status": "operational",
+        "total_capacity_m3": 150,
+        "type": "modular"
+      },
+      "type": "Feature"
+    }
+  ],
+  "name": "OASYS Biométricos",
+  "type": "FeatureCollection"
+}

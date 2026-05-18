@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OASYS · Earth Alternative</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #globe-container {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="globe-container"></div>
+
+    <!-- Try different CDN -->
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script>
+        console.log('Script cargado desde unpkg');
+
+        setTimeout(function() {
+            if (typeof Globe !== 'undefined') {
+                console.log('Globe disponible');
+
+                try {
+                    const myGlobe = new Globe(document.getElementById('globe-container'))
+                        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+                        .backgroundColor('#000000')
+                        .showAtmosphere(true)
+                        .atmosphereColor('#3a8cff');
+
+                    myGlobe.controls().autoRotate = true;
+                    myGlobe.controls().autoRotateSpeed = 0.5;
+                    myGlobe.pointOfView({ lat: 40.0, lng: -3.5, altitude: 2.5 });
+
+                    console.log('✅ Globo creado exitosamente');
+                } catch (error) {
+                    console.error('❌ Error:', error);
+                }
+            } else {
+                console.error('❌ Globe no está disponible');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

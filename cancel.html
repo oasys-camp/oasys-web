@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Cancelado | OASYS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark: #060d08;
+            --teal: #00D4AA;
+            --gold: #C9A84C;
+            --cream: #F5F0E8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--dark);
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--cream);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .cancel-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            opacity: 0.6;
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            color: rgba(245,240,232,0.7);
+            margin-bottom: 20px;
+            letter-spacing: 0.1em;
+        }
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            color: var(--gold);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        .message {
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(245,240,232,0.8);
+            margin-bottom: 40px;
+        }
+        .plaza-info {
+            background: rgba(201,168,76,0.1);
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .plaza-info h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+        .plaza-info p {
+            font-size: 12px;
+            margin: 8px 0;
+            color: rgba(245,240,232,0.7);
+        }
+        .plaza-info strong {
+            color: var(--teal);
+        }
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            border: 1px solid var(--teal);
+            background: transparent;
+            color: var(--teal);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .btn:hover {
+            background: var(--teal);
+            color: var(--dark);
+        }
+        .btn.primary {
+            background: var(--teal);
+            color: var(--dark);
+        }
+        .btn.primary:hover {
+            background: rgba(0,212,170,0.8);
+        }
+        .btn.secondary {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .btn.secondary:hover {
+            background: var(--gold);
+            color: var(--dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cancel-icon">🍃</div>
+        <h1>PAGO CANCELADO</h1>
+        <p class="subtitle">Tu plaza sigue disponible</p>
+
+        <div class="plaza-info">
+            <h3>PLAZA DISPONIBLE</h3>
+            <p><strong>Plaza:</strong> <span id="plaza-number">--</span></p>
+            <p>La plaza sigue disponible para reservar cuando estés listo.</p>
+        </div>
+
+        <p class="message">
+            Entendemos que necesitas más tiempo para tomar esta decisión.
+            Tu plaza sigue disponible y podrás completar la reserva cuando lo desees.
+        </p>
+
+        <div class="actions">
+            <a href="/" class="btn primary">VOLVER A OASYS.EARTH</a>
+            <a href="https://oasysbasecamp.com" target="_blank" class="btn secondary">MÁS INFORMACIÓN</a>
+        </div>
+    </div>
+
+    <script>
+        // Get plaza number from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const plazaNumber = urlParams.get('plaza');
+
+        if (plazaNumber) {
+            document.getElementById('plaza-number').textContent = plazaNumber;
+
+            // Track cancelled payment
+            if (window.gtag) {
+                gtag('event', 'begin_checkout', {
+                    items: [{
+                        item_id: plazaNumber,
+                        item_name: `Plaza BSG #${plazaNumber}`,
+                        quantity: 1
+                    }]
+                });
+            }
+        }
+
+        // Release plaza reservation
+        if (plazaNumber) {
+            fetch('/api/release-plaza', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plaza_number: plazaNumber })
+            }).catch(error => {
+                console.error('Error releasing plaza:', error);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OASYS · Earth Beautiful</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #globe-container {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="globe-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
+    <script>
+        console.log('Iniciando versión beautiful...');
+
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                try {
+                    const container = document.getElementById('globe-container');
+
+                    // Crear globo con imagen de NASA (permite CORS)
+                    const myGlobe = new Globe(container)
+                        .globeImageUrl('https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Solarsystemscope_texture_2k_earth_daymap.jpg/1024px-Solarsystemscope_texture_2k_earth_daymap.jpg')
+                        .backgroundColor('#000510')
+                        .showAtmosphere(true)
+                        .atmosphereColor('#00d4ff')
+                        .atmosphereAltitude(0.25)
+                        .atmosphereCoef(0.8);
+
+                    // Configurar rotación
+                    myGlobe.controls().autoRotate = true;
+                    myGlobe.controls().autoRotateSpeed = 0.8;
+                    myGlobe.pointOfView({ lat: 40.0, lng: -3.5, altitude: 2.0 });
+
+                    console.log('✅ Globo beautiful creado');
+
+                } catch (error) {
+                    console.error('❌ Error:', error);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

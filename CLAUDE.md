@@ -1,95 +1,111 @@
-# CLAUDE.md — OASYS Base Camp
-> Instrucciones de orquestación para Claude Code en el repo `oasys-web`.
-> Este archivo se lee automáticamente al arrancar cada sesión.
+# OASYS-WEB · REPOSITORIO DE PRODUCCIÓN
+# Scope: Deploy y publicación únicamente
+# Cerebro: C:\Users\amyus\Desktop\amyuste\el oasys\OASYS_MASTER.html
 
 ---
 
-## 1. Contexto del Proyecto
+## PROTOCOLO DE ARRANQUE
 
-- **Repo**: `oasys-camp/oasys-web` (GitHub) → auto-deploy en Netlify
-- **Sites**: `elbosquesagrado.org` (BSG) · `oasysbasecamp.com` (landing)
-- **Backend**: Supabase (proyecto `oasys-bsg`, región West EU)
-- **Stack**: HTML/CSS/JS vanilla · Netlify Forms · Supabase JS client
-- **Admin único**: Leonardo Muñoz Pérez (NO Antonio en ningún doc institucional)
-- **Rama principal**: `main` → cualquier push despliega en producción
+**PASO 1 — Verifica contexto**
+```bash
+pwd  # Debe ser: C:\Users\amyus\Documents\oasys-web
+git remote -v  # Debe mostrar: github.com/oasys-camp/oasys-web.git
+```
 
----
+**PASO 2 — Verifica git status**
+```bash
+git status
+```
+Si hay cambios sin commitear de sesiones anteriores: PARA y pregunta a Antonio qué hacer.
 
-## 2. Modo Planificación por Defecto
+**PASO 3 — Confirma sites activos**
+Este repo despliega a:
+- elbosquesagrado.org (desde `bsg/`)
+- oasysbasecamp.com (desde raíz o carpeta específica)
+- oasys.camp (desde `oasys.camp/`)
+- oasys.earth (desde `oasys.earth/` o raíz)
 
-- Entra en modo planificación para **CUALQUIER** tarea no trivial (más de 3 pasos o decisiones arquitectónicas).
-- Si algo sale mal, **PARA** y vuelve a planificar; no sigas forzando.
-- Usa el modo planificación también para los pasos de verificación, no solo para la construcción.
-- Escribe especificaciones detalladas por adelantado para reducir la ambigüedad.
-
----
-
-## 3. Estrategia de Subagentes
-
-- Usa subagentes con frecuencia para mantener limpia la ventana de contexto principal.
-- Delega investigación, exploración y análisis paralelo a subagentes.
-- Para problemas complejos, dedica más capacidad de cómputo mediante subagentes.
-- Una tarea por subagente para ejecución focalizada.
+Cualquier cambio aquí afecta producción directamente vía Netlify.
 
 ---
 
-## 4. Bucle de Automejora
+## ROL DE ESTE REPO
 
-- Tras **CUALQUIER** corrección: actualiza `tasks/lessons.md` con el patrón aprendido.
-- Escribe reglas que eviten el mismo error en el futuro.
-- Revisa `tasks/lessons.md` al inicio de cada sesión.
+Este directorio contiene **exclusivamente versiones FINALES** listas para publicación.
 
----
+**El desarrollo e iteración ocurren en:**
+`C:\Users\amyus\Desktop\amyuste\el oasys\`
 
-## 5. Verificación antes de Finalizar
+**Aquí solo llegan versiones probadas y aprobadas por Antonio.**
 
-- Nunca marques una tarea como completada sin demostrar que funciona.
-- Pregúntate: *"¿Aprobaría esto un Staff Engineer?"*
-- Ejecuta tests, comprueba logs y demuestra la corrección del código.
-- Para cambios en Supabase: verifica RLS, políticas anon y service key antes de mergear.
+**No tomes decisiones de producto aquí. Ejecuta. Reporta.**
 
 ---
 
-## 6. Exige Elegancia (Equilibrado)
+## SITES BAJO GESTIÓN
 
-- Para cambios no triviales: pausa y pregunta *"¿hay una forma más elegante?"*
-- Si un arreglo parece un parche: *"Sabiendo todo lo que sé ahora, implementa la solución elegante."*
-- Omite esto para arreglos simples y obvios. No hagas sobreingeniería.
-
----
-
-## 7. Corrección de Errores Autónoma
-
-- Cuando recibas un informe de error: arréglalo directamente. No pidas que te lleven de la mano.
-- Identifica logs, errores o tests que fallan y resuélvelos.
-- Ve a arreglar los tests de CI que fallan sin que te digan cómo.
+- `elbosquesagrado.org` → Netlify (vocal-sorbet-32e7da)
+- `oasysbasecamp.com`
+- `oasys.camp`
 
 ---
 
-## 8. Gestión de Tareas
+## REGLAS DE ESTE REPO
 
-1. **Planificar primero** — escribe el plan en `tasks/todo.md` con elementos verificables.
-2. **Verificar plan** — confirma antes de comenzar la implementación.
-3. **Seguir el progreso** — marca elementos como completados a medida que avances.
-4. **Explicar cambios** — resumen de alto nivel en cada paso.
-5. **Documentar resultados** — añade sección de revisión a `tasks/todo.md`.
-6. **Capturar lecciones** — actualiza `tasks/lessons.md` después de cada corrección.
+### 1. Analytics — NUNCA tocar
+```html
+<!-- GA4 -->
+G-NMC1GS2WDW
+<!-- GTM -->
+GTM-5T2LL98X
+```
+Cualquier deploy debe verificar que estos IDs están presentes y activos.
+
+### 2. Design system — respetar siempre
+```
+Colores:  #060d08 (dark) · #00D4AA (teal) · #C9A84C (gold) · #F5F0E8 (cream)
+Fuentes:  Orbitron (títulos) · Cormorant Garamond (texto) · IBM Plex Mono (datos)
+```
+
+### 3. Lenguaje web — reglas estrictas
+- Identidad geográfica: "en el corazón de La Sagra toledana, a 45 min de Madrid y 20 de Toledo"
+- Nunca: "único en España" en primera comunicación
+- Nunca: lenguaje mortuorio/memorial — centrar en vida, regeneración, comunidad
+- BSG: El Bosque Sagrado · proceso = "biotransformación aerobia CE 1069/2009"
+- NODO: ante cualquier institución = "instalación modular desmontable · almacén agrícola"
+
+### 4. Titular institucional
+- Toda facturación, contratos, formularios web → **Leonardo Muñoz Pérez**
+- IBAN BSG: ES16 3081 0151 9650 0081 2750
+- Concepto transferencia BSG: "SEMILLA + nombre del animal"
 
 ---
 
-## 9. Principios Fundamentales
+## DEPLOY CHECKLIST (antes de cualquier push a producción)
 
-- **Simplicidad primero** — cada cambio debe ser lo más simple posible. Afecta al mínimo código necesario.
-- **Sin pereza** — encuentra las causas raíz. Nada de arreglos temporales. Estándares de desarrollador senior.
-- **Impacto mínimo** — los cambios solo deben tocar lo necesario. Evita introducir errores secundarios.
+- [ ] GA4 `G-NMC1GS2WDW` presente
+- [ ] GTM `GTM-5T2LL98X` presente  
+- [ ] Sin referencias a Antonio Muñoz Yuste en HTML público
+- [ ] Design system respetado (colores y fuentes)
+- [ ] Log actualizado en `../vault/04_LOGS/YYYY-MM-DD.md`
+- [ ] Si hay cambios en copy → confirmar con Antonio antes de deploy
 
 ---
 
-## 10. Reglas Críticas para Este Repo
+## ASSETS MULTIMEDIA
 
-- `.env` **NUNCA** sube a GitHub (ya en `.gitignore`).
-- La **anon key** de Supabase va en `.env`, nunca hardcodeada en el código.
-- La **service role key** es solo para scripts de migración locales, nunca en frontend.
-- Antes de cualquier push a `main`: verificar que no hay credenciales expuestas en el diff.
-- Formulario BSG: el campo `tipo` de `bsg_plazas` usa el valor `'libre'` (no null, no vacío).
-- RLS de Supabase: política anon permite `SELECT` en `bsg_plazas`; `INSERT`/`UPDATE` solo autenticado.
+- Video hero: MP4 6MB (Blob URL via `URL.createObjectURL()`)
+- Audio: MP3 continuo en navegación hero
+- Imágenes: base64 en HTML standalone cuando sea necesario
+
+---
+
+## DESPUÉS DE CADA TAREA
+
+1. Log en `../vault/04_LOGS/YYYY-MM-DD.md`
+2. Si afecta a contenido/estructura → marcar `⚡ PENDIENTE SYNC Claude.ai`
+3. Graveyard solo para componentes completos reemplazados
+
+---
+
+*Scope limitado a frontend. Para el cuadro completo: CLAUDE.md raíz + OASYS_MASTER.html*

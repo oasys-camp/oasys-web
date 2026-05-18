@@ -48,7 +48,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': 'https://oasys.earth',
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST',
         'Access-Control-Allow-Headers': 'Content-Type'
       },
@@ -79,20 +79,20 @@ exports.handler = async (event) => {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001', // Haiku: rápido y económico para chat público
+        model: 'claude-haiku-4-5', // Haiku: rápido y económico para chat público
         max_tokens: 600,
         system: SYSTEM_PROMPT,
         messages: safeMessages
       })
     });
 
-    const data = await response.json();
+    const data = await response.json(); console.log('--- RESPUESTA ANTHROPIC ---', JSON.stringify(data));
 
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://oasys.earth'
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify(data)
     };

@@ -1,0 +1,176 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   OASYS.EARTH · ESTILOS DE IDENTIFICACIÓN Y DASHBOARD
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── IDENTIFICATION FORM ──────────────────────────────────────────────────── */
+.identification-form {
+    max-width: 420px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.form-header {
+    margin-bottom: 32px;
+}
+
+.form-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: var(--teal);
+    margin-bottom: 12px;
+}
+
+.form-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-style: italic;
+    color: rgba(245,240,232,0.5);
+    line-height: 1.5;
+}
+
+.form-field {
+    margin-bottom: 24px;
+}
+
+.form-field label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: rgba(245,240,232,0.4);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.form-field input,
+.form-field select {
+    width: 100%;
+    background: rgba(0,212,170,0.04);
+    border: 1px solid rgba(0,212,170,0.2);
+    border-radius: 3px;
+    padding: 12px 16px;
+    color: var(--cream);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+    border-color: var(--teal);
+    background: rgba(0,212,170,0.08);
+}
+
+.form-field input::placeholder {
+    color: rgba(245,240,232,0.2);
+}
+
+.form-field select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%2300D4AA' stroke-width='2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.form-field select option {
+    background: var(--dark);
+    color: var(--cream);
+}
+
+/* ── METRICS SIDEBAR ──────────────────────────────────────────────────────── */
+.metrics-sidebar {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(6,13,8,0.85);
+    border: 1px solid rgba(0,212,170,0.15);
+    border-radius: 4px;
+    padding: 20px;
+    min-width: 200px;
+    max-width: 240px;
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(20px, -50%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(0, -50%);
+    }
+}
+
+.metrics-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--teal);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,212,170,0.2);
+}
+
+.metrics-title-small {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 12px;
+    margin-top: 8px;
+}
+
+.metrics-divider {
+    height: 1px;
+    background: rgba(0,212,170,0.1);
+    margin: 16px 0;
+}
+
+.metric {
+    margin-bottom: 14px;
+}
+
+.metric-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: rgba(245,240,232,0.4);
+    margin-bottom: 4px;
+}
+
+.metric-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 0.05em;
+}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .identification-form {
+        max-width: 100%;
+        padding: 0 20px;
+    }
+    
+    .metrics-sidebar {
+        right: 12px;
+        min-width: 160px;
+        padding: 14px;
+    }
+    
+    .metric-value {
+        font-size: 14px;
+    }
+}
