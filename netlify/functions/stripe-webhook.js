@@ -92,7 +92,7 @@ async function handleCheckoutCompleted(session) {
         fecha_reserva: new Date().toISOString(),
         stripe_session_id: session.id
       })
-      .eq('stripe_session_id', session.id)
+      .eq('numero_plaza', parseInt(plazaNumber))
       .select()
       .single();
 
