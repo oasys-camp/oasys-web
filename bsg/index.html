@@ -1115,18 +1115,35 @@ function initiateStripeCheckout() {
     currency: 'EUR'
   });
 
-  // Simulate Stripe checkout (replace with actual implementation)
-  setTimeout(function() {
-    // Here you would call your Stripe checkout function
-    // For example: createStripeCheckoutSession(selectedPaymentMethod);
-
-    // Reset button for demo
+  var g = function(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  var formData = {
+    nombre: g('nombre'), nif: g('nif'), domicilio: g('domicilio'),
+    email: g('email'), telefono: g('telefono'), mascota: g('mascota'),
+    especie_raza: g('especie_mascota'), especie_arbol: g('especie'),
+    payment_method: selectedPaymentMethod
+  };
+  if (!formData.nombre || !formData.email || !formData.mascota || !formData.nif) {
+    alert('Completa los campos obligatorios: nombre, email, NIF y mascota.');
     ctaButton.textContent = originalText;
     ctaButton.disabled = false;
-
-    // Show success message (in production, this would redirect to Stripe)
-    alert('¡Demo: Iniciando checkout con ' + selectedPaymentMethod + '!\n\nEn producción, esto redirigiría a Stripe para procesar el pago de 450,00€.');
-  }, 1500);
+    return;
+  }
+  fetch('/.netlify/functions/create-checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.url) { window.location.href = data.url; }
+    else { throw new Error(data.error || 'Sin URL de checkout'); }
+  })
+  .catch(function(err) {
+    console.error('Stripe error:', err);
+    ctaButton.textContent = originalText;
+    ctaButton.disabled = false;
+    showGraciasOverlay(formData);
+  });
 }
 
 // Initialize first payment method as selected
