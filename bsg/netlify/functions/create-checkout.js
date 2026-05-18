@@ -56,7 +56,7 @@ exports.handler = async (event, context) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `${process.env.SITE_URL}/bsg/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.SITE_URL}/bsg/success.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.SITE_URL}/#reserva`,
       customer_email: data.email,
       metadata: {
