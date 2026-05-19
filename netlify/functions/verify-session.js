@@ -49,9 +49,9 @@ exports.handler = async (event, context) => {
     // Get plaza details from metadata
     const plazaNumber = session.metadata.plaza_number;
     const nif = session.metadata.nif;
-    const fullName = session.metadata.full_name;
-    const treeType = session.metadata.tree_type;
-    const animalType = session.metadata.animal_type;
+    const fullName = session.metadata.nombre;
+    const treeType = session.metadata.especie_arbol;
+    const animalType = session.metadata.especie_raza;
 
     // Get plaza details from Supabase
     const { data: plaza, error: plazaError } = await supabase
@@ -76,11 +76,11 @@ exports.handler = async (event, context) => {
         full_name: fullName,
         tree_type: treeType,
         animal_type: animalType,
-        payment_date: plaza.payment_date || session.created,
+        payment_date: plaza.fecha_reserva || (session.created * 1000),
         amount: session.amount_total / 100,
         currency: session.currency,
         customer_email: session.customer_email || session.customer_details?.email,
-        status: plaza.status
+        status: plaza.tipo
       })
     };
 

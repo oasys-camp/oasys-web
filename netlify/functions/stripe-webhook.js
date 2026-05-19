@@ -68,12 +68,12 @@ async function handleCheckoutCompleted(session) {
   // Extract BSG-specific metadata
   const plazaNumber = metadata.plaza_number;
   const nif = metadata.nif;
-  const fullName = metadata.full_name;
-  const treeType = metadata.tree_type;
-  const animalType = metadata.animal_type;
-  const petName = metadata.pet_name;
-  const phone = metadata.phone;
-  const message = metadata.message;
+  const fullName = metadata.nombre;
+  const treeType = metadata.especie_arbol;
+  const animalType = metadata.especie_raza;
+  const petName = metadata.mascota;
+  const phone = metadata.telefono;
+  const message = metadata.mensaje;
 
   try {
     // 1. Actualizar plaza en Supabase con columnas reales del schema
