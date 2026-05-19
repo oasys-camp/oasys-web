@@ -1,0 +1,62 @@
+Ejecuta este script Python desde la raíz del repo C:\Users\amyus\Documents\oasys-web
+
+python -c "
+import re
+
+# FIX 1: stripe-webhook.js
+with open('netlify/functions/stripe-webhook.js', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+content = content.replace(
+    'const fullName = metadata.full_name;',
+    'const fullName = metadata.nombre;'
+).replace(
+    'const treeType = metadata.tree_type;',
+    'const treeType = metadata.especie_arbol;'
+).replace(
+    'const animalType = metadata.animal_type;',
+    'const animalType = metadata.especie_raza;'
+).replace(
+    'const petName = metadata.pet_name;',
+    'const petName = metadata.mascota;'
+).replace(
+    'const phone = metadata.phone;',
+    'const phone = metadata.telefono;'
+).replace(
+    'const message = metadata.message;',
+    'const message = metadata.mensaje;'
+)
+
+with open('netlify/functions/stripe-webhook.js', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print('stripe-webhook.js OK')
+
+# FIX 2: verify-session.js
+with open('netlify/functions/verify-session.js', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+content = content.replace(
+    'const fullName = session.metadata.full_name;',
+    'const fullName = session.metadata.nombre;'
+).replace(
+    'const treeType = session.metadata.tree_type;',
+    'const treeType = session.metadata.especie_arbol;'
+).replace(
+    'const animalType = session.metadata.animal_type;',
+    'const animalType = session.metadata.especie_raza;'
+).replace(
+    'status: plaza.status,',
+    'status: plaza.tipo,'
+).replace(
+    'payment_date: plaza.payment_date || session.created,',
+    'payment_date: plaza.fecha_reserva || (session.created * 1000),'
+)
+
+with open('netlify/functions/verify-session.js', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print('verify-session.js OK')
+"
+
+Después muéstrame el output del script.
